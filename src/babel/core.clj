@@ -6,7 +6,7 @@
 
 
 
-(defn print-side-effect
+(defn instrument-after-each
   [handler]
   (fn [inp-message]
     (do
