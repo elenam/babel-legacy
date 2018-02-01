@@ -4,21 +4,13 @@
          '[clojure.spec.test.alpha :as stest])
 
 
-(def counter (atom 0))
+(def counter (atom []))
 
 (defn instrument-after-each
   [handler]
   (fn [inp-message]
     (do
-      (stest/instrument)
-      (swap! counter (fn [nope] (identity
-        {:str (str inp-message)
-        :class (class inp-message)
-        :identity (assoc inp-message :sumin 5)})))
-      #_(print @counter)
-      (print   inp-message)
-      (print "")
-      (handler  inp-message))))
+      (handler inp-message ))))
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
         {:requires #{}
