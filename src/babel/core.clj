@@ -4,18 +4,19 @@
          '[clojure.spec.test.alpha :as stest])
 
 
-(def counter (atom []))
+(def counter (atom 0))
 
 (defn instrument-after-each
   [handler]
   (fn [inp-message]
-    (do
-      (handler inp-message ))))
+    (let [resp (handler inp-message)]
+      (do
+        (swap! counter (fn [prev] (class resp)))
+        resp))))
 
-(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
-        {:requires #{}
-         :expects #{"eval"}
-         :handles {}})
+
+#_(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
+        {:expects #{} :requires {} :handles {}})
 
 
 ;;the below are just debug things
