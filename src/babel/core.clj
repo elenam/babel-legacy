@@ -1,28 +1,34 @@
-(ns babel.core)
-(require '[clojure.tools.nrepl :as repl]
-         '[clojure.spec.alpha :as s]
-         '[clojure.spec.test.alpha :as stest])
+(ns babel.core
+(:require [clojure.tools.nrepl :as repl]
+         [clojure.spec.alpha :as s]
+         [clojure.spec.test.alpha :as stest]
+         [clojure.tools.nrepl.transport :as t])
+(:import clojure.tools.nrepl.transport.Transport))
 
 
-(def counter (atom 0))
-(def out-watcher (atom 0))
-(def out-keeper (atom 0))
-(def inp-watcher (atom 0))
-(def inp-keeper (atom 0))
+(def last-message-rollover (atom nil))
+(def last-message (atom nil))
+(def last-response (atom nil))
+(def last-response-rollover (atom nil))
 
 (defn instrument-after-each
   [handler]
   (fn [inp-message]
-    (do
-      (swap! inp-keeper (fn [prev] (identity @inp-watcher)))
-      (swap! inp-watcher (fn [prev] (identity inp-message)))
-    (let [resp (handler inp-message)]
+    (let [transport (inp-message :transport)]
       (do
-        (swap! out-keeper (fn [prev] (identity @out-watcher)))
-        (swap! out-watcher (fn [prev] (identity resp )))
-      resp)))))
+        (swap! last-message (fn [prev] (identity @last-message-rollover)))
+        (swap! last-message-rollover (fn [prev] (identity inp-message)))
+        (handler (assoc inp-message :transport
+          (reify Transport
+            (recv [this] (.recv transport))
+            (recv [this timeout] (.recv transport timeout))
+            (send [this msg] (do
+              (swap! last-response (fn [prev] (identity @last-response-rollover)))
+              (swap! last-response-rollover (fn [prev] (identity msg)))
+              (.send transport msg))))))))))
 
-#_(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
+
+(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
         {:expects #{"eval"} :requires #{} :handles {}})
 
 
