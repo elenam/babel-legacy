@@ -2,7 +2,8 @@
 (:require [clojure.tools.nrepl :as repl]
          [clojure.spec.alpha :as s]
          [clojure.spec.test.alpha :as stest]
-         [clojure.tools.nrepl.transport :as t])
+         [clojure.tools.nrepl.transport :as t]
+         [clojure.tools.nrepl.middleware.pr-values :as prv])
 (:import clojure.tools.nrepl.transport.Transport))
 
 
@@ -10,6 +11,13 @@
 (def last-message (atom nil))
 (def last-response (atom nil))
 (def last-response-rollover (atom nil))
+(def touch-errors (atom false))
+
+(defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
+  [inp-message]
+    (if (contains? inp-message :err)
+        (assoc inp-message :err (str (inp-message :err) " -sorry!"))
+        inp-message))
 
 (defn instrument-after-each
   [handler]
@@ -25,11 +33,16 @@
             (send [this msg] (do
               (swap! last-response (fn [prev] (identity @last-response-rollover)))
               (swap! last-response-rollover (fn [prev] (identity msg)))
-              (.send transport (assoc msg :value "sadface")))))))))))
+              (.send transport (modify-errors msg)))))))))))
+
+(defn ex-trap []
+  (try (/ 8 0)
+      (catch Exception e (identity e))))
+
 
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
-        {:expects #{"eval"} :requires #{} :handles {}})
+        {:expects #{prv/pr-values} :requires #{} :handles {}})
 
 
 ;;the below are just debug things
