@@ -25,7 +25,7 @@
             (send [this msg] (do
               (swap! last-response (fn [prev] (identity @last-response-rollover)))
               (swap! last-response-rollover (fn [prev] (identity msg)))
-              (.send transport msg))))))))))
+              (.send transport (assoc msg :value "sadface")))))))))))
 
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
