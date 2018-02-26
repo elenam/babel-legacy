@@ -12,11 +12,14 @@
 (def last-response (atom nil))
 (def last-response-rollover (atom nil))
 (def touch-errors (atom false))
+(def last-error (atom false))
 
 (defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
   [inp-message]
     (if (contains? inp-message :err)
-        (assoc inp-message :err (str (inp-message :err) " -sorry!"))
+        (do
+          (swap! last-error (fn [prev] (inp-message :err)))
+          (assoc inp-message :err (str (inp-message :err) " -sorry!\n")))
         inp-message))
 
 (defn instrument-after-each
@@ -42,7 +45,7 @@
 
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
-        {:expects #{prv/pr-values} :requires #{} :handles {}})
+        {:expects #{} :requires #{prv/pr-values} :handles {}})
 
 
 ;;the below are just debug things
