@@ -22,6 +22,30 @@
           (assoc inp-message :err (str (inp-message :err) " -sorry!\n")))
         inp-message))
 
+(defn modify-numbers "takes a nREPL response, and returns a message with any number literals incremented"
+  [inp-message]
+    (if (contains? inp-message :value)
+        (do
+          (swap! last-error (fn [prev] (inp-message :value)))
+          (assoc inp-message :value #(if (number? %) (inc %) %)))
+        inp-message))
+
+#_(defn mess-with-messages
+  [inp-message]
+    (if (contains? inp-message :value)
+        (let [target-val (inp-message :value)]
+          (assoc inp-message :value
+          (if (number? target-val)
+              (inc target-val)
+              (if (string? target-val)
+                  (str target-val "kipper")
+                  target-val))))))
+
+(defn mess-with-messages [inp-message]
+  (if (contains? inp-message :value)
+        (assoc inp-message :value (str (class (inp-message :value))))))
+
+
 (defn instrument-after-each
   [handler]
   (fn [inp-message]
@@ -36,7 +60,7 @@
             (send [this msg] (do
               (swap! last-response (fn [prev] (identity @last-response-rollover)))
               (swap! last-response-rollover (fn [prev] (identity msg)))
-              (.send transport (modify-errors msg)))))))))))
+              (.send transport (mess-with-messages msg)))))))))))
 
 (defn ex-trap []
   (try (/ 8 0)
@@ -45,7 +69,7 @@
 
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
-        {:expects #{} :requires #{prv/pr-values} :handles {}})
+        {:expects #{"eval"} :requires #{} :handles {}})
 
 
 ;;the below are just debug things
