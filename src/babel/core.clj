@@ -18,7 +18,7 @@
   [inp-message]
     (if (contains? inp-message :err)
         (do
-          (swap! last-error (fn [prev] (inp-message :err)))
+          (swap! last-error (fn [prev] (eval *e)))
           (assoc inp-message :err (str (inp-message :err) " -sorry!\n")))
         inp-message))
 
@@ -44,7 +44,7 @@
 
 
 
-(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
+#_(clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
         {:expects #{} :requires #{prv/pr-values} :handles {}})
 
 
