@@ -17,9 +17,7 @@
 (defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
   [inp-message]
     (if (contains? inp-message :err)
-        (do
-          (swap! last-error (fn [prev] (eval *e)))
-          (assoc inp-message :err (str (inp-message :err) " -sorry!\n")))
+          (assoc inp-message :err (str "\nerr: " (class (eval *e)) "\n"))
         inp-message))
 
 (defn instrument-after-each
@@ -27,15 +25,11 @@
   (fn [inp-message]
     (let [transport (inp-message :transport)]
       (do
-        (swap! last-message (fn [prev] (identity @last-message-rollover)))
-        (swap! last-message-rollover (fn [prev] (identity inp-message)))
         (handler (assoc inp-message :transport
           (reify Transport
             (recv [this] (.recv transport))
             (recv [this timeout] (.recv transport timeout))
             (send [this msg] (do
-              (swap! last-response (fn [prev] (identity @last-response-rollover)))
-              (swap! last-response-rollover (fn [prev] (identity msg)))
               (.send transport (modify-errors msg)))))))))))
 
 (defn ex-trap []
