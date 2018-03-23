@@ -6,4 +6,4 @@
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]]
   :repl-options {:nrepl-middleware
-                 [babel.core/instrument-after-each]})
+                 [babel.middleware/interceptor]})
