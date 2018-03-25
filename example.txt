@@ -1,0 +1,34 @@
+value of *e, spit 
+clojure.lang.ExceptionInfo: Call to #'user/blipper did not conform to spec:
+val: (true) fails at: [:args] predicate: int?
+ {:clojure.spec.alpha/problems [{:path [:args], :pred clojure.core/int?, :val (true), :via [], :in []}], :clojure.spec.alpha/spec #object[clojure.spec.alpha$spec_impl$reify__1987 0x7a3add2f "clojure.spec.alpha$spec_impl$reify__1987@7a3add2f"], :clojure.spec.alpha/value (true), :clojure.spec.alpha/args (true), :clojure.spec.alpha/failure :instrument, :clojure.spec.test.alpha/caller {:file "form-init5791188113705125000.clj", :line 1, :var-scope user/eval1447}}
+
+
+the preceding stuff
+
+user=> (defn blipper [ x ] ( + 8 5 x))
+#'user/blipper
+user=> (require '[clojure.spec.alpha] :as s)
+
+CompilerException java.lang.RuntimeException: Unable to resolve symbol: s in this context, compiling:(/tmp/form-init5791188113705125000.clj:1:1) 
+user=> (require '[clojure.spec.alpha :as s])
+nil
+user=> (s/fdef :args int?)
+
+CompilerException java.lang.IllegalArgumentException: No value supplied for key: int?, compiling:(/tmp/form-init5791188113705125000.clj:1:1) 
+user=> (s/fdef blipper :args int?)
+user/blipper
+user=> (s/instrument)
+
+CompilerException java.lang.RuntimeException: No such var: s/instrument, compiling:(/tmp/form-init5791188113705125000.clj:1:1) 
+user=> (require '[clojure.spec.test.alpha :as stest])
+nil
+user=> (stest/instrument)
+[user/blipper]
+user=> (blipper true)
+
+ExceptionInfo Call to #'user/blipper did not conform to spec:
+val: (true) fails at: [:args] predicate: int?
+  clojure.core/ex-info (core.clj:4739)
+user=> *e
+
