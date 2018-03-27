@@ -146,7 +146,7 @@
   (let [e-class clojure.lang.ExceptionInfo
         message ex-str
         entry (first-match e-class message)
-        msg-info-obj (msg-from-matched-entry entry message)]
+        msg-info-obj (if entry (msg-from-matched-entry entry message) message)]
         {:exception-class e-class
          :msg-info-obj msg-info-obj}))
 
