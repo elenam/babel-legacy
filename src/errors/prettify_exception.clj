@@ -133,7 +133,7 @@
   [problems]
   (first (filter #(not (str/starts-with? (str (:pred %)) "length")) problems)))
 
-(defn msg-from-matched-entry [entry message data]
+(defn msg-from-matched-entry [entry message]
   "Creates a message info object from an exception and its data, if exists"
   ;(cond
     ;(and data entry) (msg-info-obj-with-data entry message data)
