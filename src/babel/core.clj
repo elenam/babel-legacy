@@ -19,7 +19,7 @@
     (if (contains? inp-message :err)
         (do
           (swap! last-error (fn [prev] (inp-message :err)))
-          (assoc inp-message :err (str (inp-message :err) " -sorry!\n")))
+          (assoc inp-message :err (str (class (inp-message :err)))))
         inp-message))
 
 (defn instrument-after-each

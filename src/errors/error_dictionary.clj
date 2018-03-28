@@ -1,4 +1,4 @@
-(ns errors.error_dictionary
+(ns errors.error-dictionary
   (:use [errors.messageobj]
         [errors.dictionaries]))
 
@@ -16,9 +16,11 @@
    ;; messages explicitly
 
    {:key :exception-info
-    :class clojure.lang.ExceptionInfo
+    :class "smoked kipper"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    :match #"\#'(.*) Call to \#'(.*)/(.*) did not conform to spec:\n(.*)\n((.*)\n)*"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 3) :arg))}
+    :match #"(.*) Call to \#'(.*)/(.*) did not conform to spec:(.*)(\n(.*)(\n)?)*"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 1) :arg))}
    ])
+
+  (println "errors/error-dictionary loaded")

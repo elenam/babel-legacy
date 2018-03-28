@@ -1,6 +1,6 @@
-(ns errors.prettify_exception
+(ns errors.prettify-exception
   (:require [clojure.string :as str]
-            [errors.error_dictionary :refer :all])
+            [errors.error-dictionary :refer :all])
   (:use [errors.dictionaries]
 	      [errors.messageobj]))
 
@@ -143,12 +143,12 @@
 
 (defn process-spec-errors
   [ex-str]
-  (let [e-class clojure.lang.ExceptionInfo
+  (let [e-class "smoked kipper"
         message ex-str
         entry (first-match e-class message)
         msg-info-obj (if entry (msg-from-matched-entry entry message) message)]
         {:exception-class e-class
-         :msg-info-obj msg-info-obj}))
+         :msg-info-obj ex-str}))
 
 ;#########################################
 ;############ Location format  ###########
@@ -159,3 +159,5 @@
    of how they are reported in an error message"
   [line ch]
   (str " on, or before, line " line))
+
+    (println "errors/prettify-exception loaded")
