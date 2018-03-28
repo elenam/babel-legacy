@@ -12,7 +12,7 @@
             (recv [this timeout] (.recv transport timeout))
             (send [this msg]     (.send transport (processor/modify-errors msg)))))))))
 
-(println "babel.middleware loaded")
-
 (clojure.tools.nrepl.middleware/set-descriptor! #'interceptor
         {:expects #{} :requires #{} :handles {}})
+
+(println "babel.middleware loaded")

@@ -54,3 +54,5 @@
 (defn make-mock-preobj [matches]
   "creates a test msg-info-obj. Used for testing so that things don't break"
   (make-msg-info-hashes  "This is a " "test." :arg))
+
+  (println "errors/messageobj loaded")
