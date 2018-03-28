@@ -12,6 +12,7 @@
           (stest/instrument)
           ;;replace the assoced value with a function call as needed.
           (assoc inp-message :err (str (m-obj/get-all-text (p-exc/process-spec-errors (inp-message :err))) " -sorry")))
+          ;(assoc inp-message :err (str (inp-message :err) " -sorry")))
         inp-message))
 
 (println "babel.processor loaded")
