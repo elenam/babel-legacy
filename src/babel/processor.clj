@@ -21,7 +21,7 @@
   [inp-message]
     (if (contains? inp-message :err)
           ;;replace the assoced value with a function call as needed.
-          (assoc inp-message :err (str  (p-exc/process-spec-errors (inp-message :err))  " -sorry\n"))
+          (assoc inp-message :err (str  (m-obj/get-all-text (p-exc/process-spec-errors (inp-message :err)))  " -sorry\n"))
           ;(assoc inp-message :err (str (inp-message :err) " -sorry\n")))
         inp-message))
 
