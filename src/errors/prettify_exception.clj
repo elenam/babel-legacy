@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [errors.error-dictionary :refer :all])
   (:use [errors.dictionaries]
-	      [errors.messageobj]))
+        [errors.messageobj]))
 
 
 ;; Main error processing file. Standard errors are processed by `standard` function, and
@@ -140,6 +140,10 @@
     entry ((:make-msg-info-obj entry) (re-matches (:match entry) message)))
     ;:else (make-msg-info-hashes message)))
 
+(defn get-sum-text [msg-obj]
+       "concatenate all text from a message object into a string"
+      ;(println (str "MESSAGE in get-all-text" msg-obj))
+      (reduce #(str %1 (:msg %2)) "" msg-obj))
 
 (defn process-spec-errors
   [ex-str]
@@ -147,8 +151,9 @@
         message ex-str
         entry (first-match e-class message)
         msg-info-obj (if entry (msg-from-matched-entry entry message) message)]
-        (str {:exception-class e-class
-         :msg-info-obj msg-info-obj})))
+        (str
+           {:exception-class e-class
+            :msg-info-obj (get-sum-text msg-info-obj)})))
 
 ;#########################################
 ;############ Location format  ###########
