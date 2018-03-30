@@ -13,6 +13,6 @@
             (send [this msg]     (.send transport (processor/modify-errors msg)))))))))
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'interceptor
-        {:expects #{} :requires #{} :handles {}})
+        {:expects #{"eval"} :requires #{} :handles {}})
 
 (println "babel.middleware loaded")
