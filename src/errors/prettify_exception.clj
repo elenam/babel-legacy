@@ -11,8 +11,13 @@
 
 (defn first-match
   [e-class message]
-	(first (filter #(and (= (:class %) e-class) (re-matches (:match %) message))
-			error-dictionary)))
+  (first (filter #(and (= (:class %) e-class) (re-matches (:match %) message))
+  error-dictionary)))
+
+(defn get-match
+  [e-class message]
+  (let [match (first-match e-class message)]
+    (if match match (first-match "default" message))))
 
 (defn fn-name
   "Takes a function object and returns a symbol that corresponds to the result of
@@ -147,13 +152,14 @@
 
 (defn process-spec-errors
   [ex-str]
-  (let [e-class "clojure.lang.ExceptionInfo"
-        message ex-str
-        entry (first-match e-class message)
-        msg-info-obj (if entry (msg-from-matched-entry entry message) [{:msg "Hello"}])]
-        (str
+  (let [chunks (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str)
+        e-class (second chunks)
+        message (apply str (drop 2 chunks))
+        entry (get-match e-class message)
+        msg-info-obj (msg-from-matched-entry entry message) ]
+        ;[{:msg "Hello"}])]
            {:exception-class e-class
-            :msg-info-obj (get-sum-text msg-info-obj)})))
+            :msg-info-obj  msg-info-obj}))
 
 ;#########################################
 ;############ Location format  ###########

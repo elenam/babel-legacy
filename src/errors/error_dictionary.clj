@@ -16,13 +16,18 @@
    ;; messages explicitly
 
    {:key :exception-info
-    :class "clojure.lang.ExceptionInfo"
+    :class "ExceptionInfo"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    ;:match #"(.*) Call to \#'(.*)/(.*) did not conform to spec:(.*)(\n(.*)(\n)?)*"
-    :match #"(.*)(\n(.*))*(\n)?"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 0) :arg))}
+    :match #"Call to \#'(.*)/(.*) did not conform to spec:(.*)(\n(.*)(\n)?)*"
+    ;:match #"(.*)(\n(.*))*(\n)?"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
+
+    {:key :other
+     :class "default"
+     :match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Error: " (nth matches 0) :arg))}
    ])
 
   (println "errors/error-dictionary loaded")

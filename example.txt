@@ -50,4 +50,18 @@ user=> *e
 (def ex-m "ExceptionInfo Call to #'user/blipper did not conform to spec:
 val: (true) fails at: [:args] predicate: int?
   clojure.core/ex-info (core.clj:4739)")
-  ()
+
+(def ex-m "Call to #'user/blipper did not conform to spec:
+  val: (true) fails at: [:args] predicate: int?
+    clojure.core/ex-info (core.clj:4739)")
+
+
+
+  ["ExceptionInfo Call to #'user/blipper did not conform to spec:\nval: (true) fails at: [:args] predicate: int?\n  clojure.core/ex-info (core.clj:4739)"
+   "ExceptionInfo"
+   "user"
+   "blipper"
+   ""
+   "\n  clojure.core/ex-info (core.clj:4739)"
+  "  clojure.core/ex-info (core.clj:4739)"
+   nil]
