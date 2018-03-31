@@ -135,10 +135,10 @@
 
 (defn msg-from-matched-entry [entry message]
   "Creates a message info object from an exception and its data, if exists"
-  ;(cond
+  (cond
     ;(and data entry) (msg-info-obj-with-data entry message data)
-    entry ((:make-msg-info-obj entry) (re-matches (:match entry) message)))
-    ;:else (make-msg-info-hashes message)))
+    entry ((:make-msg-info-obj entry) (re-matches (:match entry) message))
+    :else (make-msg-info-hashes message)))
 
 (defn get-sum-text [msg-obj]
        "concatenate all text from a message object into a string"
@@ -150,7 +150,7 @@
   (let [e-class "clojure.lang.ExceptionInfo"
         message ex-str
         entry (first-match e-class message)
-        msg-info-obj (if entry (msg-from-matched-entry entry message) message)]
+        msg-info-obj (if entry (msg-from-matched-entry entry message) {:msg "Hello"})]
         (str
            {:exception-class e-class
             :msg-info-obj (get-sum-text msg-info-obj)})))
