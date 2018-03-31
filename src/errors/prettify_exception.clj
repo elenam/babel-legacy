@@ -150,7 +150,7 @@
   (let [e-class "clojure.lang.ExceptionInfo"
         message ex-str
         entry (first-match e-class message)
-        msg-info-obj (if entry (msg-from-matched-entry entry message) {:msg "Hello"})]
+        msg-info-obj (if entry (msg-from-matched-entry entry message) [{:msg "Hello"}])]
         (str
            {:exception-class e-class
             :msg-info-obj (get-sum-text msg-info-obj)})))
