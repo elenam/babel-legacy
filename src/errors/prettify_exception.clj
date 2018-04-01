@@ -142,16 +142,27 @@
     entry ((:make-msg-info-obj entry) (re-matches (:match entry) message))
     :else (make-msg-info-hashes message)))
 
+; This was added from another file and isn't needed:
 (defn get-sum-text [msg-obj]
   "concatenate all text from a message object into a string"
       ;(println (str "MESSAGE in get-all-text" msg-obj))
   (reduce #(str %1 (:msg %2)) "" msg-obj))
 
-(defn process-spec-errors
+(defn get-exception-class-and-rest
   [ex-str]
-  (let [chunks (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str)
-        e-class (second chunks)
-        message (apply str (drop 2 chunks))
+  (let [compiler-exc (re-matches #"CompilerException (\S*): (.*)(\n(.*))*(\n)?" ex-str) ; first we check if it is a compiler exception
+        matches (if compiler-exc compiler-exc (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str))
+        e-class (second matches)
+        rest (apply str (drop 2 matches))]
+        [e-class rest]))
+
+(defn process-spec-errors
+  "Takes a message from an exception as a string and returns a message object,
+  to be displayed by the repl or IDE"
+  [ex-str]
+  (let [parsing (get-exception-class-and-rest ex-str)
+        e-class (first parsing)
+        message (second parsing)
         entry (get-match e-class message)
         msg-info-obj (msg-from-matched-entry entry message)]
         ;[{:msg "Hello"}])]
