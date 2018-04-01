@@ -8,30 +8,28 @@
 ;; A msg-info-obj doesn't have :start
 
 (defn make-msg-info-hash
-	"creates a hash-map for a msg-info-obj out of a msg and style, with the form {:msg message :stylekey style :length n}"
-	([msg style] (let [m (str msg)]
-			{:msg m :stylekey style :length (count m)}))
-	([msg] (let [m (str msg)]
-			{:msg m :stylekey :reg :length (count m)})))
+  "creates a hash-map for a msg-info-obj out of a msg and style, with the form {:msg message :stylekey style :length n}"
+  ([msg style] (let [m (str msg)]
+                 {:msg m :stylekey style :length (count m)}))
+  ([msg] (let [m (str msg)]
+           {:msg m :stylekey :reg :length (count m)})))
 
 (defn- make-msg-info-hashes-helper [messages result]
-	(if (empty? messages) result
-		(let [next (second messages)]
-			(if (keyword? next) (recur (rest (rest messages))
-					           (conj result (make-msg-info-hash (first messages) next)))
-				            (recur (rest messages)
-				            	   (conj result (make-msg-info-hash (first messages))))))))
+  (if (empty? messages) result
+      (let [next (second messages)]
+        (if (keyword? next) (recur (rest (rest messages))
+                                   (conj result (make-msg-info-hash (first messages) next)))
+            (recur (rest messages)
+                   (conj result (make-msg-info-hash (first messages))))))))
 
 (defn make-msg-info-hashes [& args]
-	"creates a vector of hash-maps out of a vector that are strings, possibly followed by optional keywords"
-	(make-msg-info-hashes-helper args []))
-
+  "creates a vector of hash-maps out of a vector that are strings, possibly followed by optional keywords"
+  (make-msg-info-hashes-helper args []))
 
 (defn add-to-msg-info
   "adds an addition (converted to a string) to the end of an existing msg-info-obj, with an optional style keyword"
   ([old-msg-info addition style] (conj old-msg-info (make-msg-info-hash addition style)))
   ([old-msg-info addition] (conj old-msg-info (make-msg-info-hash addition))))
-
 
 ;(defn make-msg-info-hashes  [messages]
 ;	"creates a vector of hash-maps out of a vector of vectors of msg + optional style"
@@ -42,12 +40,12 @@
   "fills in the starting points of objects in the hash maps, in the context of the output from make-msg-info-hashes "
   (loop [hashes msg-info-obj start 0 res []]
     (if (empty? hashes) res
-      (recur (rest hashes)
-      	     (+ start (:length (first hashes)))
-      	     (conj res (assoc (first hashes) :start start))))))
+        (recur (rest hashes)
+               (+ start (:length (first hashes)))
+               (conj res (assoc (first hashes) :start start))))))
 
 (defn get-all-text [msg-obj]
-   "concatenate all text from a message object into a string"
+  "concatenate all text from a message object into a string"
   ;(println (str "MESSAGE in get-all-text" msg-obj))
   (reduce #(str %1 (:msg %2)) "" msg-obj))
 
@@ -55,4 +53,4 @@
   "creates a test msg-info-obj. Used for testing so that things don't break"
   (make-msg-info-hashes  "This is a " "test." :arg))
 
-  (println "errors/messageobj loaded")
+(println "errors/messageobj loaded")

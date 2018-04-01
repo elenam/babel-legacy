@@ -2,7 +2,6 @@
   (:use [errors.messageobj]
         [errors.dictionaries]))
 
-
 ;; A vector of error dictionaries from the most specific one to the most general one.
 ;; Order matters because the vector is searched from top to bottom.
 
@@ -24,10 +23,27 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
-    {:key :other
-     :class "default"
-     :match #"(.*)(\n(.*))*(\n)?"
-     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Error: " (nth matches 0) :arg))}
-   ])
 
-  (println "errors/error-dictionary loaded")
+   ;#############################
+   ;### Class Cast Exceptions ###
+   ;#############################
+
+   #_{:key :class-cast-exception-cannot-cast-to-map-entry
+      :class "ClassCastException"
+      :match #"(.*) cannot be cast to java\.util\.Map\$Entry(.*)"
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to create a map using "
+                                                             (get-type (nth matches 1)) :type
+                                                             ", but a sequence of vectors of length 2 or a sequence of maps is needed."))}
+   {:key :class-cast-exception
+    :class "ClassCastException"
+    :match #"Cannot cast (\S*) to (\S*) (.*)(\n(.*)(\n)?)*"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to use "
+                                                           (get-type (nth matches 1)) :type ", but "
+                                                           (get-type (nth matches 2)) :type " was expected.\n"))}
+
+   {:key :other
+    :class "default"
+    :match #"(.*)(\n(.*))*(\n)?"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg))}])
+
+(println "errors/error-dictionary loaded")

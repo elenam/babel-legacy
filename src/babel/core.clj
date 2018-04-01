@@ -1,11 +1,10 @@
 (ns babel.core
-(:require [clojure.tools.nrepl :as repl]
-         [clojure.spec.alpha :as s]
-         [clojure.spec.test.alpha :as stest]
-         [clojure.tools.nrepl.transport :as t]
-         [clojure.tools.nrepl.middleware.pr-values :as prv])
-(:import clojure.tools.nrepl.transport.Transport))
-
+  (:require [clojure.tools.nrepl :as repl]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as stest]
+            [clojure.tools.nrepl.transport :as t]
+            [clojure.tools.nrepl.middleware.pr-values :as prv])
+  (:import clojure.tools.nrepl.transport.Transport))
 
 (def last-message-rollover (atom nil))
 (def last-message (atom nil))
@@ -16,11 +15,11 @@
 
 (defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
   [inp-message]
-    (if (contains? inp-message :err)
-        (do
-          (swap! last-error (fn [prev] (inp-message :err)))
-          (assoc inp-message :err (str (class (inp-message :err)))))
-        inp-message))
+  (if (contains? inp-message :err)
+    (do
+      (swap! last-error (fn [prev] (inp-message :err)))
+      (assoc inp-message :err (str (class (inp-message :err)))))
+    inp-message))
 
 (defn instrument-after-each
   [handler]
@@ -30,23 +29,20 @@
         (swap! last-message (fn [prev] (identity @last-message-rollover)))
         (swap! last-message-rollover (fn [prev] (identity inp-message)))
         (handler (assoc inp-message :transport
-          (reify Transport
-            (recv [this] (.recv transport))
-            (recv [this timeout] (.recv transport timeout))
-            (send [this msg] (do
-              (swap! last-response (fn [prev] (identity @last-response-rollover)))
-              (swap! last-response-rollover (fn [prev] (identity msg)))
-              (.send transport (modify-errors msg)))))))))))
+                        (reify Transport
+                          (recv [this] (.recv transport))
+                          (recv [this timeout] (.recv transport timeout))
+                          (send [this msg] (do
+                                             (swap! last-response (fn [prev] (identity @last-response-rollover)))
+                                             (swap! last-response-rollover (fn [prev] (identity msg)))
+                                             (.send transport (modify-errors msg)))))))))))
 
 (defn ex-trap []
   (try (/ 8 0)
-      (catch Exception e (identity e))))
-
-
+       (catch Exception e (identity e))))
 
 (clojure.tools.nrepl.middleware/set-descriptor! #'instrument-after-each
-        {:expects #{} :requires #{prv/pr-values} :handles {}})
-
+                                                {:expects #{} :requires #{prv/pr-values} :handles {}})
 
 ;;the below are just debug things
 (defn blipper
@@ -54,6 +50,6 @@
   "blip")
 
 (s/fdef blipper
-  :args string?)
+        :args string?)
 
 (prn "You have loaded babel.core")
