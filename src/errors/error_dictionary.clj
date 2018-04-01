@@ -40,6 +40,19 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to use "
                                                            (get-type (nth matches 1)) :type ", but "
                                                            (get-type (nth matches 2)) :type " was expected.\n"))}
+    ;######################
+    ;### Syntax Errors ###
+    ;#####################
+
+   {:key :compiler-exception-cannot-resolve-symbol
+    :class "java.lang.RuntimeException:"
+    :match #"Unable to resolve symbol: (.+) in this context(.*)(\n(.*)(\n)?)*"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
+                                                           (nth matches 1) :arg " is undefined."))}
+
+   ;######################
+   ;### Default Error ###
+   ;#####################
 
    {:key :other
     :class "default"

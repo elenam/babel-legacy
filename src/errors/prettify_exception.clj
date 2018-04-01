@@ -163,7 +163,7 @@
 ;#########################################
 
 (defn line-number-format
-  "Takes a line number and a character poistion and returns a string
+  "Takes a line number and a character position and returns a string
    of how they are reported in an error message"
   [line ch]
   (str " on, or before, line " line))
