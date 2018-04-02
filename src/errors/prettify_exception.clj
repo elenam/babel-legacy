@@ -154,7 +154,7 @@
         matches (if compiler-exc compiler-exc (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str))
         e-class (second matches)
         rest (apply str (drop 2 matches))]
-        [e-class rest]))
+    [e-class rest]))
 
 (defn process-spec-errors
   "Takes a message from an exception as a string and returns a message object,

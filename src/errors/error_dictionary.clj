@@ -48,15 +48,22 @@
     :class "java.lang.RuntimeException"
     :match #"Unable to resolve symbol: (.+) in this context(.*)(\n(.*)(\n)?)*"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
-                                                           (nth matches 1) :arg " is undefined."))}
+                                                           (nth matches 1) :arg " is undefined.\n"))}
 
-   ;######################
+   ;#############################
+   ;### Arithmetic Exception ###
+   ;############################
+
+   {:key :arithmetic-exception-divide-by-zero
+    :class "ArithmeticException"
+    :match #"Divide by zero(.*)(\n(.*)(\n)?)*"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))};######################
    ;### Default Error ###
    ;#####################
 
    {:key :other
     :class "default"
     :match #"(.*)(\n(.*))*(\n)?"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg))}])
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg "\n"))}])
 
 (println "errors/error-dictionary loaded")
