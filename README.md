@@ -1,10 +1,12 @@
 # babel
 
-A Clojure library designed to ... well, that part is up to you.
+A prrof of concept tool for transforming error message in Clojure into beginner friendly forms.
+Very early in development.
+Paper describing it's use and development availible [here](https://github.com/Clojure-Intro-Course/mics2018demo/blob/master/mics2018.pdf "MICS Paper")
 
 ## Usage
 
-FIXME
+Copy ``babel`` and ``errors`` into your src directory, and then make sure your ``project.clj`` has compatible version of all packages used in our ``project.clj``. Be sure to include the ``:nrepl-middleware`` keys. 
 
 ## License
 
