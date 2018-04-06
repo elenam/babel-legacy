@@ -2,7 +2,6 @@
   (:use [errors.messageobj]))
 (require '[clojure.string :as cs])
 
-
 ;;; A dictionary of known types and their user-friendly representations.
 ;;; Potentially, we can have multiple dictionaries depending on the level.
 
@@ -13,42 +12,41 @@
                       :clojure.lang.Keyword "a keyword"
                       :java.lang.Boolean "a boolean"
 		                  ;; I think this is better for new students to lump all numbers together
-		                  :java.lang.Long "a number"
-		                  :java.lang.Integer "a number"
-		                  :java.lang.Double "a number"
-		                  :java.lang.Float "a number"
-		                  :java.lang.Short  "a number"
-		                  :clojure.lang.BigInt "a number"
+                      :java.lang.Long "a number"
+                      :java.lang.Integer "a number"
+                      :java.lang.Double "a number"
+                      :java.lang.Float "a number"
+                      :java.lang.Short  "a number"
+                      :clojure.lang.BigInt "a number"
 		                  ;; perhaps add big ints and such
-		                  :java.lang.Character "a character" ;; switched back from a symbol
+                      :java.lang.Character "a character" ;; switched back from a symbol
 		                  ;; to short-cut processing of error messages for
 		                  ;; "Don't know how to create a sequence from ..."
-		                  :clojure.lang.ISeq "a sequence"
-		                  :ISeq "a sequence"
+                      :clojure.lang.ISeq "a sequence"
+                      :ISeq "a sequence"
 		                  ;; Refs come up in turtle graphics
-		                  :clojure.lang.Ref "a mutable object"
+                      :clojure.lang.Ref "a mutable object"
 		                  ;; regular expressions wouldn't make sense to beginners,
 		                  ;; but it's better to recognize their types for easier
 		                  ;; help with diagnostics
-		                  :java.util.regex.Pattern "a regular expression pattern"
-		                  :java.util.regex.Matcher "a regular expression matcher"
+                      :java.util.regex.Pattern "a regular expression pattern"
+                      :java.util.regex.Matcher "a regular expression matcher"
 		                  ;; also not something beginners would know,
 		                  ;; but useful for understanding errors
-		                  :clojure.lang.Symbol "a symbol"
-		                  :clojure.lang.IPersistentStack "an object that behaves as a stack (such as a vector or a list)"
+                      :clojure.lang.Symbol "a symbol"
+                      :clojure.lang.IPersistentStack "an object that behaves as a stack (such as a vector or a list)"
                       :clojure.lang.PersistentArrayMap "a map"
 		                  ;; assoc works on maps and vectors:
-		                  :clojure.lang.Associative "a map or a vector"
-		                  :clojure.lang.Reversible "a vector or a sorted-map"
-		                  :clojure.lang.Sorted "a collection stored in a sorted manner (such as sorted-map or sorted-set)"
-		                  :clojure.lang.Sequential "a sequential collection (such as a vector or a list)"
+                      :clojure.lang.Associative "a map or a vector"
+                      :clojure.lang.Reversible "a vector or a sorted-map"
+                      :clojure.lang.Sorted "a collection stored in a sorted manner (such as sorted-map or sorted-set)"
+                      :clojure.lang.Sequential "a sequential collection (such as a vector or a list)"
 		                  ;; This is here because of shuffle. It's not ideal, too similar to Sequential
-		                  :java.util.Collection " a traversable collection (such as a vector, list, or set)" ; not sure if this makes sense in relation to the previous one
+                      :java.util.Collection " a traversable collection (such as a vector, list, or set)" ; not sure if this makes sense in relation to the previous one
 		                  ;; got this in a seesaw error message. Not sure what other types are "Named"
 		                  ;; source: https://groups.google.com/forum/?fromgroups#!topic/clojure/rd-MDXvn3q8
-		                  :clojure.lang.Named "a keyword or a symbol"
-		                  :clojure.lang.nil "nil"})
-
+                      :clojure.lang.Named "a keyword or a symbol"
+                      :clojure.lang.nil "nil"})
 
 ;; matching type interfaces to beginner-friendly names.
 ;; Note: since a type may implement more than one interface,
@@ -65,8 +63,8 @@
                     [clojure.lang.ISeq "a sequence"]
 		                ;; collections - must go before functions since some collections
 		                ;; implement the IFn interface
-		                [clojure.lang.IPersistentCollection "a collection"]
-		                [clojure.lang.IFn "a function"]])
+                    [clojure.lang.IPersistentCollection "a collection"]
+                    [clojure.lang.IFn "a function"]])
 
 ;; The best approximation of a type t not listed in the type-dictionary (as a string)
 ;;; best-approximation: type -> string
@@ -89,9 +87,8 @@
   [v]
   (if (nil? v) "nil" (get-type (.getName (type v)))))
 
-
 ;; hashmap of internal function names and their user-friendly versions
-(def predefined-names {:_PLUS_ "+"  :_ "-" :_SLASH_ "/" })
+(def predefined-names {:_PLUS_ "+"  :_ "-" :_SLASH_ "/"})
 
 ;;; lookup-funct-name: predefined function name -> string
 (defn lookup-funct-name
@@ -113,7 +110,7 @@
    if it is an anonymous function, its name otherwise"
   [fname]
   (if (or (= fname "fn") (re-matches #"fn_(.*)" fname) (re-matches #"fn-(.*)" fname))
-      "anonymous-function" fname))
+    "anonymous-function" fname))
 
 ;;; get-match-name: string -> string
 (defn get-match-name
@@ -144,29 +141,28 @@
 ;;; get-macro-name: string -> string
 (defn get-macro-name [mname]
   "extract a macro name from a qualified name"
-    (nth (re-matches #"(.*)/(.*)" mname) 2))
-
+  (nth (re-matches #"(.*)/(.*)" mname) 2))
 
 (defn pretty-print-single-value
   "returns a pretty-printed value that is not a collection"
   [value]
   ;; need to check for nil first because .getName fails otherwise
   (if (nil? value) "nil"
-    (let [fname (.getName (type value))]
-      (cond (string? value) (str "\"" value "\"")  ; strings are printed in double quotes
+      (let [fname (.getName (type value))]
+        (cond (string? value) (str "\"" value "\"")  ; strings are printed in double quotes
             ; extract a function from the class fname (easier than from value):
-            (= (get-type fname) "a function") (get-function-name fname)
-            (coll? value) "(...)"
-            :else value))))
+              (= (get-type fname) "a function") (get-function-name fname)
+              (coll? value) "(...)"
+              :else value))))
 
 (defn delimeters
   "takes a collection and returns a vector of its delimeters as a vector of two strings"
   [coll]
   (cond
-   (vector? coll) ["[" "]"]
-   (set? coll) ["#{" "}"]
-   (map? coll) ["{" "}"]
-   :else ["(" ")"]))
+    (vector? coll) ["[" "]"]
+    (set? coll) ["#{" "}"]
+    (map? coll) ["{" "}"]
+    :else ["(" ")"]))
 
 (defn add-commas
   "takes a sequence and returns a sequence of the same elements with a comma
@@ -174,9 +170,9 @@
   [sq]
   (loop [result [] s sq n 1]
     (if (empty? s) result
-      (if (= n 4)
-        (recur (into result ["," (first s)]) (rest s) 1)
-        (recur (conj result (first s)) (rest s) (inc n))))))
+        (if (= n 4)
+          (recur (into result ["," (first s)]) (rest s) 1)
+          (recur (conj result (first s)) (rest s) (inc n))))))
 
 (defn add-spaces-etc
   "takes a sequence s and a limit n and returns the elements of s with spaces in-between
@@ -193,14 +189,14 @@
   for a collection and teh string of a value for a single value"
   [value & limits]
   (if (or (not limits) (not (coll? value))) (pretty-print-single-value value)
-    (let [[open close] (delimeters value)
+      (let [[open close] (delimeters value)
           ;; a sequence of a map is a sequence of vectors, turning it into a flat sequence:
-          flat-seq (if (map? value) (flatten (seq value)) value)]
-      (conj (into [open] (add-spaces-etc
-                          (take (inc (first limits)) (map #(apply pretty-print-nested-values (into [%] (rest limits))) flat-seq))
-                          (first limits)
-                          (map? value)))
-            close))))
+            flat-seq (if (map? value) (flatten (seq value)) value)]
+        (conj (into [open] (add-spaces-etc
+                            (take (inc (first limits)) (map #(apply pretty-print-nested-values (into [%] (rest limits))) flat-seq))
+                            (first limits)
+                            (map? value)))
+              close))))
 
 (defn preview-arg
   "returns a pretty-printed value of a preview of an arbitrary collection or value.
@@ -211,25 +207,23 @@
   (let [pretty-val (apply pretty-print-nested-values params)]
     (if (coll? pretty-val) (cs/join (flatten pretty-val)) (str pretty-val))))
 
-
 ;;; arg-str: number -> string
 (defn arg-str [n]
   (let [abs (fn [m] (if (> 0 m) (- m) m))
         n1 (mod (abs n) 100)
         n2 (mod (abs n) 10)]
-  (case n
-    1 "first argument"
-    2 "second argument"
-    3 "third argument"
-    4 "fourth argument"
-    5 "fifth argument"
-   (cond
-  (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n "th argument")
-   (= 1 n2) (str n "st argument")
-   (= 2 n2) (str n "nd argument")
-   (= 3 n2) (str n "rd argument")
-   :else   (str n "th argument"))
-)))
+    (case n
+      1 "first argument"
+      2 "second argument"
+      3 "third argument"
+      4 "fourth argument"
+      5 "fifth argument"
+      (cond
+        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n "th argument")
+        (= 1 n2) (str n "st argument")
+        (= 2 n2) (str n "nd argument")
+        (= 3 n2) (str n "rd argument")
+        :else   (str n "th argument")))))
 
 (defn number-word [n]
   (case n
@@ -269,12 +263,11 @@
                         :- "at least one",   :rem "two",         :mod "two",               :inc "one",
                         :dec "one",          :max "one or more", :min "one or more",       :rand "zero or one",
                         :rand-int "one",     :odd? "one",        :even? "one",             :assoc "at least three",
-                        :dissoc "at least one",
-                        })
+                        :dissoc "at least one"})
 
 (defn lookup-arity
   "returns expected arity (as a string) for a function if we know it, nil otherwise"
   [f]
   ((keyword f) known-args-number))
 
-  (println "errors/dictionaries loaded")
+(println "errors/dictionaries loaded")
