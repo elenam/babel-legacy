@@ -18,9 +18,13 @@
     :class "ExceptionInfo"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    :match #"Call to \#'(.*)/(.*) did not conform to spec:(.*)(\n(.*)(\n)?)*"
+    :match #"Call to \#'(.*)/(.*) did not conform to spec:\nIn: \[(\d*)\] val: (.*) fails at: \[:args :(\S*)\](.*)(\n(.*)(\n)?)*"
     ;:match #"(.*)(\n(.*))*(\n)?"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                            " at position " (nth matches 3) :arg
+                                                            " is expected to be a "  (nth matches 5) :type
+                                                            " , but is " (nth matches 4) :type
+                                                            "instead."))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
 
