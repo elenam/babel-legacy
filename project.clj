@@ -8,4 +8,5 @@
                  [expectations "2.2.0-rc3"]]
   :plugins [[lein-expectations "0.0.8"]]
   :repl-options {:nrepl-middleware
-                 [babel.middleware/interceptor]})
+                 [babel.middleware/interceptor]
+                 :port 7888})

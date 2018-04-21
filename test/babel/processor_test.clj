@@ -6,6 +6,9 @@
 (defn msg-from-err [inp-error] {:err inp-error})
 (defn err-from-msg [inp-message] (inp-message :err))
 
+;;attempting to capture error messages from an actual nREPL server
+
+
 (def divide-by-zero-error
   (msg-from-err "ArithmeticException Divide by zero  clojure.lang.Numbers.divide (Numbers.java:163)"))
 
