@@ -149,6 +149,7 @@
   (reduce #(str %1 (:msg %2)) "" msg-obj))
 
 (defn get-exception-class-and-rest
+  "returns a vector contianing the class and then the message without the class marking"
   [ex-str]
   (let [compiler-exc (re-matches #"CompilerException (\S*): (.*)(\n(.*))*(\n)?" ex-str) ; first we check if it is a compiler exception
         matches (if compiler-exc compiler-exc (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str))
@@ -178,5 +179,3 @@
    of how they are reported in an error message"
   [line ch]
   (str " on, or before, line " line))
-
-(println "errors/prettify-exception loaded")
