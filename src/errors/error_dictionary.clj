@@ -21,10 +21,10 @@
     :match #"Call to \#'(.*)/(.*) did not conform to spec:\nIn: \[(\d*)\] val: (.*) fails at: \[:args :(\S*)\](.*)(\n(.*)(\n)?)*"
     ;:match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                            " at position " (nth matches 3) :arg
-                                                            " is expected to be a "  (nth matches 5) :type
-                                                            " , but is " (nth matches 4) :type
-                                                            "instead."))}
+                                                           " at position " (nth matches 3) :arg
+                                                           " is expected to be a "  (nth matches 5) :type
+                                                           " , but is " (nth matches 4) :type
+                                                           "instead."))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
 
@@ -61,7 +61,9 @@
    {:key :arithmetic-exception-divide-by-zero
     :class "ArithmeticException"
     :match #"Divide by zero(.*)(\n(.*)(\n)?)*"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))};######################
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))}
+
+   ;######################
    ;### Default Error ###
    ;#####################
 
@@ -69,5 +71,3 @@
     :class "default"
     :match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg "\n"))}])
-
-(println "errors/error-dictionary loaded")

@@ -269,5 +269,3 @@
   "returns expected arity (as a string) for a function if we know it, nil otherwise"
   [f]
   ((keyword f) known-args-number))
-
-(println "errors/dictionaries loaded")
