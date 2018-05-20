@@ -151,6 +151,7 @@
 
 ;; TO-DO: simplify handling the rest: now there is only one match -EM 5/20
 (defn get-exception-class-and-rest
+  "returns a vector contianing the class and then the message without the class marking"
   [ex-str]
   (let [compiler-exc (re-matches #"(?s)CompilerException (\S*): (.*)" ex-str) ; first we check if it is a compiler exception
         matches (if compiler-exc compiler-exc (re-matches #"(?s)(\S*) (.*)" ex-str))
@@ -179,5 +180,3 @@
    of how they are reported in an error message"
   [line ch]
   (str " on, or before, line " line))
-
-(println "errors/prettify-exception loaded")

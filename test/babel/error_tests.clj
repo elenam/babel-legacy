@@ -1,8 +1,7 @@
-(ns babel.trap-server
-    (:require
-        [expectations :refer :all]
-        [clojure.tools.nrepl :as repl]))
-
+(ns babel.error-tests
+  (:require
+   [expectations :refer :all]
+   [clojure.tools.nrepl :as repl]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj
@@ -11,10 +10,10 @@
 (defn trap-response
   "evals the code given as a string, and returns the list of associated nREPL messages"
   [inp-code]
-(with-open [conn (repl/connect :port server-port)]
-     (-> (repl/client conn 1000)
-       (repl/message {:op :eval :code inp-code})
-       doall)))
+  (with-open [conn (repl/connect :port server-port)]
+    (-> (repl/client conn 1000)
+        (repl/message {:op :eval :code inp-code})
+        doall)))
 
 (defn msgs-to-error
   "takes a list of messages and returns nil if no :err is present, or the first present :err value"
@@ -30,7 +29,6 @@
 (expect  nil (get-error "(+ 5 8)"))
 (expect  nil (get-error "(prn \"error\")"))
 (expect  nil (get-error "(take 5 (filter #(> 8 %) (repeatedly #(rand-int 10))))"))
-
 
 ;;arithmetic-exception-divide-by-zero
 (expect "Tried to divide by zero\n" (get-error "(/ 70 0)"))
