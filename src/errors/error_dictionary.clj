@@ -34,13 +34,13 @@
 
    #_{:key :class-cast-exception-cannot-cast-to-map-entry
       :class "ClassCastException"
-      :match #"(.*) cannot be cast to java\.util\.Map\$Entry(.*)"
+      :match #"(?s)(.*) cannot be cast to java\.util\.Map\$Entry(.*)"
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to create a map using "
                                                              (get-type (nth matches 1)) :type
                                                              ", but a sequence of vectors of length 2 or a sequence of maps is needed."))}
    {:key :class-cast-exception
     :class "ClassCastException"
-    :match #"Cannot cast (\S*) to (\S*) (.*)(\n(.*)(\n)?)*"
+    :match #"(?s)Cannot cast (\S*) to (\S*) (.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to use "
                                                            (get-type (nth matches 1)) :type ", but "
                                                            (get-type (nth matches 2)) :type " was expected.\n"))}
@@ -50,7 +50,7 @@
 
    {:key :compiler-exception-cannot-resolve-symbol
     :class "java.lang.RuntimeException"
-    :match #"Unable to resolve symbol: (.+) in this context(.*)(\n(.*)(\n)?)*"
+    :match #"(?s)Unable to resolve symbol: (.+) in this context(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
                                                            (nth matches 1) :arg " is undefined.\n"))}
 
@@ -60,14 +60,16 @@
 
    {:key :arithmetic-exception-divide-by-zero
     :class "ArithmeticException"
-    :match #"Divide by zero(.*)(\n(.*)(\n)?)*"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))};######################
+    :match #"(?s)Divide by zero(.*)"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))}
+
+   ;######################
    ;### Default Error ###
    ;#####################
 
    {:key :other
     :class "default"
-    :match #"(.*)(\n(.*))*(\n)?"
+    :match #"(?s)(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg "\n"))}])
 
 (println "errors/error-dictionary loaded")

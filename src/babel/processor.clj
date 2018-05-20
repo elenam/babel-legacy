@@ -8,11 +8,8 @@
   [inp-message]
   (if (contains? inp-message :err)
           ;;replace the assoced value with a function call as needed.
-          ;(assoc inp-message :err (str  "should be our messages here:" (if (m-obj/get-all-text (p-exc/process-spec-errors (inp-message :err))) "haddock" "tuna") "\n\n" (inp-message :err) " -sorry\n"))
-          ;(assoc inp-message :err (str (inp-message :err) " -sorry\n")))
-          ;(assoc inp-message :err (m-obj/get-all-text [{:msg "fiddledeedee" :stylekey :flea :length (count "fiddledeedee")}]))
-          ;(assoc inp-message :err (str (p-exc/process-spec-errors "awwwoooooo")))
     (assoc inp-message :err (m-obj/get-all-text (:msg-info-obj (p-exc/process-spec-errors (inp-message :err)))))
+    ;(assoc inp-message :err (str (inp-message :err))) ;; Debugging
     inp-message))
 
 (println "babel.processor loaded")
