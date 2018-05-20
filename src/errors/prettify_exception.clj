@@ -148,11 +148,13 @@
       ;(println (str "MESSAGE in get-all-text" msg-obj))
   (reduce #(str %1 (:msg %2)) "" msg-obj))
 
+
+;; TO-DO: simplify handling the rest: now there is only one match -EM 5/20
 (defn get-exception-class-and-rest
   "returns a vector contianing the class and then the message without the class marking"
   [ex-str]
-  (let [compiler-exc (re-matches #"CompilerException (\S*): (.*)(\n(.*))*(\n)?" ex-str) ; first we check if it is a compiler exception
-        matches (if compiler-exc compiler-exc (re-matches #"(\S*) (.*)(\n(.*))*(\n)?" ex-str))
+  (let [compiler-exc (re-matches #"(?s)CompilerException (\S*): (.*)" ex-str) ; first we check if it is a compiler exception
+        matches (if compiler-exc compiler-exc (re-matches #"(?s)(\S*) (.*)" ex-str))
         e-class (second matches)
         rest (apply str (drop 2 matches))]
     [e-class rest]))
@@ -166,7 +168,6 @@
         message (second parsing)
         entry (get-match e-class message)
         msg-info-obj (msg-from-matched-entry entry message)]
-        ;[{:msg "Hello"}])]
     {:exception-class e-class
      :msg-info-obj  msg-info-obj}))
 
