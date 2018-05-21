@@ -89,7 +89,8 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 1) :arg " must come in pairs, but one of them does not have a match.\n"))}
 
     {:key :cant-call-nil
-    :class "java.lang.IllegalArgumentException"
+    ;:class "java.lang.IllegalArgumentException"
+    :class "IllegalArgumentException"
     :match (beginandend "Can't call nil")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot call nil as a function.\n"))}
 
@@ -118,7 +119,8 @@
     ;#####################
 
    {:key :compiler-exception-cannot-resolve-symbol
-    :class "java.lang.RuntimeException"
+    ;:class "java.lang.RuntimeException"
+    :class "RuntimeException"
     :match (beginandend "Unable to resolve symbol: (.+) in this context")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
                                                            (nth matches 1) :arg " is undefined.\n"))}
