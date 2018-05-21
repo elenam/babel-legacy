@@ -5,6 +5,8 @@
 ;; A vector of error dictionaries from the most specific one to the most general one.
 ;; Order matters because the vector is searched from top to bottom.
 
+(defn beginandend [x]
+  (re-pattern (str "(?s)" x "(.*)")))
 
 (def error-dictionary
   [;########################
@@ -40,14 +42,14 @@
                                                              ", but a sequence of vectors of length 2 or a sequence of maps is needed."))}
    {:key :class-cast-exception
     :class "ClassCastException"
-    :match #"(?s)Cannot cast (\S*) to (\S*) (.*)"
+    :match (beginandend "Cannot cast (\\S*) to (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to use "
                                                            (get-type (nth matches 1)) :type ", but "
                                                            (get-type (nth matches 2)) :type " was expected.\n"))}
 
     {:key :class-cast-exception-lower-case
      :class "ClassCastException"
-     :match #"(?s)(\S*) cannot be cast to (\S*)(.*)"
+     :match (beginandend "(\\S*) cannot be cast to (\\S*)")
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to use "
                                                             (get-type (nth matches 1)) :type ", but "
                                                             (get-type (nth matches 2)) :type " was expected.\n"))}
@@ -58,12 +60,12 @@
 
     {:key :assoc-parity-error
     :class "IllegalArgumentException"
-    :match #"(?s)assoc expects even number of arguments after map/vector, found odd number(.*)"
+    :match (beginandend "assoc expects even number of arguments after map/vector, found odd number")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n"))}
 
     {:key :illegal-argument-no-val-supplied-for-key
     :class "IllegalArgumentException"
-    :match #"(?s)No value supplied for key: (\S*)(.*)"
+    :match (beginandend "No value supplied for key: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "No value found for key "
                                                            ; is this too wordy?
                                                            ;(nth matches 1) :arg ". Every key must be paired with a value; the value should be immediately following the key."))
@@ -71,7 +73,7 @@
 
     {:key :illegal-argument-vector-arg-to-map-conj
     :class "IllegalArgumentException"
-    :match #"(?s)Vector arg to map conj must be a pair(.*)"
+    :match (beginandend "Vector arg to map conj must be a pair")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Vectors added to a map must consist of two elements: a key and a value.\n"))}
 
     {:key :illegal-argument-cannot-convert-type
@@ -86,45 +88,59 @@
     :match #"(?s)(\S*) requires an even number of forms(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 1) :arg " must come in pairs, but one of them does not have a match.\n"))}
 
+    {:key :cant-call-nil
+    :class "java.lang.IllegalArgumentException"
+    :match (beginandend "Can't call nil")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot call nil as a function.\n"))}
+
+    {:key :duplicate-key-hashmap
+    :class "IllegalArgumentException"
+    :match (beginandend "Duplicate key: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
+
     ;########################
     ;### Arity Exceptions ###
     ;########################
 
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "ArityException"
-    :match #"(?s)Wrong number of args (\S*) passed to: core/keyword(.*)"
+    :match (beginandend "Wrong number of args (\\S*) passed to: core/keyword")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A keyword can only take one or two arguments.\n"))}
 
     {:key :wrong-number-of-args-passed-to-core
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match #"(?s)Wrong number of args (\S*) passed to: core/(\S*)(.*)"
+    :match (beginandend "Wrong number of args (\\S*) passed to: core/(\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (nth matches 2) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
 
-    ;######################
+    ;#####################
     ;### Syntax Errors ###
     ;#####################
 
    {:key :compiler-exception-cannot-resolve-symbol
     :class "java.lang.RuntimeException"
-    :match #"(?s)Unable to resolve symbol: (.+) in this context(.*)"
+    :match (beginandend "Unable to resolve symbol: (.+) in this context")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
                                                            (nth matches 1) :arg " is undefined.\n"))}
 
-   ;#############################
+   ;############################
    ;### Arithmetic Exception ###
    ;############################
 
    {:key :arithmetic-exception-divide-by-zero
     :class "ArithmeticException"
-    :match #"(?s)Divide by zero(.*)"
+    :match (beginandend "Divide by zero")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))}
 
-   ;######################
+    ;######################################
+    ;### Index Out of Bounds Exceptions ###
+    ;######################################
+
+   ;#####################
    ;### Default Error ###
    ;#####################
 
    {:key :other
     :class "default"
-    :match #"(?s)(.*)"
+    :match (beginandend "")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Default Error: " (nth matches 0) :arg "\n"))}])
