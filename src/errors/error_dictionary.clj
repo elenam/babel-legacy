@@ -63,6 +63,11 @@
     :match (beginandend "assoc expects even number of arguments after map/vector, found odd number")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n"))}
 
+    {:key :wrong-number-of-args-passed-to-a-keyword
+    :class "IllegalArgumentException"
+    :match (beginandend "Wrong number of args passed to keyword: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A keyword: " (nth matches 1) :arg " can only take one or two arguments.\n"))}
+
     {:key :illegal-argument-no-val-supplied-for-key
     :class "IllegalArgumentException"
     :match (beginandend "No value supplied for key: (\\S*)")
@@ -77,19 +82,18 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Vectors added to a map must consist of two elements: a key and a value.\n"))}
 
     {:key :illegal-argument-cannot-convert-type
-    ;need to test still
+    ;spec
     :class "IllegalArgumentException"
     :match #"(?s)Don't know how to create (\S*) from: (\S*)(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Don't know how to create " (get-type (nth matches 1)) :type " from "(get-type (nth matches 2)) :type ".\n"))}
 
+
     {:key :illegal-argument-even-number-of-forms
-    ;need to test still
     :class "IllegalArgumentException"
     :match #"(?s)(\S*) requires an even number of forms(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 1) :arg " must come in pairs, but one of them does not have a match.\n"))}
 
     {:key :cant-call-nil
-    ;:class "java.lang.IllegalArgumentException"
     :class "IllegalArgumentException"
     :match (beginandend "Can't call nil")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot call nil as a function.\n"))}
@@ -97,7 +101,7 @@
     {:key :duplicate-key-hashmap
     :class "IllegalArgumentException"
     :match (beginandend "Duplicate key: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash-map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
 
     ;########################
     ;### Arity Exceptions ###
@@ -119,7 +123,6 @@
     ;#####################
 
    {:key :compiler-exception-cannot-resolve-symbol
-    ;:class "java.lang.RuntimeException"
     :class "RuntimeException"
     :match (beginandend "Unable to resolve symbol: (.+) in this context")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
@@ -137,6 +140,90 @@
     ;######################################
     ;### Index Out of Bounds Exceptions ###
     ;######################################
+
+  ;###############################
+   ;### Number Format Exception ###
+   ;###############################
+
+    {:key :number-format-exception
+    :class "NumberFormatException"
+    :match (beginandend "Invalid number: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Invalid number: " (nth matches 1) :arg ".\n"))}
+
+    ;#####################################################################
+    ;### Runtime Exceptions or clojure.lang.LispReader$ReaderException ###
+    ;#####################################################################
+
+    {:key :reader-tag-must-be-symbol
+    :class "RuntimeException"
+    :match (beginandend "Reader tag must be a symbol")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "# must be followed by a symbol.\n"))}
+
+    {:key :invalid-tolken-error
+    :class "RuntimeException"
+    :match (beginandend "Invalid token: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use " (clojure.string/replace (nth matches 1) #"^/.*|.*/$" "/") :arg " in this position.\n"))}
+
+    {:key :syntax-error-cant-specifiy-over-20-args
+    :class "RuntimeException"
+    :match (beginandend "Can't specify more than 20 params")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A function may not take more than 20 parameters.\n" ))}
+
+    {:key :compiler-exception-first-argument-must-be-symbol
+    :class "RuntimeException"
+    :match (beginandend "First argument to (\\S*) must be a Symbol")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " must be followed by a name.\n"))}
+
+    {:key :compiler-exception-cannot-take-value-of-macro
+   :class "RuntimeException"
+   :match (beginandend "Can't take value of a macro: (\\S*)")
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes
+                                                          (get-macro-name (nth matches 1)) :arg
+                                                          " is a macro, cannot be passed to a function.\n"))}
+
+    #_{:key :compiler-exception-first-argument-must-be-symbol
+    ;spec
+    :class "RuntimeException"
+    :match (beginandend "First argument to (\\S*) must be a Symbol(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " must be followed by a name.\n"))}
+
+    {:key :compiler-exception-unmatched-delimiter
+    :class "RuntimeException"
+    :match (beginandend "Unmatched delimiter: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is an unmatched delimiter " (nth matches 1) :arg ".\n"))}
+
+    {:key :compiler-exception-end-of-file
+    :class "RuntimeException"
+    :match (beginandend "EOF while reading, starting at line (.+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "End of file, starting at line.\nProbably a non-closing parenthesis or bracket.\n"))}
+
+    {:key :compiler-exception-end-of-file-string
+    ;this cannot be done in repl needs to be tested still
+    :class "RuntimeException"
+    :match (beginandend "EOF while reading string")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An opened " "\"" :arg " does not have a matching closing one.\n"))}
+
+    {:key :compiler-exception-end-of-file-##
+    ;This error message needs to be improved
+    :class "RuntimeException"
+    :match (beginandend "EOF while reading")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "End of file " (nth matches 1) :arg ".\n"))}
+
+    {:key :compiler-exception-end-of-file
+    ;This error message needs to be improved
+    :class "UnsupportedOperationException"
+    :match (beginandend "Can only recur from tail")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You can only recur from the tail\n"))}
+
+    ;###############################
+    ;### Illegal State Exception ###
+    ;###############################
+
+    {:key :compiler-exception-end-of-file
+    :class "IllegalStateException"
+    :match (beginandend "arg literal must be %, %& or %integer")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed & or a number.\n"))}
+
 
    ;#####################
    ;### Default Error ###
