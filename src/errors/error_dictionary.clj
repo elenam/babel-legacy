@@ -103,6 +103,22 @@
     :match (beginandend "Duplicate key: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash-map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
 
+   ;########################
+   ;### Assertion Errors ###
+   ;########################
+
+   #_{:key :assertion-error-with-argument
+    ;need to test
+    :class "AssertionError"
+    :match (beginandend "Assert failed: \\((\\S*) argument(\\S*)\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot assert on " (nth matches 2) ".\n"))} ; process-asserts-obj from dictionaries.clj
+
+   {:key :assertion-error-without-argument
+    :class "AssertionError"
+    :match (beginandend "Assert failed: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot assert on " (nth matches 1) :arg ".\n"))}
+
+
     ;########################
     ;### Arity Exceptions ###
     ;########################
@@ -117,6 +133,12 @@
     :class "ArityException"
     :match (beginandend "Wrong number of args (\\S*) passed to: core/(\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (nth matches 2) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+
+    {:key :wrong-number-of-args-passed-to-user-defined
+    ;we may want to find a way to make this less general
+    :class "ArityException"
+    :match (beginandend "Wrong number of args (\\S*) passed to: (\\S*)/(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 3) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
 
     ;#####################
     ;### Syntax Errors ###
@@ -137,11 +159,63 @@
     :match (beginandend "Divide by zero")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Tried to divide by zero\n"))}
 
-    ;######################################
-    ;### Index Out of Bounds Exceptions ###
-    ;######################################
+   ;######################################
+   ;### Index Out of Bounds Exceptions ###
+   ;######################################
 
-  ;###############################
+    {:key :string-index-out-of-bounds
+    :class "StringIndexOutOfBoundsException"
+    :match (beginandend "String index out of range: (\\d+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (nth matches 1) :arg " is outside of the string.\n"))}
+
+    {:key :index-out-of-bounds-index-not-provided
+    :class "IndexOutOfBoundsException"
+    :match (beginandend "") ; an empty message
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An index in a sequence is out of bounds or invalid.\n"))}
+
+   ;###############################
+   ;### Null Pointer Exceptions ###
+   ;###############################
+
+   #_{:key :null-pointer-non-existing-object-provided
+    ;need to test
+    :class "NullPointerException"
+    :match (beginandend "(.+)") ; for some reason (.*) matches twice. Since we know there is at least one symbol, + is fine
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An attempt to access a non-existing object: "
+                                                           (nth matches 1) :arg " (NullPointerException).\n"))}
+
+    {:key :null-pointer-non-existing-object-not-provided
+    :class "NullPointerException"
+    :match  (beginandend "")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An attempt to access a non-existing object (NullPointerException).\n"))}
+
+    ;########################################
+    ;### Unsupported Operation Exceptions ###
+    ;########################################
+
+    #_{:key :unsupported-operation-wrong-type-of-argument
+    ;need to test
+    :class "UnsupportedOperationException"
+    :match (beginandend "(\\S*) not supported on this type: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (nth matches 1) :arg
+                                                           " does not allow " (get-type (nth matches 2)) :type " as an argument.\n"))}
+
+    {:key :compiler-exception-must-recur-from-tail-position
+    :class "UnsupportedOperationException"
+    :match (beginandend "Can only recur from tail position")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur can only occur as a tail call: no operations can be done after its return.\n"))}
+
+   ;##############################
+   ;### ClassNotFoundException ###
+   ;##############################
+
+    {:key :class-not-found-exception
+    :class "ClassNotFoundException"
+    :match (beginandend "(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name " (nth matches 1) :arg " is undefined.\n"))}
+
+
+   ;###############################
    ;### Number Format Exception ###
    ;###############################
 
@@ -158,6 +232,12 @@
     :class "RuntimeException"
     :match (beginandend "Reader tag must be a symbol")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "# must be followed by a symbol.\n"))}
+
+    #_{:key :invalid-tolken-error
+    ;need to test
+    :class "RuntimeException"
+    :match (beginandend "java.lang.RuntimeException: Invalid token: (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use " (nth matches 1) :arg " in this position.\n"))}
 
     {:key :invalid-tolken-error
     :class "RuntimeException"
@@ -177,9 +257,17 @@
     {:key :compiler-exception-cannot-take-value-of-macro
    :class "RuntimeException"
    :match (beginandend "Can't take value of a macro: (\\S*)")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes
-                                                          (get-macro-name (nth matches 1)) :arg
-                                                          " is a macro, cannot be passed to a function.\n"))}
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro, cannot be passed to a function.\n"))}
+
+   #_{:key :compiler-exception-cannot-resolve-symbol
+    :class "RuntimeException"
+    :match (beginandend "Unable to resolve symbol: (\\S*) in this context")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name " (nth matches 1) :arg " is undefined.\n"))}
+
+    {:key :compiler-exception-map-literal-even
+    :class "RuntimeException"
+    :match (beginandend "Map literal must contain an even number of forms")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A hash map must consist of key/value pairs; you have a key that's missing a value.\n"))}
 
     #_{:key :compiler-exception-first-argument-must-be-symbol
     ;spec
@@ -191,6 +279,16 @@
     :class "RuntimeException"
     :match (beginandend "Unmatched delimiter: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is an unmatched delimiter " (nth matches 1) :arg ".\n"))}
+
+    {:key :compiler-exception-too-many-arguments
+    :class "RuntimeException"
+    :match (beginandend "Too many arguments to (\\S*),")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Too many arguments to " (nth matches 1) :arg ".\n"))}
+
+   {:key :compiler-exception-too-few-arguments
+    :class "RuntimeException"
+    :match (beginandend "Too few arguments to (\\S*),")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Too few arguments to " (nth matches 1) :arg ".\n"))}
 
     {:key :compiler-exception-end-of-file
     :class "RuntimeException"
@@ -222,7 +320,7 @@
     {:key :compiler-exception-end-of-file
     :class "IllegalStateException"
     :match (beginandend "arg literal must be %, %& or %integer")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed & or a number.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
 
    ;#####################
