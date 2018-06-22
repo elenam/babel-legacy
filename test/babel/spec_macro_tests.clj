@@ -1,0 +1,13 @@
+(ns babel.spec-macro-tests
+  (:require
+   [babel.error-tests :refer :all]
+   [expectations :refer :all]))
+
+;;you need to have launched a nREPL server in babel for these to work.
+;;this must be the same port specified in project.clj
+
+(expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
+        (get-error "(defn hello [x] (let [y 2 z] (+ x y)))"))
+
+(expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
+        (get-error "(defn hello [x] (let [y] (+ x y)))"))

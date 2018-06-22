@@ -18,16 +18,9 @@
 
    {:key :exception-info
     :class "ExceptionInfo"
-    ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
-    ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    :match #"Call to \#'(.*)/(.*) did not conform to spec:\nIn: \[(\d*)\] val: (.*) fails at: \[:args :(\S*)\](.*)(\n(.*)(\n)?)*"
-    ;:match #"(.*)(\n(.*))*(\n)?"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           " at position " (nth matches 3) :arg
-                                                           " is expected to be a "  (nth matches 5) :type
-                                                           " , but is " (nth matches 4) :type
-                                                           "instead."))}
-    ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/bindings(.*)predicate: any\?,  Insufficient input")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+    " must come in pairs, but one of them does not have a match.\n"))}
 
 
    ;#############################
@@ -39,7 +32,7 @@
       :match #"(?s)(.*) cannot be cast to java\.util\.Map\$Entry(.*)"
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to create a map using "
                                                              (get-type (nth matches 1)) :type
-                                                             ", but a sequence of vectors of length 2 or a sequence of maps is needed."))}
+                                                             ", but a sequence of vectors of length 2 or a sequence of maps is needed.\n"))}
    {:key :class-cast-exception
     :class "ClassCastException"
     :match (beginandend "Cannot cast (\\S*) to (\\S*)")
