@@ -39,4 +39,38 @@
 (expect "Name Ebeneezer is undefined.\n" (get-error "(Ebeneezer)"))
 
 ;;class-cast-exception
-;(expect "Attempted to use a string, but a number was expected" (get-error "(+ 8 \"seventeen\")"));;will not work until we write specs for core functions
+(expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ 8 \"seventeen\")"))
+(expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ \"hello\" 3)"))
+(expect "Attempted to use a number, but a function was expected.\n" (get-error "(map 5 [3])"))
+
+(expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
+
+;(expect "\n" (get-error ""))
+(expect "A keyword can only take one or two arguments.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
+
+(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
+
+(expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
+
+(expect "A symbol cannot take (3) arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
+
+(expect "Cannot call nil as a function.\n" (get-error "(nil)"))
+
+(expect "You cannot use the same key in a hash-map twice, but you have duplicated the key 1.\n" (get-error "{1 1 1 1}"))
+
+(expect "End of file, starting at line.\nProbably a non-closing parenthesis or bracket.\n" (get-error "(def elements-that-can-contain-simple-types #_=> #{:xs:attribute"))
+
+(expect "Invalid number: 1.2.2.\n" (get-error "(+ 1.2.2 0)"))
+
+(expect "You cannot use / in this position.\n" (get-error "(/string \"abcd\")"))
+
+(expect "Parameters for cond must come in pairs, but one of them does not have a match.\n" (get-error "(cond (seq? [1 2]) 5 (seq? [1 3]))"))
+(expect "Parameters for loop must come in pairs, but one of them does not have a match.\n" (get-error "(defn s [s] (loop [s]))"))
+
+(expect "with-open, is a macro, cannot be passed to a function.\n" (get-error "(defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))")) ;credit: https://stackoverflow.com/questions/5751262/cant-take-value-of-a-macro-clojure
+
+(expect "% can only be followed by & or a number.\n" (get-error "(#(+ %a 1) 2 3)"))
+
+(expect "Position 5 is outside of the string.\n" (get-error "(nth \"hello\" 5)"))
+
+(expect "An index in a sequence is out of bounds or invalid.\n" (get-error "(nth (seq [1 2 3]) 5)"))
