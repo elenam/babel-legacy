@@ -74,3 +74,15 @@
 (expect "Position 5 is outside of the string.\n" (get-error "(nth \"hello\" 5)"))
 
 (expect "An index in a sequence is out of bounds or invalid.\n" (get-error "(nth (seq [1 2 3]) 5)"))
+
+(expect "An attempt to access a non-existing object (NullPointerException).\n" (get-error "(defn my-even [ilist] (if (= (mod (first ilist) 2) 0)(concat (list (first ilist)) (my-even (rest ilist)))(my-even (rest ilist)))) (my-even '(1,2,3,4,5))")) ;credit: https://stackoverflow.com/questions/7584337/clojure-nullpointerexception-error
+
+(expect "Name clojure.hello is undefined.\n" (get-error "(clojure.hello/union #{1 2 3} #{3 4})"))
+
+(expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
+
+(expect "hello cannot take (1) arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+
+(expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
+
+(expect "Too few arguments to if.\n" (get-error "(if (= 0 0))"))
