@@ -10,14 +10,20 @@
 
 (def error-dictionary
   [;########################
-   ;##### Spec Error #######
+   ;##### Spec Errors ######
    ;########################
 
-   {:key :let-even-number-of-forms
+   {:key :bindings-even-number-of-forms
     :class "ExceptionInfo"
-    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(s?)(.*)predicate: any\?,  Insufficient input")
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/bindings(.*)predicate: any\?,  Insufficient input")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
     " must come in pairs, but one of them does not have a match.\n"))}
+
+    {:key :binding-requires-a-pair
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+     " must be a pair, but only one element is given.\n"))}
 
 
    ;#############################
