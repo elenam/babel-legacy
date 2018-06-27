@@ -14,3 +14,6 @@
 
 (expect "Parameters for if-let must be a pair, but only one element is given.\n"
         (get-error "(if-let [x] x)"))
+
+(expect "Parameters for if-let must be only one name and one value, but more parameters were given.\n"
+        (get-error "(if-let [x 2 y] x)"))

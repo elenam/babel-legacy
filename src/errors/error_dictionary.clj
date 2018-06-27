@@ -25,6 +25,12 @@
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
      " must be a pair, but only one element is given.\n"))}
 
+     {:key :extra-input-for-a-binding
+      :class "ExceptionInfo"
+      :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding (.*)Extra input")
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+      " must be only one name and one value, but more parameters were given.\n"))}
+
 
    ;#############################
    ;### Class Cast Exceptions ###
