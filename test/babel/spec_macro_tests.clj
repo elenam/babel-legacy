@@ -11,3 +11,6 @@
 
 (expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
         (get-error "(defn hello [x] (let [y] (+ x y)))"))
+
+(expect "Parameters for if-let must come in pairs, but one of them does not have a match.\n"
+        (get-error "(if-let [x] x)"))

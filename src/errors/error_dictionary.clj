@@ -13,12 +13,9 @@
    ;##### Spec Error #######
    ;########################
 
-   ;; Wild cards in regular expressions don't match \n, so we need to include multi-line
-   ;; messages explicitly
-
-   {:key :exception-info
+   {:key :let-even-number-of-forms
     :class "ExceptionInfo"
-    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/bindings(.*)predicate: any\?,  Insufficient input")
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(s?)(.*)predicate: any\?,  Insufficient input")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
     " must come in pairs, but one of them does not have a match.\n"))}
 
@@ -80,7 +77,7 @@
     :match #"(?s)Don't know how to create (\S*) from: (\S*)(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Don't know how to create " (get-type (nth matches 1)) :type " from "(get-type (nth matches 2)) :type ".\n"))}
 
-
+    ;; This might go away now
     {:key :illegal-argument-even-number-of-forms
     :class "IllegalArgumentException"
     :match #"(?s)(\S*) requires an even number of forms(.*)"
