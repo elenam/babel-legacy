@@ -31,6 +31,11 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
       " must be only one name and one value, but more parameters were given.\n"))}
 
+      {:key :wrong-binding-name
+       :class "ExceptionInfo"
+       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
+       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+       (nth matches 5) :arg " is used instead of a variable name.\n"))}
 
    ;#############################
    ;### Class Cast Exceptions ###
