@@ -40,3 +40,8 @@
 
 ;;class-cast-exception
 ;(expect "Attempted to use a string, but a number was expected" (get-error "(+ 8 \"seventeen\")"));;will not work until we write specs for core functions
+
+;; NullPointerException with an object given
+;; This might not be what we want (might need to process the object), but that's what it currently is
+(expect #"(?s)An attempt to access a non-existing object:   java\.util\.regex\.Pattern\.<init> \(Pattern\.java:1336\)(.*) \(NullPointerException\)\."
+        (get-error "(re-pattern nil)"))

@@ -184,7 +184,7 @@
    ;### Null Pointer Exceptions ###
    ;###############################
 
-   #_{:key :null-pointer-non-existing-object-provided
+   {:key :null-pointer-non-existing-object-provided
     ;need to test
     :class "NullPointerException"
     :match (beginandend "(.+)") ; for some reason (.*) matches twice. Since we know there is at least one symbol, + is fine
