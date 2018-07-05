@@ -16,7 +16,7 @@
    ;; Wild cards in regular expressions don't match \n, so we need to include multi-line
    ;; messages explicitly
 
-   {:key :exception-info
+   #_{:key :exception-info
     :class "ExceptionInfo"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
@@ -26,7 +26,7 @@
                                                            " at position " (nth matches 3) :arg
                                                            " is expected to be a "  (nth matches 5) :type
                                                            " , but is " (nth matches 4) :type
-                                                           "instead."))}
+                                                           "instead.\n"))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
 
