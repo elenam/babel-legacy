@@ -16,18 +16,76 @@
    ;; Wild cards in regular expressions don't match \n, so we need to include multi-line
    ;; messages explicitly
 
-   #_{:key :exception-info
+   {:key :length-not-greater-zero
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-zero")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take one or more variables.\n"))}
+
+   {:key :length-not-greater-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or more variables.\n"))}
+
+   {:key :length-not-greater-two
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or more variables.\n"))}
+
+   {:key :length-not-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take one variable.\n"))}
+
+   {:key :length-not-two
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two variable.\n"))}
+
+   {:key :length-not-three
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three variable.\n"))}
+
+   {:key :length-not-zero-or-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-or-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take zero or one variables.\n"))}
+
+   {:key :0-not-valid
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails spec: :(.*)/b-not-zero") ;at: \\[:args :(\\S*)\\](.*)(\\n(.*)(\\n)?)*")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", position " (nth matches 3) :arg
+                                                           " cannot be 0.\n"))}
+
+   {:key :exception-info
     :class "ExceptionInfo"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
     :match #"Call to \#'(.*)/(.*) did not conform to spec:\nIn: \[(\d*)\] val: (.*) fails at: \[:args :(\S*)\](.*)(\n(.*)(\n)?)*"
     ;:match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           " at position " (nth matches 3) :arg
+                                                           ", position " (nth matches 3) :arg
                                                            " is expected to be a "  (nth matches 5) :type
-                                                           " , but is " (nth matches 4) :type
-                                                           "instead.\n"))}
+                                                           ", but is " (nth matches 4) :type
+                                                           " instead.\n"))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
+
+    {:key :exception-info-or ;need to find a way to make this output correctly, the problem is right after val:
+     :class "ExceptionInfo" ;[^\\(\\)](.*)
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val:(\\s)(\\S*)(\\s)fails at: \\[:args :(\\S*)\\](.*)(\\n(.*)(\\n)?)*")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                            ", position " (nth matches 3) :arg
+                                                            " is expected to be a "  (nth matches 7) :type
+                                                            ", but is " (nth matches 5) :type
+                                                            " instead.\n"))}
 
 
    ;#############################
