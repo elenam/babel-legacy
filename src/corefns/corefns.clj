@@ -79,12 +79,12 @@
 (s/fdef clojure.core/conj
   :args (s/and ::b-length-greater-zero
                (s/or :any (s/cat :any any?)
-                     :seqableandany (s/cat :seqable seqable? :any (s/+ any?)))))
+                     :collectionandany (s/cat :collection (s/nilable coll?) :any (s/+ any?)))))
 (stest/instrument `clojure.core/conj)
 
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
-               (s/cat :function ifn? :seqable (s/* seqable?)))) ;change to a + to block transducers
+               (s/cat :function ifn? :collections (s/* (s/nilable coll?))))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
 (s/fdef clojure.core/mod
@@ -92,6 +92,13 @@
                (s/cat :number number? :number (s/and number? ::b-not-zero)))) ;(fn [{:keys [a b]}] (not= b 0))))
 (stest/instrument `clojure.core/mod)
 
+(s/fdef clojure.core/numerator
+  :args (s/cat :a ratio?))
+(stest/instrument `clojure.core/numerator)
+
+(s/fdef clojure.core/denominator
+  :args (s/cat :a ratio?))
+(stest/instrument `clojure.core/denominator)
 
 ;##### Inline Functions #####
 

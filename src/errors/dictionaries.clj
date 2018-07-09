@@ -239,6 +239,19 @@
     "9" "nine"
     n))
 
+;;; ?-name: string->string
+(defn ?-name [n]
+  (case n
+    "coll?" "collection"
+    "ifn?" "function"
+    (cond
+      (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
+      :else n)))
+
+;;; check-divide: string->string
+(defn check-divide [n]
+  (if (= n "") "/" n))
+
 ;;; process-asserts-obj: string or nil -> string
 
 
