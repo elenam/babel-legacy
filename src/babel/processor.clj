@@ -10,6 +10,7 @@
     ;;replace the assoced value with a function call as needed.
     (assoc inp-message :err (m-obj/get-all-text (:msg-info-obj (p-exc/process-spec-errors (inp-message :err)))))
     ;(assoc inp-message :err (str (inp-message :err))) ;; Debugging
+    ;(assoc inp-message :err (str "\n" inp-message "\n" (p-exc/process-spec-errors (inp-message :err)))) ;; Debugging
     inp-message))
 
 (println "babel.processor loaded")

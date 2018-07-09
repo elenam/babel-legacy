@@ -29,3 +29,6 @@
 
 (expect "Parameters for if-let must be only one name and one value, but more parameters were given.\n"
         (get-error "(if-let [x 2 y] x)"))
+
+(expect "In let 2 is used instead of a variable name.\n"
+        (get-error "(let [2 3] 8)"))
