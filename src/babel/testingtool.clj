@@ -47,23 +47,25 @@
   (spit "./doc/test_log.txt" (str (new java.util.Date) "\n")) :append true)
 
 ;;get original error msg
-(defn get-original-error
-  []
-  (:value (first (filter :value (trap-response "(:msg @babel.processor/recorder)")))))
+(defn get-original-error-by-key
+  [key]
+  (:value (first (filter :value (trap-response (str "(" key " @babel.processor/recorder)"))))))
 
 ;;content that is going to be put into the log
 (defn log-content
   [inp-code]
   (if
     (not= (msgs-to-error (trap-response inp-code)) nil)
-    (str "#" (:total @counter) ":\n"
-         "code input: " inp-code "\n"
-         "modified error: " (clojure.string/trim-newline (msgs-to-error (trap-response inp-code))) "\n"
-         "original error: " (clojure.string/trim-newline (get-original-error)) "\n\n")
-    (str "#" (:total @counter) ":\n"
-         "code input: " inp-code "\n"
-         "modified error: nil\n"
-         "original error: nil\n\n")))
+    (str "#" (:total @counter) ":\n\n"
+         "code input: " inp-code "\n\n"
+         "modified error: " (clojure.string/trim-newline (msgs-to-error (trap-response inp-code))) "\n\n"
+         "original error: " (clojure.string/trim-newline (get-original-error-by-key :msg)) "\n\n"
+         "error detail: "(clojure.string/trim-newline (get-original-error-by-key :detail)) "\n\n\n")
+    (str "#" (:total @counter) ":\n\n"
+         "code input: " inp-code "\n\n"
+         "modified error: nil\n\n"
+         "original error: nil\n\n"
+         "error detail: nil\n\n\n")))
 
 ;;save the content into the log file
 (defn save-log
