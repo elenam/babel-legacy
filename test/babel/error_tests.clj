@@ -106,3 +106,11 @@
 (expect "In function even?, the first argument is expected to be a number, but is \"a\" instead.\n" (get-error "(even? \"a\")"))
 
 (expect "rand-int can only take one argument.\n" (get-error "(rand-int)"))
+
+(expect "In function rand-int, the first argument is expected to be a number, but is \"3\" instead.\n" (get-error "(rand-int \"3\")"))
+
+(expect "In function denominator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(denominator 3)"))
+
+(expect "In function numerator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(numerator 3)"))
+
+(expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
