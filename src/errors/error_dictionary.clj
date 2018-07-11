@@ -19,6 +19,11 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
     " must come in pairs, but one of them does not have a match.\n"))}
 
+    {:key :vector-expected-for-bindings
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+
     {:key :binding-requires-a-pair
      :class "ExceptionInfo"
      :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input")
@@ -37,10 +42,11 @@
        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
        (nth matches 5) :arg " is used instead of a variable name.\n"))}
 
-       {:key :vector-expected-for-bindings
-        :class "ExceptionInfo"
-        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
-        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+      ;  {:key :vector-expected-for-arg-list
+      ;   :class "ExceptionInfo"
+      ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+      ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A parameter for " (nth matches 2) :arg " required a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+
 
    ;#############################
    ;### Class Cast Exceptions ###

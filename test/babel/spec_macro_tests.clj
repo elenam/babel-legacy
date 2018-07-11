@@ -20,6 +20,9 @@
 (expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
         (get-error " (let [[a b]] (+ a b))"))
 
+(expect "Parameters for let require a vector, instead, 'a' was given.\n"
+        (get-error " (let a (+ a 2))"))
+
 ;############################################
 ;#### Testing for 'let-like forms ###########
 ;############################################
