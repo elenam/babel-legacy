@@ -2,7 +2,9 @@
   (:require
    [expectations :refer :all]
    [clojure.tools.nrepl :as repl]
-   [babel.processor :as processor]))
+   [babel.processor :as processor])
+  (:use
+   [hiccup.core]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj
@@ -41,10 +43,17 @@
   (swap! counter update-in [:total] inc)
   (msgs-to-error (trap-response inp-code)))
 
+(defn html-log-preset
+  []
+  (html [:title "Test_log"] [:h3 "Test_log: "] [:h4 (new java.util.Date)]))
+
+
 ;;add date to the test log
 (defn start-log
   []
-  (spit "./doc/test_log.txt" (str (new java.util.Date) "\n")) :append true)
+  (do
+    (spit "./doc/testhtml.html" (html-log-preset) :append false)
+    (spit "./doc/test_log.txt" (str (new java.util.Date) "\n")) :append true))
 
 ;;get original error msg
 (defn get-original-error-by-key
@@ -77,11 +86,31 @@
   []
   (println (slurp "./doc/test_log.txt")))
 
+(defn html-content
+  [inp-code]
+  (if
+    (not= (msgs-to-error (trap-response inp-code)) nil)
+    (html [:p "#" (:total @counter) ":<br />"
+               "code input: " inp-code "<br />"
+               "modified error: " (clojure.string/trim-newline (msgs-to-error (trap-response inp-code))) "<br />"
+               "original error: " (clojure.string/trim-newline (get-original-error-by-key :msg)) "<br />"
+               "error detail: "(clojure.string/trim-newline (get-original-error-by-key :detail)) "<br /><br />"])
+    (html [:p "#" (:total @counter) ":<br />"
+               "code input: " inp-code "<br />"
+               "modified error: nil<br />"
+               "original error: nil<br />"
+               "error detail: nil<br /><br />"])))
+
+(defn write-html
+  [inp-code]
+  (spit "./doc/testhtml.html" (html-content inp-code) :append true))
+
 ;;the execution funtion for the tests
 (defn get-error
   [inp-code]
   (do
     (save-log inp-code)
+    (write-html inp-code)
     (processor/reset-recorder)
     (record-error inp-code)))
 
