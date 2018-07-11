@@ -37,6 +37,11 @@
        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
        (nth matches 5) :arg " is used instead of a variable name.\n"))}
 
+       {:key :vector-expected-for-bindings
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+
    ;#############################
    ;### Class Cast Exceptions ###
    ;#############################
