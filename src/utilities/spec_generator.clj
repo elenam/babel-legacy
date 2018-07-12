@@ -29,6 +29,18 @@
                 :args  {:has-type ":a (s/* args)"},
                 nil {:has-type ":a something"}})
 
+(def re-type-replace '{
+                :arg   ":a arg"
+                :coll  ":a (s/nilable coll?)"
+                :n     ":a number?"
+                :colls ":a (s/nilable coll?)"
+                :str   ":a string?"
+                :strs  ":a string?"
+                :f     ":a ifn?"
+                :fs    ":a ifn?"
+                :args  ":a (s/* args)"
+                nil ":a something"})
+
 ;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
 ;; (def arg-type (merge
 ;;                      (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
@@ -98,7 +110,7 @@
  ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
 
 (defn same-type2? [& args] ;need to look into why this always returns true but the function doesn't if you run it without the defn
-	(map #(:has-type (re-type-data %)) args)) ;this returns true for absolutely everything
+	(map #(replace re-type-replace %) args)) ;this returns true for absolutely everything
  ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
 
 ;;helper function for chomp-arglists, appends last-arg to the end of the longest coll in arglists
@@ -150,7 +162,7 @@
       (clojure.string/replace
         (clojure.string/replace
           (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/or :a (s/cat "
-            (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply map same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
+            (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
             "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
 
