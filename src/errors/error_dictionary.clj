@@ -107,6 +107,14 @@
                                                               " is expected to be a "  (?-name (nth matches 6)) :type
                                                               ", but is " (nth matches 4) :type
                                                               " instead.\n"))}
+   {:key :exception-info-or-one-line
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args(.*)\\] predicate: (.*)\\n  (.*)/(.*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
+                                                           " is expected to be a "  (?-name (nth matches 6)) :type
+                                                           ", but is " (nth matches 4) :type
+                                                           " instead.\n"))}
 
    ;#############################
    ;### Class Cast Exceptions ###

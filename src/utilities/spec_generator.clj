@@ -16,6 +16,19 @@
                 ;:args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
                 :args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
 
+;;plans to use this for the output
+(def re-type-data {
+                :arg   {:has-type ":a arg"},
+                :coll  {:has-type ":a (s/nilable coll?)"},
+                :n     {:has-type ":a number?"},
+                :colls {:has-type ":a (s/nilable coll?)"},
+                :str   {:has-type ":a string?"},
+                :strs  {:has-type ":a string?"},
+                :f     {:has-type ":a ifn?"},
+                :fs    {:has-type ":a ifn?"},
+                :args  {:has-type ":a (s/* args)"},
+                nil {:has-type ":a something"}})
+
 ;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
 ;; (def arg-type (merge
 ;;                      (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
@@ -52,11 +65,11 @@
 
 ;;does the translating from the names rich hickey gave the arguments, to something consistent
 ;;list of lists of strings -> list of lists of keys
-(defn arglists->argtypes [arglists] (map (fn [x] (map #(arg-type (keyword %)) x)) arglists))
+(defn arglists->argtypes [arglists] (map (fn [x] (map #(arg-type (keyword %)) x)) arglists)) ;changes things like :x to :arg
 
 ;;returns the longest collection in a collection of collections
 ;;arglists -> arglist
-(defn last-arglist [arglists] (first (reverse (sort-by count arglists))))
+(defn last-arglist [arglists] (first (reverse (sort-by count arglists)))) ;gets the last collection in the collection
 
 ;;returns trus if an arglists has & ____ as an argument
 ;;arglists -> boolean
@@ -84,6 +97,10 @@
 	(apply = (map #(:has-type (type-data %)) args))) ;this returns true for absolutely everything
  ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
 
+(defn same-type2? [& args] ;need to look into why this always returns true but the function doesn't if you run it without the defn
+	(map #(:has-type (re-type-data %)) args)) ;this returns true for absolutely everything
+ ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
+
 ;;helper function for chomp-arglists, appends last-arg to the end of the longest coll in arglists
 ;;arglists -> arglists
 (defn append-last-arg [arglists last-arg]
@@ -108,7 +125,7 @@
 ;;arglists -> arglists
 (defn chomp-if-necessary [arglists]
 	(if (chompable? arglists) ;checks for & in the arglist essentially
-		(chomp-arglists arglists) ;
+		(chomp-arglists arglists) ;look at chomp-arglists
 		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
 
 ;; outputs a string of generated data for redefining functions with preconditions
@@ -119,12 +136,23 @@
     (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
       (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
 
+#_(defn pre-re-defn [fvar]
+;;   (println "pre-re-defn ing: " (:name (meta fvar)))
+  (let [fmeta (meta fvar)]
+    (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " :args (s/or :a (s/cat "
+      ;" " between each variable(s)
+      (apply str (vec (interpose ") :a (s/cat " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")))")))
+
 (defn pre-re-defn [fvar]
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
   (let [fmeta (meta fvar)]
-    (str "(s/fdef `" (:ns fmeta) "/" (:name fmeta) " :args "
-      ;" " between each variable(s)
-      (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
+    (clojure.string/replace
+      (clojure.string/replace
+        (clojure.string/replace
+          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " :args (s/or :a (s/cat "
+            ;" " between each variable(s)
+            (apply str (vec (interpose ") :a (s/cat " (map vec (apply map same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
+            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
 
 (defn println-recur [all-vars]
