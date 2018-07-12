@@ -149,10 +149,9 @@
     (clojure.string/replace
       (clojure.string/replace
         (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " :args (s/or :a (s/cat "
-            ;" " between each variable(s)
-            (apply str (vec (interpose ") :a (s/cat " (map vec (apply map same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
-            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")") #"\[\"" "") #"\"\]" "") #"\"" "")))
+          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/or :a (s/cat "
+            (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply map same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
+            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
 
 (defn println-recur [all-vars]
