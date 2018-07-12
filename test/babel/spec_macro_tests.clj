@@ -35,3 +35,10 @@
 
 (expect "In let 2 is used instead of a variable name.\n"
         (get-error "(let [2 3] 8)"))
+
+;############################################
+;#### Testing for 'let-like forms ###########
+;############################################
+
+(expect "In defn [b c] is used instead of a function name.\n"
+        (get-error "(defn [b c] (+ 4 3))"))

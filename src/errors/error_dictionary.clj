@@ -42,6 +42,13 @@
        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
        (nth matches 5) :arg " is used instead of a variable name.\n"))}
 
+       {:key :wrong-binding-name-defn-args
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure.core.specs.alpha/defn-args (.*) predicate: simple-symbol\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+        (nth matches 5) :arg " is used instead of a function name.\n"))}
+
+       ; returns null pointer regardless if the value passed instead of a vector is defined or not.
       ;  {:key :vector-expected-for-arg-list
       ;   :class "ExceptionInfo"
       ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
