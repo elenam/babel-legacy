@@ -8,6 +8,7 @@
                 :arg   {:check nil,                   :has-type "arg",      :argument "arg",  :arg-vec ["arg"]},
                 :coll  {:check "check-if-seqable?",   :has-type "seqable",  :argument "coll", :arg-vec ["coll"]},
                 :n     {:check "check-if-number?",    :has-type "number",   :argument "n",    :arg-vec ["n"]},
+                :r     {:check "check-if-ratio?",     :has-type "ratio",    :argument "r",    :arg-vec ["r"]},
                 :colls {:check "check-if-seqables?",  :has-type "seqable",  :argument "args", :arg-vec ["&" "args"]},
                 :str   {:check "check-if-string?",    :has-type "string",   :argument "str",  :arg-vec ["str"]},
                 :strs  {:check "check-if-strings?",   :has-type "string",   :argument "strs", :arg-vec ["&" "strs"]},
@@ -16,30 +17,21 @@
                 ;:args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
                 :args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
 
-;;plans to use this for the output
-(def re-type-data {
-                :arg   {:has-type ":a arg"},
-                :coll  {:has-type ":a (s/nilable coll?)"},
-                :n     {:has-type ":a number?"},
-                :colls {:has-type ":a (s/nilable coll?)"},
-                :str   {:has-type ":a string?"},
-                :strs  {:has-type ":a string?"},
-                :f     {:has-type ":a ifn?"},
-                :fs    {:has-type ":a ifn?"},
-                :args  {:has-type ":a (s/* args)"},
-                nil {:has-type ":a something"}})
 
-(def re-type-replace '{
-                :arg   ":a arg"
-                :coll  ":a (s/nilable coll?)"
-                :n     ":a number?"
-                :colls ":a (s/nilable coll?)"
-                :str   ":a string?"
-                :strs  ":a string?"
-                :f     ":a ifn?"
-                :fs    ":a ifn?"
-                :args  ":a (s/* args)"
-                nil ":a something"})
+(def re-type-replace
+  "This hashmap used for replacing the keywords with strings"
+  '{
+    :arg   ":a any?"
+    :coll  ":a (s/nilable coll?)"
+    :n     ":a number?"
+    :colls ":a (s/nilable coll?)"
+    :str   ":a string?"
+    :strs  ":a string?"
+    :f     ":a ifn?"
+    :fs    ":a ifn?"
+    :args  ":a (s/+ args)" ;s+ or s*
+    :r ":a ratio?"
+    nil ":a something"})
 
 ;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
 ;; (def arg-type (merge
@@ -58,6 +50,7 @@
                      (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
                      (zipmap [:maps] (repeat :maps-or-vectors)), ;added
                      (zipmap [:n :number :step :start :end :size] (repeat :n)),
+                     (zipmap [:r] (repeat :r)),
                      (zipmap [:arg :key :val :argument :x :y :test] (repeat :arg)), ; key is added
                      ;(zipmap ["(s/cat :a any?)" :key :val :argument :x :y] (repeat :arg)), ; key is added
                      (zipmap [:f :function :pred] (repeat :f)),
@@ -140,33 +133,69 @@
 		(chomp-arglists arglists) ;look at chomp-arglists
 		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
 
+(defn spec-length
+   "This function takes an argument n and changes it to a corresponding string"
+   [n]
+   (case n
+    1 "::b-length-one"
+    2 "::b-length-two"
+    3 "::b-length-three"
+    (cond
+    (or (= n [2 1]) (= n [1 2])) "::b-length-one-or-two"
+    (or (= n [3 1]) (= n [1 3])) "::b-length-one-or-three"
+    (or (= n [3 2]) (= n [2 3])) "::b-length-two-or-three"
+    (= n :args )"::b-length-greater-zero"
+    :else  n)))
+
+(defn args-and-range
+  "This function helps keep the length of replace count down
+  it sends :args and a minimum and maximum to spec-length"
+  [arglist x]
+  (if (= :args (first (first arglist)))
+    (spec-length (first (first arglist)))
+    (spec-length (vec (conj nil (apply min x) (apply max x))))))
+
+(defn replace-count
+  "This function takes a vector, creates a vector with the count of the
+  vectors in the vector and outputs the corresponding string"
+  [arglist]
+  (let [x (map count arglist)]
+    (if (and (= 1 (count x)) (not= :args (first (first arglist))))
+      (spec-length (first x))
+      (args-and-range arglist x))))
+
 ;; outputs a string of generated data for redefining functions with preconditions
 ;; function -> string
-#_(defn pre-re-defn [fvar]
+(defn pre-re-defn [fvar]
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
   (let [fmeta (meta fvar)]
     (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
       (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
 
-#_(defn pre-re-defn [fvar]
-;;   (println "pre-re-defn ing: " (:name (meta fvar)))
-  (let [fmeta (meta fvar)]
-    (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " :args (s/or :a (s/cat "
-      ;" " between each variable(s)
-      (apply str (vec (interpose ") :a (s/cat " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")))")))
-
-(defn pre-re-defn [fvar]
+(defn pre-re-defn-spec [fvar]
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
   (let [fmeta (meta fvar)]
     (clojure.string/replace
       (clojure.string/replace
         (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/or :a (s/cat "
+          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args " "(s/or :a (s/cat "
             (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
             "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
+(defn pre-re-defn-spec-babel [fvar]
+  (let [fmeta (meta fvar)]
+    (clojure.string/replace
+      (clojure.string/replace
+        (clojure.string/replace
+          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/and " (replace-count (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))) " (s/or :a (s/cat "
+            (apply str (vec (interpose ") \n  :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) "))))\n"
+            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
-(defn println-recur [all-vars]
+
+(defn println-recur
+  "This function shows everything required for a defn, to work with this
+  there can be an intermediate step"
+  [all-vars]
   (when
     (not (empty? all-vars))
     (try
@@ -175,7 +204,32 @@
     (println-recur (rest all-vars))))
 ;; (println-recur (vals (ns-publics 'clojure.core)))
 
-(defn println-recur-criminals [all-vars]
+(defn println-recur-spec
+  "This function generates basic specs for a library"
+  [all-vars]
+  (when
+    (not (empty? all-vars))
+    (try
+      (println (pre-re-defn-spec (first all-vars)))
+      (catch java.lang.ClassCastException e))
+    (println-recur-spec (rest all-vars))))
+;; (println-recur-spec (vals (ns-publics 'clojure.core)))
+
+(defn println-recur-spec-babel
+  "This function generates specs that include length used in
+  babel only."
+  [all-vars]
+  (when
+    (not (empty? all-vars))
+    (try
+      (println (pre-re-defn-spec-babel (first all-vars)))
+      (catch java.lang.ClassCastException e))
+    (println-recur-spec-babel (rest all-vars))))
+;; (println-recur-spec-babel (vals (ns-publics 'clojure.core)))
+
+(defn println-recur-criminals
+  "This function shows everything that could not be run in pre-re-defn"
+  [all-vars]
   (when
     (not (empty? all-vars))
     (try
