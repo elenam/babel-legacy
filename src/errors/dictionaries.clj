@@ -241,13 +241,19 @@
     n))
 
 ;;; ?-name: string->string
-(defn ?-name [n]
+(defn ?-name
+  "?-name takes a string and converts it into a new string
+  that is easier to understand when reading error messages
+  it replaces specific strings and removes ? and \r at the end of
+  every string that gets passed to it" 
+  [n]
   (case n
     "coll?" "collection"
     "ifn?" "function"
     "fn?" "function"
     (cond
       (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
+      (= "\r" (subs n (- (count n) 1))) (?-name (subs n 0 (- (count n) 1)))
       :else n)))
 
 ;;; check-divide: string->string
