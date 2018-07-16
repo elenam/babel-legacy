@@ -88,7 +88,7 @@
 
 (s/fdef clojure.core/conj
   :args (s/and ::b-length-greater-zero
-               (s/or :any (s/cat :any any?)
+               (s/or :any (s/cat :collection (s/nilable coll?)) ;conj can take anything but the intent of conj is that a single argument will be a collection
                      :collectionandany (s/cat :collection (s/nilable coll?) :any (s/+ any?)))))
 (stest/instrument `clojure.core/conj)
 
@@ -121,6 +121,10 @@
                (s/or :a (s/cat :ifn ifn? :coll (s/nilable coll?))
                      :b (s/cat :ifn ifn? :val any? :coll (s/nilable coll?)))))
 (stest/instrument `clojure.core/reduce)
+
+(s/fdef clojure.core/denominator
+  :args (s/or :a (s/cat :a ratio?)))
+(stest/instrument `clojure.core/denominator)
 
 ;##### Inline Functions #####
 

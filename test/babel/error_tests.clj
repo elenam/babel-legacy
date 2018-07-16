@@ -94,7 +94,11 @@
 (expect #"(?s)An attempt to access a non-existing object:   java\.util\.regex\.Pattern\.<init> (.*) \(NullPointerException\)\."
         (get-error "(re-pattern nil)"))
 
-(expect 3 (conj 3))
+(expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
+
+;##### Spec Testing #####
+
+(expect "In function conj, the first argument is expected to be a collection, but is a function instead.\n" (get-error "(conj even? \"a\")"))
 
 (expect "In function conj, the first argument is expected to be a collection, but is 3 instead.\n" (get-error "(conj 3 3)"))
 
@@ -102,11 +106,19 @@
 
 (expect "conj can only take one or more arguments.\n" (get-error "(conj)"))
 
+(expect "In function conj, the first argument is expected to be a collection, but is 3 instead.\n" (get-error "(conj 3)"))
+
+(expect "In function conj, the first argument is expected to be a collection, but is \\a instead.\n" (get-error "(conj \\a \"a\")"))
+
 (expect "In function map, the second argument is expected to be a collection, but is 3 instead.\n" (get-error "(map even? 3)"))
 
 (expect "In function map, the first argument is expected to be a function, but is 3 instead.\n" (get-error "(map 3 [3])"))
 
 (expect "In function map, the 6th argument is expected to be a collection, but is 3 instead.\n" (get-error "(map even? [3] [3] [3] [3] 3)"))
+
+(expect "In function map, the second argument is expected to be a collection, but is a function instead.\n" (get-error "(map even? even?)"))
+
+(expect "In function map, the first argument is expected to be a function, but is nil instead.\n" (get-error "(map nil)"))
 
 (expect "map can only take one or more arguments.\n" (get-error "(map)"))
 
@@ -118,7 +130,10 @@
 
 (expect "In function denominator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(denominator 3)"))
 
+(expect "In function denominator, the first argument is expected to be a ratio, but is a function instead.\n" (get-error "(denominator even?)"))
+
+(expect "denominator cannot take as few arguments as are curently in it, needs more arguments.\n" (get-error "(denominator)"))
+
+(expect "denominator cannot take as many arguments as are curently in it, needs fewer arguments.\n" (get-error "(denominator 1/3 3)"))
+
 (expect "In function numerator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(numerator 3)"))
-
-(expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
-

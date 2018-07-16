@@ -240,20 +240,40 @@
     "9" "nine"
     n))
 
+(defn number-vals [failedvals failedlength] ;figure out why failedvals is undefined, failed length works
+  (if (not= "nil" failedvals) ;failed vals works here so it most likely fails in the let
+    (let [x (vec (eval (quote (read-string failedvals))))] ;this works if failedvals is reaplaced with a string
+      (cond
+        (= failedlength "b-length-one") (if (> (count x) 1)
+                                            (str (number-word (str (count x))) " arguments")
+                                            (str "no arguments"))
+        (= failedlength "b-length-two") (if (> (count x) 2)
+                                            (str (number-word (str (count x))) " arguments")
+                                            (str "one argument"))
+        (= failedlength "b-length-three") (if (> (count x) 3)
+                                              (str (number-word (str (count x))) " arguments")
+                                              (if (= (count x) 1)
+                                                (str "one argument")
+                                                (str (number-word (str (count x))) " arguments")))
+        :else failedlength))
+      "no arguments"))
+
 ;;; ?-name: string->string
 (defn ?-name
   "?-name takes a string and converts it into a new string
   that is easier to understand when reading error messages
   it replaces specific strings and removes ? and \r at the end of
-  every string that gets passed to it" 
+  every string that gets passed to it"
   [n]
   (case n
     "coll?" "collection"
     "ifn?" "function"
     "fn?" "function"
+    "object" "function"
     (cond
       (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
       (= "\r" (subs n (- (count n) 1))) (?-name (subs n 0 (- (count n) 1)))
+      (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
       :else n)))
 
 ;;; check-divide: string->string
