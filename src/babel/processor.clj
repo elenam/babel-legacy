@@ -2,7 +2,8 @@
   (:require  [clojure.tools.nrepl :as repl]
              [clojure.spec.test.alpha :as stest]
              [errors.messageobj :as m-obj]
-             [errors.prettify-exception :as p-exc]))
+             [errors.prettify-exception :as p-exc]
+             [corefns.corefns :as cf]))
 
 (defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
   [inp-message]

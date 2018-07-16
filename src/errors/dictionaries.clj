@@ -207,23 +207,24 @@
   (let [pretty-val (apply pretty-print-nested-values params)]
     (if (coll? pretty-val) (cs/join (flatten pretty-val)) (str pretty-val))))
 
-;;; arg-str: number -> string
+;;; arg-str: non-negative integer as a string -> string
 (defn arg-str [n]
   (let [abs (fn [m] (if (> 0 m) (- m) m))
-        n1 (mod (abs n) 100)
-        n2 (mod (abs n) 10)]
-    (case n
+        n0 (+ 1 (Integer. n))
+        n1 (mod (abs n0) 100)
+        n2 (mod (abs n0) 10)]
+    (case n0
       1 "first argument"
       2 "second argument"
       3 "third argument"
       4 "fourth argument"
       5 "fifth argument"
       (cond
-        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n "th argument")
-        (= 1 n2) (str n "st argument")
-        (= 2 n2) (str n "nd argument")
-        (= 3 n2) (str n "rd argument")
-        :else   (str n "th argument")))))
+        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n0 "th argument")
+        (= 1 n2) (str n0 "st argument")
+        (= 2 n2) (str n0 "nd argument")
+        (= 3 n2) (str n0 "rd argument")
+        :else   (str n0 "th argument")))))
 
 (defn number-word [n]
   (case n
@@ -238,6 +239,20 @@
     "8" "eight"
     "9" "nine"
     n))
+
+;;; ?-name: string->string
+(defn ?-name [n]
+  (case n
+    "coll?" "collection"
+    "ifn?" "function"
+    "fn?" "function"
+    (cond
+      (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
+      :else n)))
+
+;;; check-divide: string->string
+(defn check-divide [n]
+  (if (= n "") "/" n))
 
 ;;; process-asserts-obj: string or nil -> string
 

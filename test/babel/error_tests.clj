@@ -41,14 +41,14 @@
 ;;class-cast-exception
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ 8 \"seventeen\")"))
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ \"hello\" 3)"))
-(expect "Attempted to use a number, but a function was expected.\n" (get-error "(map 5 [3])"))
+;(expect "Attempted to use a number, but a function was expected.\n" (get-error "(map 5 [3])"))
 
 (expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
 
 ;(expect "\n" (get-error ""))
 (expect "A keyword can only take one or two arguments.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
 
-(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
+;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
 (expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
 
@@ -75,7 +75,7 @@
 
 (expect "An index in a sequence is out of bounds or invalid.\n" (get-error "(nth (seq [1 2 3]) 5)"))
 
-(expect "An attempt to access a non-existing object (NullPointerException).\n" (get-error "(defn my-even [ilist] (if (= (mod (first ilist) 2) 0)(concat (list (first ilist)) (my-even (rest ilist)))(my-even (rest ilist)))) (my-even '(1,2,3,4,5))")) ;credit: https://stackoverflow.com/questions/7584337/clojure-nullpointerexception-error
+;(expect "An attempt to access a non-existing object (NullPointerException).\n" (get-error "(defn my-even [ilist] (if (= (mod (first ilist) 2) 0)(concat (list (first ilist)) (my-even (rest ilist)))(my-even (rest ilist)))) (my-even '(1,2,3,4,5))")) ;credit: https://stackoverflow.com/questions/7584337/clojure-nullpointerexception-error
 
 (expect "Name clojure.hello is undefined.\n" (get-error "(clojure.hello/union #{1 2 3} #{3 4})"))
 
@@ -93,3 +93,32 @@
 ;; This might not be what we want (might need to process the object), but that's what it currently is
 (expect #"(?s)An attempt to access a non-existing object:   java\.util\.regex\.Pattern\.<init> (.*) \(NullPointerException\)\."
         (get-error "(re-pattern nil)"))
+
+(expect 3 (conj 3))
+
+(expect "In function conj, the first argument is expected to be a collection, but is 3 instead.\n" (get-error "(conj 3 3)"))
+
+(expect "In function conj, the first argument is expected to be a collection, but is \"a\" instead.\n" (get-error "(conj \"a\" 3)"))
+
+(expect "conj can only take one or more arguments.\n" (get-error "(conj)"))
+
+(expect "In function map, the second argument is expected to be a collection, but is 3 instead.\n" (get-error "(map even? 3)"))
+
+(expect "In function map, the first argument is expected to be a function, but is 3 instead.\n" (get-error "(map 3 [3])"))
+
+(expect "In function map, the 6th argument is expected to be a collection, but is 3 instead.\n" (get-error "(map even? [3] [3] [3] [3] 3)"))
+
+(expect "map can only take one or more arguments.\n" (get-error "(map)"))
+
+(expect "In function even?, the first argument is expected to be a number, but is \"a\" instead.\n" (get-error "(even? \"a\")"))
+
+(expect "rand-int can only take one argument.\n" (get-error "(rand-int)"))
+
+(expect "In function rand-int, the first argument is expected to be a number, but is \"3\" instead.\n" (get-error "(rand-int \"3\")"))
+
+(expect "In function denominator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(denominator 3)"))
+
+(expect "In function numerator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(numerator 3)"))
+
+(expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
+
