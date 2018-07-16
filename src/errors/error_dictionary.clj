@@ -49,10 +49,10 @@
         (nth matches 5) :arg " is used instead of a function name.\n"))}
 
        ; returns null pointer regardless if the value passed instead of a vector is defined or not.
-      ;  {:key :vector-expected-for-arg-list
-      ;   :class "ExceptionInfo"
-      ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
-      ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A parameter for " (nth matches 2) :arg " required a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+       {:key :vector-expected-for-arg-list
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
 
 
    ;#############################

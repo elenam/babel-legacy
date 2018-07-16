@@ -37,8 +37,11 @@
         (get-error "(let [2 3] 8)"))
 
 ;############################################
-;#### Testing for 'let-like forms ###########
+;#### Testing for 'defn' ###########
 ;############################################
 
 (expect "In defn [b c] is used instead of a function name.\n"
         (get-error "(defn [b c] (+ 4 3))"))
+
+(expect "An argument for defn required a vector, instead, 'x' was given.\n"
+        (get-error "(defn afunc2 x (+ 3 x))"))
