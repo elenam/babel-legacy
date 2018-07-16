@@ -121,7 +121,7 @@
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args(.*)\\] predicate: (\\S*)(.*)  Extra input")
     ;:match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
-                                                           "cannot take as many arguments as are curently in it, needs less arguments.\n"))}
+                                                           " cannot take as many arguments as are curently in it, needs fewer arguments.\n"))}
 
    {:key :exception-info-insufficient-input
     :class "ExceptionInfo"
@@ -130,7 +130,7 @@
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails at: \\[:args(.*)\\] predicate: (\\S*)(.*)  Insufficient input")
     ;:match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
-                                                           "cannot take as few arguments as are curently in it, needs more argumetns.\n"))}
+                                                           " cannot take as few arguments as are curently in it, needs more argumetns.\n"))}
 
    {:key :exception-info
     :class "ExceptionInfo"
