@@ -13,6 +13,7 @@
                         (recv [this] (.recv transport))
                         (recv [this timeout] (.recv transport timeout))
                         (send [this msg]     (.send transport (processor/modify-errors msg)))))))))
+                        ;(send [this msg]     (.send transport msg))))))))
 
 ;;sets the appropriate flags on the middleware so it is placed correctly
 (clojure.tools.nrepl.middleware/set-descriptor! #'interceptor

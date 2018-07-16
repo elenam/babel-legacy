@@ -10,24 +10,49 @@
 
 (def error-dictionary
   [;########################
-   ;##### Spec Error #######
+   ;##### Spec Errors ######
    ;########################
 
-   ;; Wild cards in regular expressions don't match \n, so we need to include multi-line
-   ;; messages explicitly
-
-   {:key :exception-info
+   {:key :bindings-even-number-of-forms
     :class "ExceptionInfo"
-    ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
-    ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    :match #"Call to \#'(.*)/(.*) did not conform to spec:\nIn: \[(\d*)\] val: (.*) fails at: \[:args :(\S*)\](.*)(\n(.*)(\n)?)*"
-    ;:match #"(.*)(\n(.*))*(\n)?"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           " at position " (nth matches 3) :arg
-                                                           " is expected to be a "  (nth matches 5) :type
-                                                           " , but is " (nth matches 4) :type
-                                                           "instead."))}
-    ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/bindings(.*)predicate: any\?,  Insufficient input")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+    " must come in pairs, but one of them does not have a match.\n"))}
+
+    {:key :vector-expected-for-bindings
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+
+    {:key :binding-requires-a-pair
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+     " must be a pair, but only one element is given.\n"))}
+
+     {:key :extra-input-for-a-binding
+      :class "ExceptionInfo"
+      :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding (.*)Extra input")
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+      " must be only one name and one value, but more parameters were given.\n"))}
+
+      {:key :wrong-binding-name
+       :class "ExceptionInfo"
+       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
+       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+       (nth matches 5) :arg " is used instead of a variable name.\n"))}
+
+       {:key :wrong-binding-name-defn-args
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure.core.specs.alpha/defn-args (.*) predicate: simple-symbol\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+        (nth matches 5) :arg " is used instead of a function name.\n"))}
+
+       ; returns null pointer regardless if the value passed instead of a vector is defined or not.
+      ;  {:key :vector-expected-for-arg-list
+      ;   :class "ExceptionInfo"
+      ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+      ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A parameter for " (nth matches 2) :arg " required a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
 
 
    ;#############################
@@ -39,7 +64,7 @@
       :match #"(?s)(.*) cannot be cast to java\.util\.Map\$Entry(.*)"
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Attempted to create a map using "
                                                              (get-type (nth matches 1)) :type
-                                                             ", but a sequence of vectors of length 2 or a sequence of maps is needed."))}
+                                                             ", but a sequence of vectors of length 2 or a sequence of maps is needed.\n"))}
    {:key :class-cast-exception
     :class "ClassCastException"
     :match (beginandend "Cannot cast (\\S*) to (\\S*)")
@@ -87,7 +112,7 @@
     :match #"(?s)Don't know how to create (\S*) from: (\S*)(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Don't know how to create " (get-type (nth matches 1)) :type " from "(get-type (nth matches 2)) :type ".\n"))}
 
-
+    ;; This might go away now
     {:key :illegal-argument-even-number-of-forms
     :class "IllegalArgumentException"
     :match #"(?s)(\S*) requires an even number of forms(.*)"
@@ -177,7 +202,7 @@
    ;### Null Pointer Exceptions ###
    ;###############################
 
-   #_{:key :null-pointer-non-existing-object-provided
+   {:key :null-pointer-non-existing-object-provided
     ;need to test
     :class "NullPointerException"
     :match (beginandend "(.+)") ; for some reason (.*) matches twice. Since we know there is at least one symbol, + is fine
