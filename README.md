@@ -1,6 +1,6 @@
 # babel
 
-A prrof of concept tool for transforming error message in Clojure into beginner friendly forms.
+A proof of concept tool for transforming error message in Clojure into beginner friendly forms.
 Very early in development.
 Paper describing its use and development availible [here](https://github.com/Clojure-Intro-Course/mics2018demo/blob/master/mics2018.pdf "MICS Paper")
 

@@ -151,13 +151,15 @@
 
 ;; TO-DO: simplify handling the rest: now there is only one match -EM 5/20
 (defn get-exception-class-and-rest
-  "returns a vector contianing the class and then the message without the class marking"
+  "returns a vector containing the class and then the message without the class marking"
   [ex-str]
   (let [compiler-exc (re-matches #"(?s)CompilerException (\S*): (.*)" ex-str) ; first we check if it is a compiler exception
         matches (if compiler-exc compiler-exc (re-matches #"(?s)(\S*) (.*)" ex-str))
         e-class (second matches)
+        qual-name (nth (re-matches #"(\w+)\.(\w+)\.(.*)" e-class) 3)
+        e-class1 (if qual-name qual-name e-class)
         rest (apply str (drop 2 matches))]
-    [e-class rest]))
+    [e-class1 rest]))
 
 (defn process-spec-errors
   "Takes a message from an exception as a string and returns a message object,
@@ -167,6 +169,7 @@
         e-class (first parsing)
         message (second parsing)
         entry (get-match e-class message)
+        ;msg-info-obj (make-msg-info-hashes e-class " & " message "\n")]
         msg-info-obj (msg-from-matched-entry entry message)]
     {:exception-class e-class
      :msg-info-obj  msg-info-obj}))

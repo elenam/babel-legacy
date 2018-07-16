@@ -9,4 +9,6 @@
   :plugins [[lein-expectations "0.0.8"]]
   :repl-options {:nrepl-middleware
                  [babel.middleware/interceptor]
-                 :port 7888})
+                 :port 7888};)
+   :main utilities.spec_generator)
+   ;:main specfiletesting.core)
