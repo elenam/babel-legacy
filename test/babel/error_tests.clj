@@ -132,8 +132,8 @@
 
 (expect "In function denominator, the first argument is expected to be a ratio, but is a function instead.\n" (get-error "(denominator even?)"))
 
-(expect "denominator cannot take as few arguments as are curently in it, needs more arguments.\n" (get-error "(denominator)"))
+(expect "denominator cannot take as few arguments as are currently in it, needs more arguments.\n" (get-error "(denominator)"))
 
-(expect "denominator cannot take as many arguments as are curently in it, needs fewer arguments.\n" (get-error "(denominator 1/3 3)"))
+(expect "denominator cannot take as many arguments as are currently in it, needs fewer arguments.\n" (get-error "(denominator 1/3 3)"))
 
 (expect "In function numerator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(numerator 3)"))
