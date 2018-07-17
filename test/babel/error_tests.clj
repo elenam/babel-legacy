@@ -104,7 +104,7 @@
 
 (expect "In function conj, the first argument is expected to be a collection, but is \"a\" instead.\n" (get-error "(conj \"a\" 3)"))
 
-(expect "conj can only take one or more arguments.\n" (get-error "(conj)"))
+(expect "conj can only take one or more arguments; recieved no arguments.\n" (get-error "(conj)"))
 
 (expect "In function conj, the first argument is expected to be a collection, but is 3 instead.\n" (get-error "(conj 3)"))
 
@@ -120,11 +120,13 @@
 
 (expect "In function map, the first argument is expected to be a function, but is nil instead.\n" (get-error "(map nil)"))
 
-(expect "map can only take one or more arguments.\n" (get-error "(map)"))
+(expect "map can only take one or more arguments; recieved no arguments.\n" (get-error "(map)"))
 
 (expect "In function even?, the first argument is expected to be a number, but is \"a\" instead.\n" (get-error "(even? \"a\")"))
 
-(expect "rand-int can only take one argument.\n" (get-error "(rand-int)"))
+(expect "rand-int can only take one argument; recieved no arguments.\n" (get-error "(rand-int)"))
+
+(expect "rand-int can only take one argument; recieved three arguments.\n" (get-error "(rand-int 2 3 4)"))
 
 (expect "In function rand-int, the first argument is expected to be a number, but is \"3\" instead.\n" (get-error "(rand-int \"3\")"))
 

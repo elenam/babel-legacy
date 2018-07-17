@@ -242,19 +242,34 @@
 
 (defn number-vals [failedvals failedlength] ;figure out why failedvals is undefined, failed length works
   (if (not= "nil" failedvals) ;failed vals works here so it most likely fails in the let
-    (let [x (vec (eval (quote (read-string failedvals))))] ;this works if failedvals is reaplaced with a string
+    (let [x (count (read-string failedvals))] ;this works if failedvals is reaplaced with a string
       (cond
-        (= failedlength "b-length-one") (if (> (count x) 1)
+        (= failedlength "b-length-one") (if (> x 1)
                                             (str (number-word (str (count x))) " arguments")
                                             (str "no arguments"))
-        (= failedlength "b-length-two") (if (> (count x) 2)
+        (= failedlength "b-length-two") (if (> x 2)
                                             (str (number-word (str (count x))) " arguments")
                                             (str "one argument"))
-        (= failedlength "b-length-three") (if (> (count x) 3)
+        (= failedlength "b-length-three") (if (> x 3)
                                               (str (number-word (str (count x))) " arguments")
                                               (if (= (count x) 1)
                                                 (str "one argument")
                                                 (str (number-word (str (count x))) " arguments")))
+        (= failedlength "b-length-greater-zero") (str "no arguments")
+        (= failedlength "b-length-greater-one") (if (= (count x) 1)
+                                                  (str "one argument")
+                                                  (str "no arguments"))
+        (= failedlength "b-length-greater-two") (if (= (count x) 2)
+                                                 (str "two arguments")
+                                                 (if (= (count x) 1)
+                                                  (str "one argument")
+                                                  (str "no arguments")))
+        (= failedlength "b-length-zero-or-one") (str (number-word (str (count x))) " arguments")
+        (= failedlength "b-length-two-or-three") (if (> (count x) 3)
+                                              (str (number-word (str (count x))) " arguments")
+                                              (if (= (count x) 1)
+                                                (str "one argument")
+                                                (str "no arguments")))
         :else failedlength))
       "no arguments"))
 

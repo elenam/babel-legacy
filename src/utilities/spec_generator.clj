@@ -29,7 +29,7 @@
     :strs  ":a string?"
     :f     ":a ifn?"
     :fs    ":a ifn?"
-    :args  ":a (s/+ args)" ;s+ or s*
+    :args  ":a (s/* args)" ;s+ or s*
     :r ":a ratio?"
     nil ":a something"})
 
@@ -62,18 +62,18 @@
 (def arg-type (merge ;this changes the various possible arguments into the various corresponding types, like :x into :arg
                      (zipmap [:seq] (repeat :seq)), ; added
                      (zipmap [:map] (repeat :map-or-vector)), ;added
-                     (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
+                     (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5 :m :ks] (repeat :coll)),
                      (zipmap [:maps] (repeat :maps-or-vectors)), ;added
                      (zipmap [:n :number :step :start :end :size] (repeat :n)),
                      (zipmap [:r] (repeat :r)),
-                     (zipmap [:arg :key :val :argument :x :y :test] (repeat :arg)), ; key is added
+                     (zipmap [:arg :key :val :argument :x :y :test :not-found] (repeat :arg)), ; key is added
                      ;(zipmap ["(s/cat :a any?)" :key :val :argument :x :y] (repeat :arg)), ; key is added
                      (zipmap [:f :function :pred] (repeat :f)),
                      (zipmap [:fs :functions :preds] (repeat :fs)),
                      (zipmap [:colls :cs] (repeat :colls)),
                      (zipmap [:string :str :s] (repeat :str)),
                      (zipmap [:strs :strings :ss] (repeat :strs)),
-                     (zipmap [:more :args :vals :arguments :xs :ys] (repeat :args))))
+                     (zipmap [:more :args :vals :arguments :xs :ys :forms :filters] (repeat :args))))
 
 ;; returns the index of the last logically false member of the array
 ;; coll -> number
@@ -138,7 +138,7 @@
       (loop [rem-args f-arglists
              diffs []]
         (cond
-          (empty? rem-args) (append-last-arg (vec (filter #(<= (count %) (last-false-index diffs)) f-arglists)) last-arg)
+          (empty? rem-args) (append-last-arg (vec (filter #(<= (count %) (last-false-index diffs)) f-arglists)) last-arg) ; this is where the problem occurs with args, due to last-false-index.
           :else (recur (drop-while empty? (map rest rem-args)) (into diffs [true]))))));(apply map same-type? (conj rem-args [last-arg]))))))))
           ;:else (recur (drop-while empty? (map rest rem-args)) (into diffs (apply map same-type? (conj rem-args [last-arg]))))))))
           ;reduces all the sequences in the sequence by one (rest) and removes those that are empty
@@ -150,6 +150,16 @@
 	(if (chompable? arglists) ;checks for & in the arglist essentially
 		(chomp-arglists arglists) ;look at chomp-arglists
 		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
+
+;the fix for args may be to remove chomp-arglists and improve arglists->argtypes
+;in arglists->arg types if we (remove empty? sequence) and use the remove & function
+;we can get all the type data. The main problem with this is + and all other arg
+;functions will include all of their parts not includeing the empty sequence
+;(unless we decide to make empty sequence translate to s/* for spec and [] for intermediate)
+;so things like + will look like (defn #'clojure.core/+ [:n] [:n :n] [:n :n :args]) or with the
+;empty sequence (defn #'clojure.core/+ [] [:n] [:n :n] [:n :n :args]). This will change how
+;we process specs but shouldn't hurt the intermediate step too much.
+
 
 (defn spec-length
    "This function takes an argument n and changes it to a corresponding string"
