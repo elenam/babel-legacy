@@ -45,3 +45,12 @@
 
 (expect "An argument for defn required a vector, instead, 'x' was given.\n"
         (get-error "(defn afunc2 x (+ 3 x))"))
+
+;############################################
+;#### Testing for 'fn' ###########
+;############################################
+(expect "An argument for fn required a vector, instead, 'VARIABLE-NAME' was given.\n"
+        (get-error "(map (fn fn-name1 VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))"))
+
+(expect "An argument for fn required a vector, instead, 'VARIABLE-NAME' was given.\n"
+        (get-error "(map (fn VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))"))
