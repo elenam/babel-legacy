@@ -33,6 +33,21 @@
     :r ":a ratio?"
     nil ":a something"})
 
+(def type-replace
+  "This hashmap used for replacing the keywords with strings"
+  '{
+    :arg   :arg
+    :coll  :coll
+    :n     :n
+    :colls :colls
+    :str   :str
+    :strs  :strs
+    :f     :f
+    :fs    :fs
+    :args  [:coll :args]
+    :r :r
+    nil nil})
+
 ;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
 ;; (def arg-type (merge
 ;;                      (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
@@ -106,6 +121,9 @@
 	(map #(replace re-type-replace %) args)) ;this returns true for absolutely everything
  ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
 
+(defn replace-types [& args]
+	(map #(replace type-replace %) args))
+
 ;;helper function for chomp-arglists, appends last-arg to the end of the longest coll in arglists
 ;;arglists -> arglists
 (defn append-last-arg [arglists last-arg]
@@ -172,6 +190,14 @@
     (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
       (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
 
+(defn pre-re-defn-temp-solution [fvar]
+;;   (println "pre-re-defn ing: " (:name (meta fvar)))
+  (let [fmeta (meta fvar)] ;eventually I would like to make this take place in the code itself
+     (clojure.string/replace
+       (clojure.string/replace
+        (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
+         (apply str (vec (interpose " " (map vec (apply replace-types (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")") #"\[\[" "[") #"\]\]" "]")))
+
 (defn pre-re-defn-spec [fvar]
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
   (let [fmeta (meta fvar)]
@@ -203,6 +229,18 @@
       (catch java.lang.ClassCastException e))
     (println-recur (rest all-vars))))
 ;; (println-recur (vals (ns-publics 'clojure.core)))
+
+(defn println-recur-temp
+  "This function shows everything required for a defn, to work with this
+  there can be an intermediate step"
+  [all-vars]
+  (when
+    (not (empty? all-vars))
+    (try
+      (println (pre-re-defn-temp-solution (first all-vars)))
+      (catch java.lang.ClassCastException e))
+    (println-recur-temp (rest all-vars))))
+;; (println-recur-temp (vals (ns-publics 'clojure.core)))
 
 (defn println-recur-spec
   "This function generates basic specs for a library"
