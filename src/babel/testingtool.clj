@@ -11,18 +11,26 @@
 ;;you also need include hiccup dependency in project.clj
 ;;place (start-log) in the testing file to record testing time in the log
 
-;;set server-port
+;;--funtionality-- set server-port
 (def server-port 7888)
 
-;;counter atom
-(def counter (atom {:total 1}))
 
-;;reset atom
+;;--logging-- set time with the file name format
+(declare current-time)
+
+(defn update-time
+  []
+  (def current-time (.format (java.text.SimpleDateFormat. "MM'_'dd'_'yyyy'_T'HH'_'mm'_'ss") (new java.util.Date))))
+
+;;--logging-- counter atom
+(def counter (atom {:total 1 :partial 1}))
+
+;;--logging-- reset atom
 (defn reset-counter
   []
-  (def counter (atom {:total 1})))
+  (def counter (atom {:total 1 :partial 1})))
 
-;;trap-response gets the returning message from open repl
+;;--funtionality-- gets the returning message from open repl
 (defn trap-response
   "evals the code given as a string, and returns the list of associated nREPL messages"
   [inp-code]
@@ -31,25 +39,25 @@
         (repl/message {:op :eval :code inp-code})
         doall)))
 
-;;takes the response and returns only the error message
+;;--funtionality-- takes the response and returns only the error message
 (defn msgs-to-error
   "takes a list of messages and returns nil if no :err is present, or the first present :err value"
   [list-of-messages]
   (:err (first (filter :err list-of-messages))))
 
-;;execution funtion that takes a string and return its error message if applied
+;;--funtionality-- takes a string and return its error message if applied, also adds counter atom
 (defn record-error
   "takes code as a string, and returns the error from evaulating it on the nREPL server, or nil"
   [inp-code]
   (swap! counter update-in [:total] inc)
+  (swap! counter update-in [:partial] inc)
   (msgs-to-error (trap-response inp-code)))
 
-
-;;preset html environment
+;;--logging-- preset html log contents
 (defn html-log-preset
   []
   (html [:title "Babel testing log"]
-        [:h3 {:style "padding-top:20px"} "Testing log: "]
+        [:h3 {:style "padding-top:10px"} "Testing log : "]
         [:h4 (new java.util.Date)]
         [:script
          "function hideModified() {
@@ -93,26 +101,59 @@
                    x[i].style.display='block';
                  }
                  }
-               }"]
+
+               }
+               function hidenils() {
+                 var x = document.getElementsByClassName(\"nilResult\");
+                 if (document.getElementById(\"nil\").checked != true) {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.display='none';
+                   }
+                   } else {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.display='block';
+                   }
+                   }
+
+                 }"]
         [:p "Display options:"]
-        [:div
+        [:div#displayOptions
+         [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
          [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
          [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
          [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]]))
 
-;;add date to the txt and html test log
+;;--logging-- set html division for different test files
+(defn log-division
+  [file-name]
+  (html
+    [:div {:class "fileDivision"}
+     [:hr]
+     [:h3 "<br />Test file: " file-name "<br /><br />"]]))
+
+;;--logging-- start of txt and html test log, including preset up
 (defn start-log
   []
   (do
-    (spit "./doc/test_log.html" (html-log-preset) :append false)
-    (spit "./doc/test_log.txt" (str (new java.util.Date) "\n")) :append true))
+    (update-time)
+    (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
+    (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
 
-;;get original error msg by key
+;;--logging-- add html division previously defined
+(defn add-log
+    [file-name]
+    (do
+      (swap! counter assoc :partial 1)
+      (spit (str "./log/history/" current-time ".html") (log-division file-name) :append true)))
+
+;;--funtionality-- get original error msg by key
 (defn get-original-error-by-key
   [key]
   (:value (first (filter :value (trap-response (str "(" key " @babel.processor/recorder)"))))))
 
-;;content that is going to be put into the log
+;;--logging-- content that is going to be put into the log
 (defn log-content
   [inp-code]
   (if
@@ -120,50 +161,53 @@
     (str "#" (:total @counter) ":\n\n"
          "code input: " inp-code "\n\n"
          "modified error: " (clojure.string/trim-newline (msgs-to-error (trap-response inp-code))) "\n\n"
-         "original error: " (clojure.string/trim-newline (get-original-error-by-key :msg)) "\n\n"
-         "error detail: "(clojure.string/trim-newline (get-original-error-by-key :detail)) "\n\n\n")
+         "original error: " (clojure.string/trim-newline (get-original-error-by-key :msg)) "\n\n\n")
     (str "#" (:total @counter) ":\n\n"
          "code input: " inp-code "\n\n"
          "modified error: nil\n\n"
-         "original error: nil\n\n"
-         "error detail: nil\n\n\n")))
+         "original error: nil\n\n\n")))
 
-;;save the content into the txt log file
+;;--logging-- save the content into the txt log file
 (defn save-log
   [inp-code]
-  (spit "./doc/test_log.txt" (log-content inp-code) :append true))
+  (spit "./log/last_test.txt" (log-content inp-code) :append true))
 
-;;read the exsiting txt log content
+;;--logging-- read the exsiting txt log content
 (defn read-log
   []
-  (println (slurp "./doc/test_log.txt")))
+  (println (slurp "./log/last_test.txt")))
 
-;;html content
+;;--logging-- define html content
 (defn html-content
   [inp-code]
   (if
     (not= (msgs-to-error (trap-response inp-code)) nil)
-    (html [:div
+    (html [:div {:class "nonNilResult"}
            [:hr]
-           [:p "#" (:total @counter) ":<br />"]
+           [:div
+             [:p {:style "width:50%;float:left"} "#" (:partial @counter) ":<br />"]
+             [:p {:style "width:50%;text-align:right;float:right"} (:total @counter)]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
            [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (clojure.string/trim-newline (msgs-to-error (trap-response inp-code))) "<br />"]
            [:p {:class "originalError" :style "color:#D10101"} "original error: " (clojure.string/trim-newline (get-original-error-by-key :msg)) "<br />"]
            [:p {:class "errorDetail" :style "display:none"} "error detail: "(clojure.string/trim-newline (get-original-error-by-key :detail)) "<br /><br />"]])
-    (html [:div
+    (html [:div {:class "nilResult"}
            [:hr]
-           [:p "#" (:total @counter) ":<br />"]
+           [:div
+             [:p {:style "width:50%;float:left"} "#" (:partial @counter) ":<br />"]
+             [:p {:style "width:50%;text-align:right;float:right"} (:total @counter)]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: nil<br />"]
-           [:p {:class "originalError" :style "color:#D10101"} "original error: nil<br />"]
-           [:p {:class "errorDetail" :style "display:none"} "error detail: nil<br /><br />"]])))
+           [:p {:class "modifiedError" :style "color:#808080"} "modified error: nil<br />"]
+           [:p {:class "originalError" :style "color:#808080"} "original error: nil<br />"]
+           [:p {:class "errorDetail" :style "color:#808080;display:none"} "error detail: nil<br /><br />"]])))
 
-;;write html content
+
+;;--logging-- write html content
 (defn write-html
   [inp-code]
-  (spit "./doc/test_log.html" (html-content inp-code) :append true))
+  (spit (str "./log/history/" current-time ".html") (html-content inp-code) :append true))
 
-;;the execution funtion for the tests
+;;--funtionality-- the execution funtion for the tests
 (defn get-error
   [inp-code]
   (do

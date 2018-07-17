@@ -1,14 +1,16 @@
 (ns babel.error-tests
   (:require
-   [expectations :refer :all]
-   [babel.processor])
+   [expectations :refer :all])
   (:use
-   [babel.testingtool :only [get-error start-log]]))
+   [babel.testingtool :only [get-error start-log add-log]]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj
 
+;;start logging
 (start-log)
+(expect nil (add-log "error-tests.clj"))
+
 
 ;;test non erroring commands
 (expect  nil (get-error "(+ 5 8)"))
