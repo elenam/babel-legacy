@@ -54,3 +54,6 @@
 
 (expect "An argument for fn required a vector, instead, 'VARIABLE-NAME' was given.\n"
         (get-error "(map (fn VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))"))
+
+(expect "An argument for fn required a vector, but no vector was passed.\n"
+        (get-error "(map (fn (* 4 VARIABLE-NAME)) (range 1 10))"))
