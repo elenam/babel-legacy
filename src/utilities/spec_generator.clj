@@ -29,8 +29,23 @@
     :strs  ":a string?"
     :f     ":a ifn?"
     :fs    ":a ifn?"
-    :args  ":a (s/* args)" ;s+ or s*
+    ;:args  ":a (s/* args)" ;s+ or s*
+    :colls* ":a (s/* (s/nilable coll?))"
+    :strs*  ":a (s/* string?)"
+    :fs*    ":a (s/* function?)"
+    :args*  ":a (s/* args)"
     :r ":a ratio?"
+    :arg? ":a (s/? any?)"
+    :coll? ":a (s/? (s/nilable coll?))"
+    :n? ":a (s/? number?)"
+    :str? ":a (s/? string?)"
+    :f? ":a (s/? ifn?)"
+    :r? ":a (s/? ratio?)"
+    :nil? ":a (s/? something)"
+    :colls+ ":a (s/+ (s/nilable coll?))"
+    :strs+  ":a (s/+ string?)"
+    :fs+    ":a (s/+ function?)"
+    :args+  ":a (s/+ args)"
     nil ":a something"})
 
 (def type-replace
@@ -47,6 +62,41 @@
     :args  [:coll :args]
     :r :r
     nil nil})
+
+(def type-multi
+  "This hashmap used for checking that certain keys exist"
+  '{
+    [:coll :colls] :colls
+    [:str :strs]  :strs
+    [:f :fs]    :fs
+    [:arg :args]  :args})
+
+(def type-single
+  "This hashmap used for checking that certain keys exist and replacing them"
+  '{
+    [:arg]   :arg?
+    [:coll]  :coll?
+    [:n]     :n?
+    [:str]   :str?
+    [:f]     :f?
+    [:r]     :r?
+    [nil] :nil?})
+
+(def type-multi-replace
+  "This hashmap used for replacing keys"
+  '{
+    :colls :colls*
+    :strs  :strs*
+    :fs    :fs*
+    :args  :args*})
+
+(def type-multi-replace+
+  "This hashmap used for replacing keys"
+  '{
+    :colls :colls+
+    :strs  :strs+
+    :fs    :fs+
+    :args  :args+})
 
 ;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
 ;; (def arg-type (merge
@@ -73,7 +123,7 @@
                      (zipmap [:colls :cs] (repeat :colls)),
                      (zipmap [:string :str :s] (repeat :str)),
                      (zipmap [:strs :strings :ss] (repeat :strs)),
-                     (zipmap [:more :args :vals :arguments :xs :ys :forms :filters] (repeat :args))))
+                     (zipmap [:more :args :vals :arguments :xs :ys :forms :filters :keyvals] (repeat :args))))
 
 ;; returns the index of the last logically false member of the array
 ;; coll -> number
@@ -86,6 +136,7 @@
 ;;does the translating from the names rich hickey gave the arguments, to something consistent
 ;;list of lists of strings -> list of lists of keys
 (defn arglists->argtypes [arglists] (map (fn [x] (map #(arg-type (keyword %)) x)) arglists)) ;changes things like :x to :arg
+
 
 ;;returns the longest collection in a collection of collections
 ;;arglists -> arglist
@@ -109,7 +160,17 @@
 
 ;;returns the last element of the longest coll in a coll of colls
 ;;arglists -> keyword
-(defn last-arg [arglists] (keyword (str (name (first (reverse (first (reverse (sort-by count arglists)))))))))
+(defn last-arg [arglists] (first (reverse (first (reverse (sort-by count arglists))))))
+
+(defn second-to-last-arg [arglists] (first (rest (reverse (first (reverse (sort-by count arglists)))))))
+
+(defn second-arglist [arglists] (first (rest arglists)))
+
+(defn argtypes->moretypes [arglists] (cond (and (empty? (first arglists)) (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)])) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
+                                           (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-single (vec (second-arglist arglists)))) (seq [(seq [(get type-single (vec (second-arglist arglists)))])])
+                                           (and (= (count arglists) 1) (= (count (first arglists)) 2) (contains? type-multi (vec (first arglists)))) (seq [(seq [(get type-multi-replace+ (last-arg arglists))])])
+                                           (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-multi-replace (last-arg arglists))) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
+                                           :else arglists))
 
 ;;checks the :type-data of each argument, returning true if they are all the same
 ;;args -> boolean
@@ -148,7 +209,8 @@
 ;;arglists -> arglists
 (defn chomp-if-necessary [arglists]
 	(if (chompable? arglists) ;checks for & in the arglist essentially
-		(chomp-arglists arglists) ;look at chomp-arglists
+		;(chomp-arglists arglists) ;look at chomp-arglists
+  (argtypes->moretypes (arglists->argtypes (remove-and arglists)))
 		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
 
 ;the fix for args may be to remove chomp-arglists and improve arglists->argtypes
