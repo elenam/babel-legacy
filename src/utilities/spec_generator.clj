@@ -33,7 +33,7 @@
     :colls* ":a (s/* (s/nilable coll?))"
     :strs*  ":a (s/* string?)"
     :fs*    ":a (s/* function?)"
-    :args*  ":a (s/* args)"
+    :args*  ":a (s/* any?)"
     :r ":a ratio?"
     :arg? ":a (s/? any?)"
     :coll? ":a (s/? (s/nilable coll?))"
@@ -45,7 +45,7 @@
     :colls+ ":a (s/+ (s/nilable coll?))"
     :strs+  ":a (s/+ string?)"
     :fs+    ":a (s/+ function?)"
-    :args+  ":a (s/+ args)"
+    :args+  ":a (s/+ any?)"
     nil ":a something"})
 
 (def type-replace
@@ -166,10 +166,11 @@
 
 (defn second-arglist [arglists] (first (rest arglists)))
 
-(defn argtypes->moretypes [arglists] (cond (and (empty? (first arglists)) (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)])) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
+(defn argtypes->moretypes [arglists] (cond (and (empty? (first arglists)) (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)])) (do (println "please check to make sure this is right") (seq [(seq [(get type-multi-replace (last-arg arglists))])]))
                                            (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-single (vec (second-arglist arglists)))) (seq [(seq [(get type-single (vec (second-arglist arglists)))])])
                                            (and (= (count arglists) 1) (= (count (first arglists)) 2) (contains? type-multi (vec (first arglists)))) (seq [(seq [(get type-multi-replace+ (last-arg arglists))])])
                                            (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-multi-replace (last-arg arglists))) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
+                                           (contains? type-multi-replace (last-arg arglists)) (reverse (conj (rest (reverse (seq (map seq arglists)))) (reverse (conj (rest (reverse (first (reverse (seq (map seq arglists)))))) (get type-multi-replace (last-arg arglists))))))
                                            :else arglists))
 
 ;;checks the :type-data of each argument, returning true if they are all the same
@@ -234,14 +235,16 @@
     (or (= n [2 1]) (= n [1 2])) "::b-length-one-or-two"
     (or (= n [3 1]) (= n [1 3])) "::b-length-one-or-three"
     (or (= n [3 2]) (= n [2 3])) "::b-length-two-or-three"
-    (= n :args )"::b-length-greater-zero"
+    (= n :args ) "::b-length-greater-zero"
+    (not= nil (re-matches #":(\S*)s*" (str n))) "::b-length-greater-zero"
+    (not= nil (re-matches #":(\S*)s+" (str n))) "::b-length-greater-one"
     :else  n)))
 
 (defn args-and-range
   "This function helps keep the length of replace count down
   it sends :args and a minimum and maximum to spec-length"
   [arglist x]
-  (if (= :args (first (first arglist)))
+  (if (or (= :args (first (first arglist))) (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist))))))
     (spec-length (first (first arglist)))
     (spec-length (vec (conj nil (apply min x) (apply max x))))))
 
@@ -250,7 +253,7 @@
   vectors in the vector and outputs the corresponding string"
   [arglist]
   (let [x (map count arglist)]
-    (if (and (= 1 (count x)) (not= :args (first (first arglist))))
+    (if (and (= 1 (count x)) (not= :args (first (first arglist))) (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist))))))
       (spec-length (first x))
       (args-and-range arglist x))))
 
