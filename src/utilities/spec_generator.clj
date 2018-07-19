@@ -82,6 +82,17 @@
     [:r]     :r?
     [nil] :nil?})
 
+(def type-single-no-vec
+  "This hashmap used for checking that certain keys exist and replacing them"
+  '{
+    :arg   :arg?
+    :coll  :coll?
+    :n     :n?
+    :str   :str?
+    :f     :f?
+    :r     :r?
+    nil :nil?})
+
 (def type-multi-replace
   "This hashmap used for replacing keys"
   '{
@@ -171,6 +182,7 @@
                                            (and (= (count arglists) 1) (= (count (first arglists)) 2) (contains? type-multi (vec (first arglists)))) (seq [(seq [(get type-multi-replace+ (last-arg arglists))])])
                                            (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-multi-replace (last-arg arglists))) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
                                            (contains? type-multi-replace (last-arg arglists)) (reverse (conj (rest (reverse (seq (map seq arglists)))) (reverse (conj (rest (reverse (first (reverse (seq (map seq arglists)))))) (get type-multi-replace (last-arg arglists))))))
+                                           (and (empty? (first arglists)) (>= (count arglists) 2)) (conj (reverse (rest (rest arglists))) (reverse (conj (reverse (rest (first (rest arglists)))) (get type-single-no-vec (first (first (rest arglists)))))))
                                            :else arglists))
 
 ;;checks the :type-data of each argument, returning true if they are all the same
@@ -226,25 +238,43 @@
 
 (defn spec-length
    "This function takes an argument n and changes it to a corresponding string"
-   [n]
-   (case n
-    1 "::b-length-one"
-    2 "::b-length-two"
-    3 "::b-length-three"
+   [n & [arg]]
+   (if arg
     (cond
-    (or (= n [2 1]) (= n [1 2])) "::b-length-one-or-two"
-    (or (= n [3 1]) (= n [1 3])) "::b-length-one-or-three"
-    (or (= n [3 2]) (= n [2 3])) "::b-length-two-or-three"
-    (= n :args ) "::b-length-greater-zero"
-    (not= nil (re-matches #":(\S*)s*" (str n))) "::b-length-greater-zero"
-    (not= nil (re-matches #":(\S*)s+" (str n))) "::b-length-greater-one"
-    :else  n)))
+      (not= nil (re-matches #":(\S*)s\*" (str arg))) (case n
+                                                       1 "::b-length-zero-or-greater"
+                                                       2 "::b-length-greater-zero"
+                                                       3 "::b-length-greater-one"
+                                                       4 "::b-length-greater-two"
+                                                       5 "::b-length-greater-three"
+                                                       n)
+      (not= nil (re-matches #":(\S*)s+" (str arg))) (case n
+                                                       1 "::b-length-greater-zero"
+                                                       2 "::b-length-greater-one"
+                                                       3 "::b-length-greater-two"
+                                                       4 "::b-length-greater-three"
+                                                       5 "::b-length-greater-four"
+                                                       n)
+      :else n)
+    (case n
+      1 "::b-length-one"
+      2 "::b-length-two"
+      3 "::b-length-three"
+      (cond
+        (or (= n [2 1]) (= n [1 2])) "::b-length-one-to-two"
+        (or (= n [3 1]) (= n [1 3])) "::b-length-one-to-three"
+        (or (= n [3 2]) (= n [2 3])) "::b-length-two-to-three"
+        (= n :args ) "::b-length-greater-zero"
+        (not= nil (re-matches #":(\S*)s\*" (str n))) "::b-length-greater-zero"
+        (not= nil (re-matches #":(\S*)s+" (str n))) "::b-length-greater-one"
+        (not= nil (re-matches #":(\S*)\?" (str n))) "::b-length-zero-or-one"
+        :else  n))))
 
 (defn args-and-range
   "This function helps keep the length of replace count down
   it sends :args and a minimum and maximum to spec-length"
   [arglist x]
-  (if (or (= :args (first (first arglist))) (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist))))))
+  (if (or (= :args (first (first arglist))) (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist))))) (not= nil (re-matches #":(\S*)\?" (str (first (first arglist))))))
     (spec-length (first (first arglist)))
     (spec-length (vec (conj nil (apply min x) (apply max x))))))
 
@@ -253,9 +283,11 @@
   vectors in the vector and outputs the corresponding string"
   [arglist]
   (let [x (map count arglist)]
-    (if (and (= 1 (count x)) (not= :args (first (first arglist))) (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist))))))
+    (if (and (= 1 (count x)) (nil? (re-matches #":(\S*)s(.*)" (str (last-arg arglist)))) (not= :args (first (first arglist))) (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist))))) (nil? (re-matches #":(\S*)?" (str (first (first arglist))))))
       (spec-length (first x))
-      (args-and-range arglist x))))
+      (if (not= nil (re-matches #":(\S*)s(.*)" (str (last-arg arglist))))
+        (spec-length (count (first (reverse arglist))) (last-arg arglist))
+        (args-and-range arglist x)))))
 
 ;; outputs a string of generated data for redefining functions with preconditions
 ;; function -> string
@@ -327,6 +359,8 @@
       (catch java.lang.ClassCastException e))
     (println-recur-spec (rest all-vars))))
 ;; (println-recur-spec (vals (ns-publics 'clojure.core)))
+;; check for :special-form true
+;; send to vectors instead of printing
 
 (defn println-recur-spec-babel
   "This function generates specs that include length used in
@@ -339,6 +373,22 @@
       (catch java.lang.ClassCastException e))
     (println-recur-spec-babel (rest all-vars))))
 ;; (println-recur-spec-babel (vals (ns-publics 'clojure.core)))
+
+(defn println-recur-spec-babel-vector
+  "This function generates specs that include length used in
+  babel only."
+  [all-vars]
+    (loop [rem-args all-vars
+           normal "Normal Cases: "
+           macro "Macros and Special Cases: "]
+      (cond
+        (empty? rem-args) [(str normal) (str macro)]
+        :else (recur (rest rem-args) (if-not (or (get (meta (first rem-args)) :macro) (get (meta (first rem-args)) :special-form))
+                       (str normal (pre-re-defn-spec-babel (first rem-args)))
+                       (str normal))
+                     (if (or (get (meta (first rem-args)) :macro) (get (meta (first rem-args)) :special-form))
+                       (str macro (pre-re-defn-spec-babel (first rem-args))) ;this fails for some reason
+                       (str macro))))))
 
 (defn println-recur-criminals
   "This function shows everything that could not be run in pre-re-defn"
