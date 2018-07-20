@@ -205,7 +205,7 @@
 
 ;;removes redundant arguments in arglists
 ;;arglists -> arglists
-(defn chomp-arglists [arglists]
+#_(defn chomp-arglists [arglists]
     (let [f-arglists (arglists->argtypes (remove-and arglists)) ;removes & and changing the various args to stuff like :arg
 	  last-arg (first (reverse (first (reverse (sort-by count f-arglists))))) ;gets the last argument in the last sequence
           ]
@@ -295,7 +295,7 @@
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
   (let [fmeta (meta fvar)]
     (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
-      (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
+      (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")\n")))
 
 (defn pre-re-defn-temp-solution [fvar]
 ;;   (println "pre-re-defn ing: " (:name (meta fvar)))
@@ -324,6 +324,14 @@
             (apply str (vec (interpose ") \n  :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) "))))\n"
             "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
 
+(defn apply-persist
+ [& vars]
+(map #(clojure.string/includes? % "Persistent") vars))
+
+
+(defn check-persist
+    [vars]
+   (boolean? (some #(= true %) (apply apply-persist (vec (map vec (map #(map str %) (map #(map type %) (:arglists (meta vars))))))))))
 
 (defn println-recur
   "This function shows everything required for a defn, to work with this
@@ -374,21 +382,25 @@
     (println-recur-spec-babel (rest all-vars))))
 ;; (println-recur-spec-babel (vals (ns-publics 'clojure.core)))
 
-(defn println-recur-spec-babel-vector
+(defn println-recur-vector
   "This function generates specs that include length used in
   babel only."
   [all-vars]
     (loop [rem-args all-vars
-           normal "Normal Cases: "
-           macro "Macros and Special Cases: "]
+           normal "Normal Cases: \n"
+           macros "Macros and Special Cases: \n"
+           exceptions "Exceptions: \n"]
       (cond
-        (empty? rem-args) [(str normal) (str macro)]
-        :else (recur (rest rem-args) (if-not (or (get (meta (first rem-args)) :macro) (get (meta (first rem-args)) :special-form))
-                       (str normal (pre-re-defn-spec-babel (first rem-args)))
-                       (str normal))
-                     (if (or (get (meta (first rem-args)) :macro) (get (meta (first rem-args)) :special-form))
-                       (str macro (pre-re-defn-spec-babel (first rem-args))) ;this fails for some reason
-                       (str macro))))))
+        (empty? rem-args) [normal macros exceptions]
+        ;(clojure.string/includes? (str (:name (meta (first rem-args)))) "def") (recur (rest rem-args) normal macros (str exceptions (first rem-args) "\n"))
+        ;(clojure.string/includes? (str (:name (meta (first rem-args)))) "assoc-in") (recur (rest rem-args) normal macros (str exceptions (first rem-args) "\n"))
+        (check-persist (first rem-args)) (recur (rest rem-args) normal macros (str exceptions (first rem-args) "\n"))
+        :else ;(recur ;(rest rem-args) (if-not (or (get (meta (first rem-args)) :macro) (get (meta (first rem-args)) :special-form))
+                       ;(str normal (pre-re-defn-spec-babel (first rem-args)))
+                       ;(str normal))
+                       (if (or ((meta (first rem-args)) :macro) ((meta (first rem-args)) :special-form))
+                         (recur (rest rem-args) normal (str macros (pre-re-defn (first rem-args)) "\n") exceptions) ;this fails for some reason
+                         (recur (rest rem-args) (str normal (pre-re-defn (first rem-args)) "\n") macros exceptions)))))
 
 (defn println-recur-criminals
   "This function shows everything that could not be run in pre-re-defn"
@@ -400,8 +412,8 @@
       (catch java.lang.ClassCastException e
           (println (first all-vars))))
     (println-recur-criminals (rest all-vars))))
-;; (println-recur-criminals (vals (ns-publics 'clojure.core)))
 
+;; (println-recur-criminals (vals (ns-publics 'clojure.core)))
 
 ;;probably depricated since spec, but below is slightly buggy code to automate the re defining of functions
 ;;This should be deleted after I am certain it is no longer useful.
