@@ -303,10 +303,12 @@
     ;### Arity Exceptions ###
     ;########################
 
+    ;; Need to revisit this one: we might want to add a spec to it
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: core/keyword")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A keyword can only take one or two arguments.\n"))}
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/keyword")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A function 'keyword' can only take one or two arguments, but "
+    (nth matches 1) " were passed to it.\n"))}
 
     {:key :wrong-number-of-args-passed-to-core
     ;we may want to find a way to make this less general
@@ -502,6 +504,25 @@
     :match (beginandend "arg literal must be %, %& or %integer")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
+    ;###################################
+    ;### Memory and Stack Exceptions ###
+    ;###################################
+
+    {:key :out-of-memory
+    :class "OutOfMemoryError"
+    :match (beginandend "Java heap space ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation.\n"))}
+
+    {:key :stack-overflow-with-name
+    :class "StackOverflowError"
+    :match (beginandend ".*(\\S+)\\.(\\S+)/(\\S+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion."
+    " Detected in function " (nth matches 3) ".\n"))}
+
+    {:key :stack-overflow-generic
+    :class "StackOverflowError"
+    :match (beginandend ".*(\\S+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion.\n"))}
 
    ;#####################
    ;### Default Error ###

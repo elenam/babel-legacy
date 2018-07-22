@@ -46,7 +46,7 @@
 (expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
 
 ;(expect "\n" (get-error ""))
-(expect "A keyword can only take one or two arguments.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
+(expect "A function 'keyword' can only take one or two arguments, but 3 were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
 
 ;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
@@ -86,6 +86,9 @@
 (expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
 (expect "Too few arguments to if.\n" (get-error "(if (= 0 0))"))
+
+;; it doesn't look like we can run this test; works correctly in repl
+#_(expect "Clojure ran out of memory, likely due to an infinite computation.\n" (get-error "(range)"))
 
 ;(expect "Attempted to use a string, but a number was expected" (get-error "(+ 8 \"seventeen\")"));;will not work until we write specs for core functions
 
@@ -139,3 +142,11 @@
 (expect "denominator cannot take as many arguments as are currently in it, needs fewer arguments.\n" (get-error "(denominator 1/3 3)"))
 
 (expect "In function numerator, the first argument is expected to be a ratio, but is 3 instead.\n" (get-error "(numerator 3)"))
+
+;#################################################################
+;############################## Nested errors ####################
+;#################################################################
+
+(expect "Tried to divide by zero\n" (get-error "(even? [(map #(/ % 0) [1 2])])"))
+
+(expect "In function map, the first argument is expected to be a function, but is 2 instead.\n" (get-error "(even? [(map 2 [1 2])])"))
