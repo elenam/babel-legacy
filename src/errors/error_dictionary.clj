@@ -307,7 +307,7 @@
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/keyword")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A function 'keyword' can only take one or two arguments, but "
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A function " "keyword" :arg " can only take one or two arguments, but "
     (nth matches 1) " were passed to it.\n"))}
 
     {:key :wrong-number-of-args-passed-to-core
@@ -515,14 +515,9 @@
 
     {:key :stack-overflow-with-name
     :class "StackOverflowError"
-    :match (beginandend ".*(\\S+)\\.(\\S+)/(\\S+)")
+    :match (beginandend "\\s*(\\S+)\\s+")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion."
-    " Detected in function " (nth matches 3) ".\n"))}
-
-    {:key :stack-overflow-generic
-    :class "StackOverflowError"
-    :match (beginandend ".*(\\S+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion.\n"))}
+    " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
 
    ;#####################
    ;### Default Error ###

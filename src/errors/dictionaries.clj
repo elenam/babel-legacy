@@ -118,18 +118,18 @@
   [fname]
   (let [;check-spec ((merge corefns-map specs-map) fname)
         ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
-        m (nth (re-matches #"(.*)\$(.*)" fname) 2)
-        matched (if m m (nth (re-matches #"(.*)/(.*)" fname) 2))]
+        matched (or (nth (re-matches #"(.*)\$(.*)" fname) 2)
+                    (nth (re-matches #"(.*)/(.*)" fname) 2))]
     (if matched
       (check-if-anonymous-function (lookup-funct-name matched))
       fname)))
 
 ;;; remove-inliner: string -> string
 (defn- remove-inliner
-  "If fname ends with inliner this will return everything before it"
+  "If fname ends with inliner or any generated name with --, this will return everything before it"
   [fname]
-  (let [match (nth (re-matches #"(.*)--inliner(.*)" fname) 1)]
-    (if match match fname)))
+  (let [match (nth (re-matches #"(.*)--(.*)" fname) 1)]
+    (or match fname)))
 
 ;;; get-function-name: string -> string
 (defn get-function-name

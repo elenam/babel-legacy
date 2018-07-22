@@ -46,7 +46,7 @@
 (expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
 
 ;(expect "\n" (get-error ""))
-(expect "A function 'keyword' can only take one or two arguments, but 3 were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
+(expect "A function keyword can only take one or two arguments, but 3 were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
 
 ;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
