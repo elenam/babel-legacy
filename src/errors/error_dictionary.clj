@@ -22,7 +22,7 @@
     {:key :vector-expected-for-bindings
      :class "ExceptionInfo"
      :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
-     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, " (nth matches 5) :arg " was given.\n"))}
 
     {:key :binding-requires-a-pair
      :class "ExceptionInfo"
@@ -48,11 +48,23 @@
         :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
         (nth matches 5) :arg " is used instead of a function name.\n"))}
 
-       ; returns null pointer regardless if the value passed instead of a vector is defined or not.
-      ;  {:key :vector-expected-for-arg-list
-      ;   :class "ExceptionInfo"
-      ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
-      ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A parameter for " (nth matches 2) :arg " required a vector, instead, '" (nth matches 5) :arg "' was given.\n"))}
+        {:key :vector-expected-for-arg-list-second-var-arg
+         :class "ExceptionInfo"
+         :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) (.*) \(")
+         :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 9) :arg " was given.\n"))}
+
+      {:key :vector-expected-for-arg-list
+       :class "ExceptionInfo"
+       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) \(")
+       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 8) :arg " was given.\n"))}\
+
+       {:key :vector-expected-for-arg-list
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
+
+
+
 
    {:key :length-not-greater-zero
     :class "ExceptionInfo"
@@ -319,7 +331,7 @@
     {:key :wrong-number-of-args-passed-to-user-defined
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: (\\S*)/(\\S*)")
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*)/(\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 3) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
 
     ;#####################
