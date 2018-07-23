@@ -169,12 +169,12 @@
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (nth matches 2) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot call " (nth matches 2) :arg " with " (nth matches 1) :arg " arguments.\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: (\\S*)/(\\S*)")
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*)/(\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 3) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
 
     ;#####################
