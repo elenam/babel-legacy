@@ -20,7 +20,7 @@
 (expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
         (get-error " (let [[a b]] (+ a b))"))
 
-(expect "Parameters for let require a vector, instead, 'a' was given.\n"
+(expect "Parameters for let require a vector, instead, a was given.\n"
         (get-error " (let a (+ a 2))"))
 
 ;############################################
@@ -43,23 +43,26 @@
 (expect "In defn [b c] is used instead of a function name.\n"
         (get-error "(defn [b c] (+ 4 3))"))
 
-(expect "An argument for defn required a vector, instead, 'x' was given.\n"
+(expect "An argument for defn required a vector, instead, x was given.\n"
         (get-error "(defn afunc2 x (+ 3 x))"))
 
 (expect "In defn- [b c] is used instead of a function name.\n"
         (get-error "(defn- [b c] (+ 4 3))"))
 
-(expect "An argument for defn- required a vector, instead, 'x' was given.\n"
+(expect "An argument for defn- required a vector, instead, x was given.\n"
         (get-error "(defn- afunc2 x (+ 3 x))"))
 
 ;############################################
 ;#### Testing for 'fn' ###########
 ;############################################
-(expect "An argument for fn required a vector, instead, 'VARIABLE-NAME' was given.\n"
+(expect "An argument for fn required a vector, instead, VARIABLE-NAME was given.\n"
         (get-error "(map (fn fn-name1 VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))"))
 
-(expect "An argument for fn required a vector, instead, 'VARIABLE-NAME' was given.\n"
+(expect "An argument for fn required a vector, instead, VARIABLE-NAME was given.\n"
         (get-error "(map (fn VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))"))
 
 (expect "An argument for fn required a vector, but no vector was passed.\n"
         (get-error "(map (fn (* 4 VARIABLE-NAME)) (range 1 10))"))
+
+(expect "An argument for fn required a vector, instead, p was given.\n"
+        (get-error "(let [x 7] (fn [r] (fn p (+ p p))))"))
