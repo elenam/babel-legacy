@@ -81,7 +81,7 @@
 
 (expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
 
-(expect "hello cannot take (1) arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+(expect "hello cannot take 1 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
 
 (expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
