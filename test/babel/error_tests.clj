@@ -52,7 +52,7 @@
 
 (expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
 
-(expect "A symbol cannot take (3) arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
+(expect "A symbol cannot take 3 arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
 
 (expect "Cannot call nil as a function.\n" (get-error "(nil)"))
 
