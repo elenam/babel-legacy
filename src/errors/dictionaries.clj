@@ -118,18 +118,21 @@
   [fname]
   (let [;check-spec ((merge corefns-map specs-map) fname)
         ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
-        m (nth (re-matches #"(.*)\$(.*)" fname) 2)
-        matched (if m m (nth (re-matches #"(.*)/(.*)" fname) 2))]
+        matched (or (nth (re-matches #"(.*)\$(.*)" fname) 2)
+                    (nth (re-matches #"(.*)/(.*)" fname) 2)
+                    ;; the last match is the function name we need:
+                    (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
     (if matched
       (check-if-anonymous-function (lookup-funct-name matched))
       fname)))
 
 ;;; remove-inliner: string -> string
-(defn- remove-inliner
-  "If fname ends with inliner this will return everything before it"
+(defn remove-inliner
+  "If fname ends with inliner or any generated name with --, this will return everything before it"
   [fname]
-  (let [match (nth (re-matches #"(.*)--inliner(.*)" fname) 1)]
-    (if match match fname)))
+  (let [match1 (nth (re-matches #"(.*)--(.*)" fname) 1)
+        match2 (if match1 (nth (re-matches #"(.*)--(.*)" match1) 1) nil)]
+    (or match2 match1 fname)))
 
 ;;; get-function-name: string -> string
 (defn get-function-name
@@ -207,23 +210,24 @@
   (let [pretty-val (apply pretty-print-nested-values params)]
     (if (coll? pretty-val) (cs/join (flatten pretty-val)) (str pretty-val))))
 
-;;; arg-str: number -> string
+;;; arg-str: non-negative integer as a string -> string
 (defn arg-str [n]
   (let [abs (fn [m] (if (> 0 m) (- m) m))
-        n1 (mod (abs n) 100)
-        n2 (mod (abs n) 10)]
-    (case n
+        n0 (+ 1 (Integer. n))
+        n1 (mod (abs n0) 100)
+        n2 (mod (abs n0) 10)]
+    (case n0
       1 "first argument"
       2 "second argument"
       3 "third argument"
       4 "fourth argument"
       5 "fifth argument"
       (cond
-        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n "th argument")
-        (= 1 n2) (str n "st argument")
-        (= 2 n2) (str n "nd argument")
-        (= 3 n2) (str n "rd argument")
-        :else   (str n "th argument")))))
+        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n0 "th argument")
+        (= 1 n2) (str n0 "st argument")
+        (= 2 n2) (str n0 "nd argument")
+        (= 3 n2) (str n0 "rd argument")
+        :else   (str n0 "th argument")))))
 
 (defn number-word [n]
   (case n
@@ -238,6 +242,61 @@
     "8" "eight"
     "9" "nine"
     n))
+
+(defn number-vals [failedvals failedlength] ;figure out why failedvals is undefined, failed length works
+  (if (not= "nil" failedvals) ;failed vals works here so it most likely fails in the let
+    (let [x (count (read-string failedvals))] ;this works if failedvals is reaplaced with a string
+      (cond
+        (= failedlength "b-length-one") (if (> x 1)
+                                            (str (number-word (str x)) " arguments")
+                                            (str "no arguments"))
+        (= failedlength "b-length-two") (if (> x 2)
+                                            (str (number-word (str x)) " arguments")
+                                            (str "one argument"))
+        (= failedlength "b-length-three") (if (> x 3)
+                                              (str (number-word (str x)) " arguments")
+                                              (if (= x 1)
+                                                (str "one argument")
+                                                (str (number-word (str x)) " arguments")))
+        (= failedlength "b-length-greater-zero") (str "no arguments")
+        (= failedlength "b-length-greater-one") (if (= x 1)
+                                                  (str "one argument")
+                                                  (str "no arguments"))
+        (= failedlength "b-length-greater-two") (if (= x 2)
+                                                 (str "two arguments")
+                                                 (if (= x 1)
+                                                  (str "one argument")
+                                                  (str "no arguments")))
+        (= failedlength "b-length-zero-or-one") (str (number-word (str x)) " arguments")
+        (= failedlength "b-length-two-or-three") (if (> x 3)
+                                              (str (number-word (str x)) " arguments")
+                                              (if (= x 1)
+                                                (str "one argument")
+                                                (str "no arguments")))
+        :else failedlength))
+      "no arguments"))
+
+;;; ?-name: string->string
+(defn ?-name
+  "?-name takes a string and converts it into a new string
+  that is easier to understand when reading error messages
+  it replaces specific strings and removes ? and \r at the end of
+  every string that gets passed to it"
+  [n]
+  (case n
+    "coll?" "collection"
+    "ifn?" "function"
+    "fn?" "function"
+    "object" "function"
+    (cond
+      (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
+      (= "\r" (subs n (- (count n) 1))) (?-name (subs n 0 (- (count n) 1)))
+      (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
+      :else n)))
+
+;;; check-divide: string->string
+(defn check-divide [n]
+  (if (= n "") "/" n))
 
 ;;; process-asserts-obj: string or nil -> string
 
