@@ -1,5 +1,5 @@
-(ns utilities.spec_generator)
-   ;(:require [corefns.assert_handling :refer :all]))
+(ns utilities.spec_generator
+   (:require [clojure.string :as str]))
 
 
 ;;the only part of this hash map we still use is :has-type
@@ -172,12 +172,10 @@
 (defn replace-types [& args]
 	(map #(replace type-replace %) args))
 
-;;runs chomp-arglist if the & is present, else just translates to our representation
-;;arglists -> arglists
 (defn chomp-if-necessary [arglists]
-	(if (chompable? arglists) ;checks for & in the arglist essentially
+	(if (chompable? arglists)
   (argtypes->moretypes (arglists->argtypes (remove-and arglists)))
-		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
+		(arglists->argtypes arglists)))
 
 (defn spec-length
    "This function takes an argument n and changes it to a corresponding string"
@@ -236,33 +234,61 @@
 ;; function -> string
 (defn pre-re-defn [fvar]
   (let [fmeta (meta fvar)]
-    (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
-      (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")\n")))
-
-(defn pre-re-defn-temp-solution [fvar]
-  (let [fmeta (meta fvar)]
-     (clojure.string/replace
-       (clojure.string/replace
-        (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
-         (apply str (vec (interpose " " (map vec (apply replace-types (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")") #"\[\[" "[") #"\]\]" "]")))
+    (format "(re-defn #' %s/%s %s)\n"
+      (:ns fmeta)
+      (:name fmeta)
+      (->> (:arglists fmeta)
+           (map #(map name %))
+           (chomp-if-necessary)
+           (map vec)
+           (interpose "")
+           (vec)
+           (apply str)))))
 
 (defn pre-re-defn-spec [fvar]
   (let [fmeta (meta fvar)]
-    (clojure.string/replace
-      (clojure.string/replace
-        (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args " "(s/or :a (s/cat "
-            (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
-            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
+    (-> (format "(s/def %s/%s :args (s/or :a (s/cat %s)))\n(stest/instrument `%s/%s)\n"
+          (:ns fmeta)
+          (:name fmeta)
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (apply same-type2?)
+               (map vec)
+               (interpose ") \n  :a (s/cat ")
+               (vec)
+               (apply str))
+          (:ns fmeta)
+          (:name fmeta))
+        (clojure.string/replace #"\[\"" "")
+        (clojure.string/replace #"\"\]" "")
+        (clojure.string/replace #"\"" ""))))
 
 (defn pre-re-defn-spec-babel [fvar]
   (let [fmeta (meta fvar)]
-    (clojure.string/replace
-      (clojure.string/replace
-        (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/and " (replace-count (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))) " (s/or :a (s/cat "
-            (apply str (vec (interpose ") \n  :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) "))))\n"
-            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
+    (-> (format "(s/def %s/%s :args (s/and %s (s/or :a (s/cat %s))))\n(stest/instrument `%s/%s)\n"
+          (:ns fmeta)
+          (:name fmeta)
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (replace-count))
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (apply same-type2?)
+               (map vec)
+               (interpose ") \n  :a (s/cat ")
+               (vec)
+               (apply str))
+          (:ns fmeta)
+          (:name fmeta))
+        (clojure.string/replace #"\[\"" "")
+        (clojure.string/replace #"\"\]" "")
+        (clojure.string/replace #"\"" ""))))
 
 (defn apply-persist
  [& vars]
@@ -283,17 +309,6 @@
       (println (pre-re-defn (first all-vars)))
       (catch java.lang.ClassCastException e))
     (println-recur (rest all-vars))))
-
-(defn println-recur-temp
-  "This function shows everything required for a defn, to work with this
-  there can be an intermediate step"
-  [all-vars]
-  (when
-    (not (empty? all-vars))
-    (try
-      (println (pre-re-defn-temp-solution (first all-vars)))
-      (catch java.lang.ClassCastException e))
-    (println-recur-temp (rest all-vars))))
 
 (defn println-recur-spec
   "This function generates basic specs for a library"
