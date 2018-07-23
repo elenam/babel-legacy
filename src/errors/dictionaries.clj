@@ -125,11 +125,12 @@
       fname)))
 
 ;;; remove-inliner: string -> string
-(defn- remove-inliner
+(defn remove-inliner
   "If fname ends with inliner or any generated name with --, this will return everything before it"
   [fname]
-  (let [match (nth (re-matches #"(.*)--(.*)" fname) 1)]
-    (or match fname)))
+  (let [match1 (nth (re-matches #"(.*)--(.*)" fname) 1)
+        match2 (if match1 (nth (re-matches #"(.*)--(.*)" match1) 1) nil)]
+    (or match2 match1 fname)))
 
 ;;; get-function-name: string -> string
 (defn get-function-name
