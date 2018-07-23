@@ -119,7 +119,9 @@
   (let [;check-spec ((merge corefns-map specs-map) fname)
         ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
         matched (or (nth (re-matches #"(.*)\$(.*)" fname) 2)
-                    (nth (re-matches #"(.*)/(.*)" fname) 2))]
+                    (nth (re-matches #"(.*)/(.*)" fname) 2)
+                    ;; the last match is the function name we need:
+                    (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
     (if matched
       (check-if-anonymous-function (lookup-funct-name matched))
       fname)))
