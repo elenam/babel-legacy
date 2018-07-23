@@ -1,7 +1,6 @@
 (ns utilities.spec_generator
    (:require [clojure.string :as str]))
 
-
 ;;the only part of this hash map we still use is :has-type
 ;;the other parts used to be useful when I was also doing the re-defining, and may yet be useful
 (def type-data {
@@ -16,7 +15,6 @@
                 :fs    {:check "check-if-functions?", :has-type "function", :argument "fs",   :arg-vec ["&" "fs"]}
                 ;:args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
                 :args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
-
 
 (def re-type-replace
   "This hashmap used for replacing the keywords with strings"
@@ -128,7 +126,6 @@
 ;;list of lists of strings -> list of lists of keys
 (defn arglists->argtypes [arglists] (map (fn [x] (map #(arg-type (keyword %)) x)) arglists)) ;changes things like :x to :arg
 
-
 ;;returns the longest collection in a collection of collections
 ;;arglists -> arglist
 (defn last-arglist [arglists] (first (reverse (sort-by count arglists)))) ;gets the last collection in the collection
@@ -157,14 +154,85 @@
 
 (defn second-arglist [arglists] (first (rest arglists)))
 
-(defn argtypes->moretypes [arglists] (cond (and (empty? (first arglists)) (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)])) (do (println "please check to make sure this is right") (seq [(seq [(get type-multi-replace (last-arg arglists))])]))
-                                           (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-single (vec (second-arglist arglists)))) (seq [(seq [(get type-single (vec (second-arglist arglists)))])])
-                                           (and (= (count arglists) 1) (= (count (first arglists)) 2) (contains? type-multi (vec (first arglists)))) (seq [(seq [(get type-multi-replace+ (last-arg arglists))])])
-                                           (and (empty? (first arglists)) (= (count arglists) 2) (= (count (second-arglist arglists)) 1) (contains? type-multi-replace (last-arg arglists))) (seq [(seq [(get type-multi-replace (last-arg arglists))])])
-                                           (contains? type-multi-replace (last-arg arglists)) (reverse (conj (rest (reverse (seq (map seq arglists)))) (reverse (conj (rest (reverse (first (reverse (seq (map seq arglists)))))) (get type-multi-replace (last-arg arglists))))))
-                                           (and (empty? (first arglists)) (>= (count arglists) 2)) (conj (reverse (rest (rest arglists))) (reverse (conj (reverse (rest (first (rest arglists)))) (get type-single-no-vec (first (first (rest arglists)))))))
-                                           :else arglists))
-
+(defn argtypes->moretypes [arglists]
+  (cond (and (empty? (first arglists))
+             (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)]))
+           (->> arglists
+                last-arg
+                (get type-multi-replace)
+                (conj [])
+                seq
+                (conj [])
+                seq)
+        (and (empty? (first arglists))
+             (= (count arglists) 2)
+             (= (count (second-arglist arglists)) 1)
+             (contains? type-single (vec (second-arglist arglists))))
+          (->> arglists
+               second-arglist
+               vec
+               (get type-single)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (and (= (count arglists) 1)
+             (= (count (first arglists)) 2)
+             (contains? type-multi (vec (first arglists))))
+          (->> arglists
+               last-arg
+               (get type-multi-replace+)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (and (empty? (first arglists))
+             (= (count arglists) 2)
+             (= (count (second-arglist arglists)) 1)
+             (contains? type-multi-replace (last-arg arglists)))
+          (->> arglists
+               last-arg
+               (get type-multi-replace)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (contains? type-multi-replace (last-arg arglists))
+          (->> (conj (->> arglists
+                          (map seq)
+                          seq
+                          reverse
+                          rest)
+                     (->> (conj (->> arglists
+                                     (map seq)
+                                     seq
+                                     reverse
+                                     first
+                                     reverse
+                                     rest)
+                                (->> arglists
+                                     last-arg
+                                     (get type-multi-replace)))
+                          reverse))
+               reverse)
+        (and (empty? (first arglists))
+             (>= (count arglists) 2))
+           (conj (->> arglists
+                      rest
+                      rest
+                      reverse)
+                 (->> (conj (->> arglists
+                                 rest
+                                 first
+                                 rest
+                                 reverse)
+                            (->> arglists
+                                 rest
+                                 first
+                                 first
+                                 (get type-single-no-vec)))
+                      reverse))
+        :else arglists))
 
 (defn same-type2? [& args]
 	(map #(replace re-type-replace %) args))
@@ -292,12 +360,19 @@
 
 (defn apply-persist
  [& vars]
-(map #(clojure.string/includes? % "Persistent") vars))
+ (map #(clojure.string/includes? % "Persistent") vars))
 
-
-(defn check-persist
-    [vars]
-   (boolean? (some #(= true %) (apply apply-persist (vec (map vec (map #(map str %) (map #(map type %) (:arglists (meta vars))))))))))
+(defn check-persist [vars]
+  (->> vars
+       meta
+       :arglists
+       (map #(map type %))
+       (map #(map str %))
+       (map vec)
+       vec
+       (apply apply-persist)
+       (some #(= true %))
+       boolean?))
 
 (defn println-recur
   "This function shows everything required for a defn, to work with this
@@ -343,8 +418,8 @@
         (empty? rem-args) [normal macros exceptions]
         (check-persist (first rem-args)) (recur (rest rem-args) normal macros (str exceptions (first rem-args) "\n"))
         :else (if (or ((meta (first rem-args)) :macro) ((meta (first rem-args)) :special-form))
-                         (recur (rest rem-args) normal (str macros (pre-re-defn (first rem-args)) "\n") exceptions) ;this fails for some reason
-                         (recur (rest rem-args) (str normal (pre-re-defn (first rem-args)) "\n") macros exceptions)))))
+                (recur (rest rem-args) normal (str macros (pre-re-defn (first rem-args)) "\n") exceptions)
+                (recur (rest rem-args) (str normal (pre-re-defn (first rem-args)) "\n") macros exceptions)))))
 
 (defn println-recur-criminals
   "This function shows everything that could not be run in pre-re-defn"
