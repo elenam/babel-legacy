@@ -88,14 +88,14 @@
                                                            ".\n"))}
    {:key :length-not-zero-or-one
     :class "ExceptionInfo"
-    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-or-one")
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-to-one")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take zero or one arguments; recieved " (number-vals (nth matches 3) "b-length-zero-or-one") :arg
                                                            ".\n"))}
 
    {:key :length-not-two-or-three
     :class "ExceptionInfo"
-    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two-or-three")
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two-to-three")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take two or three arguments; recieved " (number-vals (nth matches 3) "b-length-two-or-three") :arg
                                                            ".\n"))}
@@ -161,8 +161,9 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                            ", the " (arg-str (nth matches 3)) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
-                                                           ", but is " (nth matches 4) :type
-                                                           " instead.\n"))}
+                                                           ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                           (nth matches 4) :arg
+                                                           ", instead.\n"))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
     {:key :exception-info-or-after-in-0
@@ -171,8 +172,9 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 6)) :type
-                                                              ", but is " (nth matches 4) :type
-                                                              " instead.\n"))}
+                                                              ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                              (nth matches 4) :arg
+                                                              ", instead.\n"))}
 
     {:key :exception-info-functions
       :class "ExceptionInfo"
@@ -180,8 +182,9 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 7)) :type
-                                                              ", but is a " (?-name (nth matches 4)) :type
-                                                              " instead.\n"))}
+                                                              ", but is a " (get-dictionary-type (nth matches 4)) :type
+                                                              (nth matches 4) :arg
+                                                              ", instead.\n"))}
 
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
@@ -189,8 +192,9 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 7)) :type
-                                                              ", but is a " (?-name (nth matches 4)) :type
-                                                              " instead.\n"))}
+                                                              ", but is a " (get-dictionary-type (nth matches 4)) :type
+                                                              (nth matches 4) :arg
+                                                              ", instead.\n"))}
 
     #_{:key :exception-info-function
      :class "ExceptionInfo"
@@ -202,7 +206,8 @@
                                                              ", the " (arg-str (nth matches 3)) :arg
                                                              " is expected to be a "  (?-name (nth matches 7)) :type
                                                              ", but is a " (?-name (nth matches 4)) :type
-                                                             " instead.\n"))}
+                                                             (nth matches 4) :arg
+                                                             ", instead.\n"))}
 
     {:key :exception-info-or
      :class "ExceptionInfo"
@@ -210,8 +215,9 @@
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                             ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
-                                                            ", but is " (nth matches 4) :type
-                                                            " instead.\n"))}
+                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                            (nth matches 4) :arg
+                                                            ", instead.\n"))}
 
     {:key :exception-info-or-one-line
       :class "ExceptionInfo"
@@ -219,8 +225,9 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
-                                                           ", but is " (nth matches 4) :type
-                                                           " instead.\n"))}
+                                                           ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                           (nth matches 4) :arg
+                                                           ", instead.\n"))}
 
    ;#############################
    ;### Class Cast Exceptions ###

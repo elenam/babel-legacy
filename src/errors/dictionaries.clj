@@ -294,6 +294,17 @@
       (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
       :else n)))
 
+(defn get-dictionary-type [x]
+  (if (nil? (read-string x))
+    ""
+    (-> x
+      read-string
+      type
+      str
+      (clojure.string/replace #"class " "")
+      get-type
+      (str ", "))))
+
 ;;; check-divide: string->string
 (defn check-divide [n]
   (if (= n "") "/" n))
