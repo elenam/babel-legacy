@@ -163,7 +163,7 @@
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
                                                            (nth matches 4) :arg
-                                                           ", instead.\n"))}
+                                                           " instead.\n"))}
     ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
 
     {:key :exception-info-or-after-in-0
@@ -174,7 +174,7 @@
                                                               " is expected to be a "  (?-name (nth matches 6)) :type
                                                               ", but is " (get-dictionary-type (nth matches 4)) :type
                                                               (nth matches 4) :arg
-                                                              ", instead.\n"))}
+                                                              " instead.\n"))}
 
     {:key :exception-info-functions
       :class "ExceptionInfo"
@@ -184,7 +184,7 @@
                                                               " is expected to be a "  (?-name (nth matches 7)) :type
                                                               ", but is a " (get-dictionary-type (nth matches 4)) :type
                                                               (nth matches 4) :arg
-                                                              ", instead.\n"))}
+                                                              " instead.\n"))}
 
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
@@ -194,7 +194,7 @@
                                                               " is expected to be a "  (?-name (nth matches 7)) :type
                                                               ", but is a " (get-dictionary-type (nth matches 4)) :type
                                                               (nth matches 4) :arg
-                                                              ", instead.\n"))}
+                                                              " instead.\n"))}
 
     #_{:key :exception-info-function
      :class "ExceptionInfo"
@@ -207,7 +207,7 @@
                                                              " is expected to be a "  (?-name (nth matches 7)) :type
                                                              ", but is a " (?-name (nth matches 4)) :type
                                                              (nth matches 4) :arg
-                                                             ", instead.\n"))}
+                                                             " instead.\n"))}
 
     {:key :exception-info-or
      :class "ExceptionInfo"
@@ -217,7 +217,7 @@
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
                                                             ", but is " (get-dictionary-type (nth matches 4)) :type
                                                             (nth matches 4) :arg
-                                                            ", instead.\n"))}
+                                                            " instead.\n"))}
 
     {:key :exception-info-or-one-line
       :class "ExceptionInfo"
@@ -227,7 +227,7 @@
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
                                                            (nth matches 4) :arg
-                                                           ", instead.\n"))}
+                                                           " instead.\n"))}
 
    ;#############################
    ;### Class Cast Exceptions ###

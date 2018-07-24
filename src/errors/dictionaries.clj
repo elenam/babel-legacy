@@ -303,7 +303,7 @@
       str
       (clojure.string/replace #"class " "")
       get-type
-      (str ", "))))
+      (str " "))))
 
 ;;; check-divide: string->string
 (defn check-divide [n]
