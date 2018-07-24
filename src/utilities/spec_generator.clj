@@ -13,7 +13,6 @@
                 :strs  {:check "check-if-strings?",   :has-type "string",   :argument "strs", :arg-vec ["&" "strs"]},
                 :f     {:check "check-if-function?",  :has-type "function", :argument "f",    :arg-vec ["f"]},
                 :fs    {:check "check-if-functions?", :has-type "function", :argument "fs",   :arg-vec ["&" "fs"]}
-                ;:args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
                 :args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
 
 (def re-type-replace
@@ -114,7 +113,7 @@
                      (zipmap [:maps] (repeat :maps-or-vectors)),
                      (zipmap [:n :number :step :start :end :size] (repeat :n)),
                      (zipmap [:r] (repeat :r)),
-                     (zipmap [:arg :key :val :argument :x :y :test :not-found] (repeat :arg)),
+                     (zipmap [:arg :key :val :argument :x :y :test :not-found :init-val-or-seq :size-or-seq :body] (repeat :arg)),
                      (zipmap [:f :function :pred] (repeat :f)),
                      (zipmap [:fs :functions :preds] (repeat :fs)),
                      (zipmap [:colls :cs] (repeat :colls)),
@@ -135,7 +134,8 @@
 ;takes the arglist which has been turned into a sequence of sequences of strings and makes sure each
 ;that the last sequence in the sequence has no arguments which have a count less than 1
 ;it also finds the name of the second to last argument and checks if it is &
-(defn chompable? [arglists] (or (not-any? #(< 1 (count %)) arglists)  (= "&" (name (first (rest (reverse (last-arglist arglists))))))))
+(defn chompable? [arglists] (or (not-any? #(< 1 (count %)) arglists)
+                              (= "&" (name (first (rest (reverse (last-arglist arglists))))))))
 
 ;;removes the second to last element of the longest coll in a coll of colls
 ;;this is the `&` symbol in our case
@@ -256,6 +256,7 @@
                                                        3 "::b-length-greater-one"
                                                        4 "::b-length-greater-two"
                                                        5 "::b-length-greater-three"
+                                                       6 "::b-length-greater-four"
                                                        n)
       (not= nil (re-matches #":(\S*)s+" (str arg))) (case n
                                                        1 "::b-length-greater-zero"
@@ -263,16 +264,25 @@
                                                        3 "::b-length-greater-two"
                                                        4 "::b-length-greater-three"
                                                        5 "::b-length-greater-four"
+                                                       6 "::b-length-greater-five"
                                                        n)
       :else n)
     (case n
       1 "::b-length-one"
       2 "::b-length-two"
       3 "::b-length-three"
+      4 "::b-length-four"
+      5 "::b-length-five"
       (cond
+        (= n [1 1]) "::b-length-one"
+        (= n [2 2]) "::b-length-one"
         (or (= n [2 1]) (= n [1 2])) "::b-length-one-to-two"
         (or (= n [3 1]) (= n [1 3])) "::b-length-one-to-three"
         (or (= n [3 2]) (= n [2 3])) "::b-length-two-to-three"
+        (or (= n [4 3]) (= n [3 4])) "::b-length-three-to-four"
+        (or (= n [4 1]) (= n [1 4])) "::b-length-one-to-four"
+        (or (= n [4 2]) (= n [2 4])) "::b-length-two-to-four"
+        (or (= n [5 3]) (= n [3 5])) "::b-length-three-to-five"
         (= n :args ) "::b-length-greater-zero"
         (not= nil (re-matches #":(\S*)s\*" (str n))) "::b-length-greater-zero"
         (not= nil (re-matches #":(\S*)s+" (str n))) "::b-length-greater-one"
@@ -283,7 +293,9 @@
   "This function helps keep the length of replace count down
   it sends :args and a minimum and maximum to spec-length"
   [arglist x]
-  (if (or (= :args (first (first arglist))) (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist))))) (not= nil (re-matches #":(\S*)\?" (str (first (first arglist))))))
+  (if (or (= :args (first (first arglist)))
+        (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist)))))
+        (not= nil (re-matches #":(\S*)\?" (str (first (first arglist))))))
     (spec-length (first (first arglist)))
     (spec-length (vec (conj nil (apply min x) (apply max x))))))
 
@@ -292,7 +304,11 @@
   vectors in the vector and outputs the corresponding string"
   [arglist]
   (let [x (map count arglist)]
-    (if (and (= 1 (count x)) (nil? (re-matches #":(\S*)s(.*)" (str (last-arg arglist)))) (not= :args (first (first arglist))) (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist))))) (nil? (re-matches #":(\S*)?" (str (first (first arglist))))))
+    (if (and (= 1 (count x))
+          (nil? (re-matches #":(\S*)s(.*)" (str (last-arg arglist))))
+          (not= :args (first (first arglist)))
+          (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist)))))
+          (nil? (re-matches #":(\S*)?" (str (first (first arglist))))))
       (spec-length (first x))
       (if (not= nil (re-matches #":(\S*)s(.*)" (str (last-arg arglist))))
         (spec-length (count (first (reverse arglist))) (last-arg arglist))
@@ -315,7 +331,7 @@
 
 (defn pre-re-defn-spec [fvar]
   (let [fmeta (meta fvar)]
-    (-> (format "(s/def %s/%s :args (s/or :a (s/cat %s)))\n(stest/instrument `%s/%s)\n"
+    (-> (format "(s/fdef %s/%s :args (s/or :a (s/cat %s)))\n(stest/instrument `%s/%s)\n"
           (:ns fmeta)
           (:name fmeta)
           (->> (:arglists fmeta)
@@ -335,7 +351,7 @@
 
 (defn pre-re-defn-spec-babel [fvar]
   (let [fmeta (meta fvar)]
-    (-> (format "(s/def %s/%s :args (s/and %s (s/or :a (s/cat %s))))\n(stest/instrument `%s/%s)\n"
+    (-> (format "(s/fdef %s/%s :args (s/and %s (s/or :a (s/cat %s))))\n(stest/instrument `%s/%s)\n"
           (:ns fmeta)
           (:name fmeta)
           (->> (:arglists fmeta)
@@ -416,10 +432,21 @@
            exceptions "Exceptions: \n"]
       (cond
         (empty? rem-args) [normal macros exceptions]
-        (check-persist (first rem-args)) (recur (rest rem-args) normal macros (str exceptions (first rem-args) "\n"))
-        :else (if (or ((meta (first rem-args)) :macro) ((meta (first rem-args)) :special-form))
-                (recur (rest rem-args) normal (str macros (pre-re-defn (first rem-args)) "\n") exceptions)
-                (recur (rest rem-args) (str normal (pre-re-defn (first rem-args)) "\n") macros exceptions)))))
+        (check-persist (first rem-args))
+          (recur (rest rem-args)
+            normal
+            macros
+            (str exceptions (first rem-args) "\n"))
+        :else (if (or ((meta (first rem-args)) :macro)
+                      ((meta (first rem-args)) :special-form))
+                (recur (rest rem-args)
+                  normal
+                  (str macros (pre-re-defn (first rem-args)) "\n")
+                  exceptions)
+                (recur (rest rem-args)
+                  (str normal (pre-re-defn (first rem-args)) "\n")
+                  macros
+                  exceptions)))))
 
 (defn println-recur-criminals
   "This function shows everything that could not be run in pre-re-defn"
