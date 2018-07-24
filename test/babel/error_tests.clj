@@ -87,6 +87,12 @@
 
 (expect "Too few arguments to if.\n" (get-error "(if (= 0 0))"))
 
+(expect "Loop requires a vector for its binding.\n" (get-error "(loop x 5 (+ x 5))"))
+
+(expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
+
+(expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
+
 ;; it doesn't look like we can run this test; works correctly in repl
 #_(expect "Clojure ran out of memory, likely due to an infinite computation.\n" (get-error "(range)"))
 
