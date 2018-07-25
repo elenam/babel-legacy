@@ -19,3 +19,8 @@
 (expect "first" (get-function-name "clojure.lang.RT.first"))
 (expect "first" (get-function-name "clojure.lang.RT.first--5678"))
 (expect "somethingElse" (get-function-name "somethingElse"))
+
+(expect "anonymous-function" (check-if-anonymous-function "fn"))
+(expect "anonymous-function" (check-if-anonymous-function "fn_test"))
+(expect "anonymous-function" (check-if-anonymous-function "fn_"))
+(expect "random_function" (check-if-anonymous-function "random_function"))
