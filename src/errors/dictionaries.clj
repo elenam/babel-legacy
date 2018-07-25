@@ -211,7 +211,10 @@
     (if (coll? pretty-val) (cs/join (flatten pretty-val)) (str pretty-val))))
 
 ;;; arg-str: non-negative integer as a string -> string
-(defn arg-str [n]
+(defn arg-str
+  "arg-str takes a non-negative integer as a string and matches it
+   to the corresponding argument number as a string"
+  [n]
   (let [abs (fn [m] (if (> 0 m) (- m) m))
         n0 (+ 1 (Integer. n))
         n1 (mod (abs n0) 100)
@@ -229,7 +232,10 @@
         (= 3 n2) (str n0 "rd argument")
         :else   (str n0 "th argument")))))
 
-(defn number-word [n]
+(defn number-word
+  "number word takes a positive integer as a string and changes it to a
+   string with the numbers corresponding spelling"
+  [n]
   (case n
     "0" "zero"
     "1" "one"
@@ -243,9 +249,14 @@
     "9" "nine"
     n))
 
-(defn number-vals [failedvals failedlength] ;figure out why failedvals is undefined, failed length works
-  (if (not= "nil" failedvals) ;failed vals works here so it most likely fails in the let
-    (let [x (count (read-string failedvals))] ;this works if failedvals is reaplaced with a string
+(defn number-vals
+  "number-vals takes two strings, one which are the arguments that caused
+   an error and the length required of the thing it errored on. It returns the
+   number of arguments in failedvals and uses failedlength to determine
+   the correct response."
+  [failedvals failedlength]
+  (if (not= "nil" failedvals)
+    (let [x (count (read-string failedvals))]
       (cond
         (= failedlength "b-length-one") (if (> x 1)
                                             (str (number-word (str x)) " arguments")
@@ -294,10 +305,14 @@
       (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
       :else n)))
 
-(defn get-dictionary-type [x]
+(defn get-dictionary-type
+  "get-dictionary-type takes a string and returns the corresponding type
+   if the string is \"nil\" we return an empty string so the result in the
+   error dictionary does not return nil nil"
+  [x]
   (if (nil? (read-string x))
     ""
-    (if (resolve (symbol x))
+    (if (and (symbol? (read-string x)) (resolve (symbol x)))
       (-> x
         get-type
         (str " "))
@@ -310,7 +325,11 @@
         (str " ")))))
 
 ;;; check-divide: string->string
-(defn check-divide [n]
+(defn check-divide
+  "check-divide takes a string and returns either \"/\" or n
+   this is only used for / because / is removed from the resulting
+   error message so this adds it back in."
+  [n]
   (if (= n "") "/" n))
 
 ;;; process-asserts-obj: string or nil -> string
