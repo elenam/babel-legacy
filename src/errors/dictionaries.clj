@@ -297,13 +297,17 @@
 (defn get-dictionary-type [x]
   (if (nil? (read-string x))
     ""
-    (-> x
-      read-string
-      type
-      str
-      (clojure.string/replace #"class " "")
-      get-type
-      (str " "))))
+    (if (resolve (symbol x))
+      (-> x
+        get-type
+        (str " "))
+      (-> x
+        read-string
+        type
+        str
+        (clojure.string/replace #"class " "")
+        get-type
+        (str " ")))))
 
 ;;; check-divide: string->string
 (defn check-divide [n]
