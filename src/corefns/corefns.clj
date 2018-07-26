@@ -1,7 +1,8 @@
 (ns corefns.corefns
  (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as stest]
-            [clojure.spec.gen.alpha :as gen]))
+            [clojure.spec.gen.alpha :as gen]
+            [clojure.core.specs.alpha :as sp]))
 
 ;##### Length Functions ##### Credit to Tony Song (frogrammer)
 (defn b-length1? [coll] (= (count coll) 1))
@@ -139,3 +140,9 @@
 
 (s/fdef clojure.core/->> :args (s/and ::b-length-greater-zero (s/or :a (s/cat :a (s/+ any?)))))
 (stest/instrument `clojure.core/->>)
+
+(s/fdef clojure.core/if-some
+  :args (s/and ::b-length-two-to-three
+               (s/or :a (s/cat :bindings :clojure.core.specs.alpha/bindings :a any?)
+                     :b (s/cat :bindings :clojure.core.specs.alpha/bindings :a any? :b any?))))
+(stest/instrument `clojure.core/if-some)
