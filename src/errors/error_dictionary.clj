@@ -289,6 +289,18 @@
     :match (beginandend "Duplicate key: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash-map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
 
+    {:key :loop-req-vector
+    :class "IllegalArgumentException"
+    :match (beginandend "loop requires a vector for its binding (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Loop requires a vector for its binding.\n"))}
+
+    {:key :recur-arg-mismatch
+    :class "IllegalArgumentException"
+    :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (nth matches 1) " argument(s) but was given " (nth matches 2) :arg ".\n"))}
+
+
+  ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################
    ;### Assertion Errors ###
    ;########################
