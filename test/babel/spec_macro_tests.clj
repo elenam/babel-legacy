@@ -66,3 +66,19 @@
 
 (expect "An argument for fn required a vector, instead, p was given.\n"
         (get-error "(let [x 7] (fn [r] (fn p (+ p p))))"))
+
+;############################################
+;#### Testing for 'if-some' ###########
+;############################################
+
+(expect "Parameters for if-some must come in pairs, but one of them does not have a match.\n"
+        (get-error "(if-some [[a b]] (+ a b) (+ b a))"))
+
+(expect "Parameters for if-some require a vector, instead, a was given.\n"
+        (get-error "(if-some a (+ a 2) (+ 2 a))"))
+
+(expect "Parameters for if-some require a vector, instead, a was given.\n"
+        (get-error "(if-some a (+ a 2))"))
+
+(expect "if-some can only take two or three arguments; recieved one argument.\n"
+        (get-error "(if-some [a 2])"))
