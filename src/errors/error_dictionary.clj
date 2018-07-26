@@ -492,8 +492,8 @@
 
     {:key :compiler-exception-end-of-file
     :class "RuntimeException"
-    :match (beginandend "EOF while reading, starting at line (.+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "End of file, starting at line.\nProbably a non-closing parenthesis or bracket.\n"))}
+    :match (beginandend "EOF while reading, starting at line (\\d+) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Unexpected end of file, starting at line " (nth matches 1) ". Probably a non-closing parenthesis or bracket.\n"))}
 
     {:key :compiler-exception-end-of-file-string
     ;this cannot be done in repl needs to be tested still

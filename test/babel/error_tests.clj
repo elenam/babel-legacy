@@ -58,7 +58,7 @@
 
 (expect "You cannot use the same key in a hash-map twice, but you have duplicated the key 1.\n" (get-error "{1 1 1 1}"))
 
-(expect "End of file, starting at line.\nProbably a non-closing parenthesis or bracket.\n" (get-error "(def elements-that-can-contain-simple-types #_=> #{:xs:attribute"))
+(expect "Unexpected end of file, starting at line 1. Probably a non-closing parenthesis or bracket.\n" (get-error "(def elements-that-can-contain-simple-types #_=> #{:xs:attribute"))
 
 (expect "Invalid number: 1.2.2.\n" (get-error "(+ 1.2.2 0)"))
 
@@ -138,3 +138,12 @@
 (expect "Tried to divide by zero\n" (get-error "(even? [(map #(/ % 0) [1 2])])"))
 
 (expect "In function map, the first argument is expected to be a function, but is a number 2 instead.\n" (get-error "(even? [(map 2 [1 2])])"))
+
+;; spec isn't checked on secondary errors in arguments that failed (if they are lazy sequences). This is not a spec error:
+(expect "Attempted to use a number, but a function was expected.\n" (get-error "(even? (lazy-cat [2 3] (map 5 [1 2])))"))
+
+;; If the sequence evaluation is forced, we get a spec error:
+(expect "In function map, the first argument is expected to be a function, but is a number 5 instead.\n" (get-error "(even? (doall (lazy-cat [2 3] (map 5 [1 2]))))"))
+
+;; lazy sequences as unrelated function arguments aren't evaluated when a spec fails:
+(expect "In function map, the first argument is expected to be a function, but is a number 5 instead.\n" (get-error "(map 5 (lazy-cat [2 3] [(/ 1 0) 8]))"))
