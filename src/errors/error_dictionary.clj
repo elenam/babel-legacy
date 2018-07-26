@@ -334,11 +334,17 @@
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/(\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (get-function-name (nth matches 2)) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
 
-    {:key :wrong-number-of-args-passed-to-user-defined
+    {:key :wrong-number-of-args-passed-to-user-defined-one-arg
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*)/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 3) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (get-function-name (nth matches 1)) :arg " cannot be called with 1 argument.\n"))}
+
+    {:key :wrong-number-of-args-passed-to-user-defined-other
+    ;we may want to find a way to make this less general
+    :class "ArityException"
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (get-function-name (nth matches 2)) :arg " cannot be called with " (nth matches 1) :arg " arguments.\n"))}
 
     ;#####################
     ;### Syntax Errors ###
@@ -393,7 +399,7 @@
     ;### Unsupported Operation Exceptions ###
     ;########################################
 
-    #_{:key :unsupported-operation-wrong-type-of-argument
+    {:key :unsupported-operation-wrong-type-of-argument
     ;need to test
     :class "UnsupportedOperationException"
     :match (beginandend "(\\S*) not supported on this type: (\\S*)")

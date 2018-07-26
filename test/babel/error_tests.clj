@@ -81,7 +81,14 @@
 
 (expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
 
-(expect "hello cannot take 1 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+(expect "Function hello cannot be called with 1 argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+
+(expect "Function hello cannot be called with 3 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
+
+(expect "Function hello cannot be called with 0 arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
+
+;; Should not use "Function" here, but ok for now
+(expect "Function anonymous-function cannot be called with 1 argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
 
 (expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
@@ -92,6 +99,9 @@
 (expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
 
 (expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
+
+;; This is not a good error message, but we can't do better. The real cause is destructuring.
+(expect "Function nth does not allow a map as an argument.\n" (get-error " (defn f [[x y]] (+ x y)) (f {2 3})"))
 
 ;; it doesn't look like we can run this test; works correctly in repl
 #_(expect "Clojure ran out of memory, likely due to an infinite computation.\n" (get-error "(range)"))
