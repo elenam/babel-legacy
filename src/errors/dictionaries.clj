@@ -287,7 +287,6 @@
         :else failedlength))
       "no arguments"))
 
-;;; ?-name: string->string
 (defn ?-name
   "?-name takes a string and converts it into a new string
   that is easier to understand when reading error messages
@@ -324,16 +323,12 @@
         get-type
         (str " ")))))
 
-;;; check-divide: string->string
 (defn check-divide
   "check-divide takes a string and returns either \"/\" or n
    this is only used for / because / is removed from the resulting
    error message so this adds it back in."
   [n]
   (if (= n "") "/" n))
-
-;;; process-asserts-obj: string or nil -> string
-
 
 (defn get-compile-error-location
   "takes a message of a compiler error and returns
