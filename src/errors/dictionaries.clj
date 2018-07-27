@@ -337,23 +337,3 @@
   when there is no match"
   [m]
   (zipmap [:file :line :char] (rest (rest (re-matches #"(.*), compiling:\((.+):(.+):(.+)\)" m)))))
-
-;; do we want to move this to corefns?
-(def known-args-number {:map "at least two", :count "one",       :conj "at least two",     :rand-nth "one",
-                        :into "two",         :cons "two",        :nth "two or three",      :drop "two",
-                        :take "two",         :filter "two",      :reduce "two or three",   :mapcat "at least one",
-                        :reverse "one",      :sort "one or two", :sort-by "two or three",  :ffirst "one",
-                        :map-indexed "two",  :for "two",         :pmap "two or more",      :reductions "two or three",
-                        :second "one",       :last "one",        :rest "one",              :next "one",
-                        :nfirst "one",       :fnext "one",       :nnext "one",             :nthnext "two",
-                        :some "two",         :realized? "one",   :index "two",             :contains? "two",
-                        :first "one",        :empty? "one",      :join "one or two",       :string? "one",
-                        :- "at least one",   :rem "two",         :mod "two",               :inc "one",
-                        :dec "one",          :max "one or more", :min "one or more",       :rand "zero or one",
-                        :rand-int "one",     :odd? "one",        :even? "one",             :assoc "at least three",
-                        :dissoc "at least one"})
-
-(defn lookup-arity
-  "returns expected arity (as a string) for a function if we know it, nil otherwise"
-  [f]
-  ((keyword f) known-args-number))
