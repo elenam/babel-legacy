@@ -53,11 +53,9 @@
   :args (s/cat :checknum (s/* number?)))
 (stest/instrument `clojure.core/*)
 
-(defn inc [argument1]
-  (apply clojure.core/inc argument1))
-(s/fdef inc ;need to figure out how to deal with the inline, normal fix does not work here
+#_(s/fdef inc ;need to figure out how to deal with the inline, normal fix does not work here
   :args ::length-one-number)
-(stest/instrument `inc)
+#_(stest/instrument `inc)
 
 (s/fdef clojure.core/max ;inline issue
   :args ::length-greater-zero-number)

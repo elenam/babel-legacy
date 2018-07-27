@@ -26,7 +26,7 @@
     :strs  ":a string?"
     :f     ":a ifn?"
     :fs    ":a ifn?"
-    ;:args  ":a (s/* args)" ;s+ or s*
+    :args  ":a (s/* args)"
     :colls* ":a (s/* (s/nilable coll?))"
     :strs*  ":a (s/* string?)"
     :fs*    ":a (s/* function?)"
@@ -147,7 +147,10 @@
   (let [sorted-arglists (reverse (sort-by count arglists))
 	       f-arglists (first sorted-arglists)
 	       r-arglists (reverse (rest sorted-arglists))]
-	    (sort-by count (conj r-arglists (into (vec (drop-last 2 f-arglists)) (take-last 1 f-arglists))))))
+     (->> (conj r-arglists (into (->> (drop-last 2 f-arglists)
+                                      vec)
+                                 (take-last 1 f-arglists)))
+          (sort-by count))))
 
 (defn last-arg
   "last-arg returns the last element of the longest coll in a coll of colls."
