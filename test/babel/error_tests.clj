@@ -118,7 +118,7 @@
 ;; TO-DO: clean up function names
 ;; Note: this test runs correctly, but it redefines fn every time it runs.
 ;; Restarting nrepl is required after the tests are run.
-#_(expect "Warning: fn already refers to: #'clojure.core/fn in namespace: utilities.spec_generator, being replaced by #'utilities.spec_generator/fn.\n\n" (get-error "(defn fn [x] x)"))
+#_(expect #"Warning: fn already refers to: \#'clojure.core/fn in namespace: utilities\.spec_generator, being replaced by: \#'utilities\.spec_generator/fn(.*)" (get-error "(defn fn [x] x)"))
 
 ;##### Spec Testing #####
 

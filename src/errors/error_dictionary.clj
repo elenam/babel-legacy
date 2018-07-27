@@ -559,7 +559,7 @@
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Warning: " (nth matches 1) :arg
                                                             " already refers to: " (nth matches 2) :arg
                                                             " in namespace: " (nth matches 3) :arg
-                                                            ", being replaced by " (nth matches 4) :arg
+                                                            " being replaced by " (nth matches 4) :arg
                                                             ".\n\n"))}
 
    ;#####################
