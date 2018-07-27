@@ -549,6 +549,16 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion."
     " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
 
+    ;#####################
+    ;### Warning ###
+    ;#####################
+
+    {:key :other
+     :class "WARNING:"
+     :match (beginandend "")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Warning: " (nth matches 0) :arg "\n"))}
+
+
    ;#####################
    ;### Default Error ###
    ;#####################

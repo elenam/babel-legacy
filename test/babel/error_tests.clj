@@ -115,6 +115,11 @@
 
 (expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
 
+;; TO-DO: clean up function names
+;; Note: this test runs correctly, but it redefines fn every time it runs.
+;; Restarting nrepl is required after the tests are run.
+#_(expect #"Warning: fn already refers to: #'clojure.core/fn in namespace: utilities\.spec_generator, being replaced by: #'utilities\.spec_generator/fn(.*)" (get-error "(defn fn [x] x)"))
+
 ;##### Spec Testing #####
 
 (expect #"In function conj, the first argument is expected to be a collection, but is a function (\S*) instead.\n" (get-error "(conj even? \"a\")")) ;not the result we want but good for now
