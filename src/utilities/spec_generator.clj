@@ -482,6 +482,32 @@
                   macros
                   exceptions)))))
 
+(defn println-recur-spec-babel-vector
+  "This function generates specs that include length used in
+  babel only and puts them into a file h.txt."
+  [all-vars]
+    (loop [rem-args all-vars
+           normal "Normal Cases: \n"
+           macros "Macros and Special Cases: \n"
+           exceptions "Exceptions: \n"]
+      (cond
+        (empty? rem-args) (spit "h.txt" (apply str [normal macros exceptions]))
+        (check-persist (first rem-args))
+          (recur (rest rem-args)
+            normal
+            macros
+            (str exceptions (first rem-args) "\n"))
+        :else (if (or ((meta (first rem-args)) :macro)
+                      ((meta (first rem-args)) :special-form))
+                (recur (rest rem-args)
+                  normal
+                  (str macros (pre-re-defn-spec-babel (first rem-args)) "\n")
+                  exceptions)
+                (recur (rest rem-args)
+                  (str normal (pre-re-defn-spec-babel (first rem-args)) "\n")
+                  macros
+                  exceptions)))))
+
 (defn println-recur-criminals
   "This function shows everything that could not be run in pre-re-defn."
   [all-vars]
