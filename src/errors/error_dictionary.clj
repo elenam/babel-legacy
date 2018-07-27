@@ -555,18 +555,12 @@
 
     {:key :other
      :class "WARNING:"
-<<<<<<< HEAD
      :match (beginandend "(\\S*) already refers to: (\\S*) in namespace: (\\S*), being replaced by: (\\S*)")
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Warning: " (nth matches 1) :arg
                                                             " already refers to: " (nth matches 2) :arg
                                                             " in namespace: " (nth matches 3) :arg
                                                             ", being replaced by " (nth matches 4) :arg
                                                             ".\n\n"))}
-=======
-     :match (beginandend "")
-     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Warning: " (nth matches 0) :arg "\n"))}
-
->>>>>>> 9b8965e27131833879bbd5c357eac9e8656d2cad
 
    ;#####################
    ;### Default Error ###
