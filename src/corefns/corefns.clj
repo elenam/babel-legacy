@@ -14,6 +14,7 @@
                                      (= (count coll) 2)))
 (defn b-length2-to-3? [coll] (or (= (count coll) 2)
                                      (= (count coll) 3)))
+(defn b-length-0greater? [coll] (>= (count coll) 0))
 (defn b-length-greater0? [coll] (> (count coll) 0))
 (defn b-length-greater1? [coll] (> (count coll) 1))
 (defn b-length-greater2? [coll] (> (count coll) 2))
@@ -26,6 +27,7 @@
 (s/def ::b-length-one b-length1?)
 (s/def ::b-length-two b-length2?)
 (s/def ::b-length-three b-length3?)
+(s/def ::b-length-zero-or-greater b-length-0greater?)
 (s/def ::b-length-greater-zero b-length-greater0?)
 (s/def ::b-length-greater-one b-length-greater1?)
 (s/def ::b-length-greater-two b-length-greater2?)
@@ -38,6 +40,9 @@
 (s/def ::length-greater-zero-number (s/and ::b-length-greater-zero (s/cat :number (s/+ number?))))
 (s/def ::b-not-zero b-not-0?)
 #_(s/def ::b-not-greater-str-count b-not-greater-count)
+
+(s/def ::bindings-seq2 (s/and vector? ::binding-seq))
+(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/nilable coll?)))
 
 ;##### Specs #####
 (s/fdef clojure.core/+ ;inline issue
@@ -144,3 +149,15 @@
                (s/or :a (s/cat :bindings :clojure.core.specs.alpha/bindings :a any?)
                      :b (s/cat :bindings :clojure.core.specs.alpha/bindings :a any? :b any?))))
 (stest/instrument `clojure.core/if-some)
+
+(s/fdef clojure.core/when-first :args (s/and ::b-length-two (s/or :a (s/cat :a ::bindings-seq2 :a any?))))
+(stest/instrument `clojure.core/when-first)
+
+(s/fdef clojure.core/gen-class :args (s/and ::b-length-zero-or-greater (s/cat :a (s/* any?))))
+(stest/instrument `clojure.core/gen-class)
+
+(s/fdef clojure.core/while :args (s/and ::b-length-greater-zero (s/or :a (s/cat :a (s/* any?)))))
+(stest/instrument `clojure.core/while)
+
+(s/fdef clojure.core/pvalues :args (s/and ::b-length-zero-or-greater (s/cat :a (s/* any?))))
+(stest/instrument `clojure.core/pvalues)

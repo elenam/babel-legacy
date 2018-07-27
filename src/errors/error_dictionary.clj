@@ -73,9 +73,23 @@
                                                            " can only take one or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-zero") :arg
                                                            ".\n"))}
 
+   {:key :length-not-greater-zero-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-zero")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-divide (nth matches 2)) :arg
+                                                           " can only take one or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-zero") :arg
+                                                           ".\n"))}
+
    {:key :length-not-greater-one
     :class "ExceptionInfo"
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-one")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take two or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-one") :arg
                                                            ".\n"))}
@@ -86,9 +100,24 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take three or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-two") :arg
                                                            ".\n"))}
+
+   {:key :length-not-greater-two-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-two") :arg
+                                                           ".\n"))}
+
    {:key :length-not-zero-or-one
     :class "ExceptionInfo"
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-to-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take zero or one arguments; recieved " (number-vals (nth matches 3) "b-length-zero-or-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-zero-or-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-to-one")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take zero or one arguments; recieved " (number-vals (nth matches 3) "b-length-zero-or-one") :arg
                                                            ".\n"))}
@@ -99,6 +128,7 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take two or three arguments; recieved " (number-vals (nth matches 3) "b-length-two-or-three") :arg
                                                            ".\n"))}
+
    {:key :length-not-two-or-three-macro
     :class "ExceptionInfo"
     :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two-to-three")
@@ -113,16 +143,37 @@
                                                            " can only take one argument; recieved " (number-vals (nth matches 3) "b-length-one") :arg
                                                            ".\n"))}
 
+   {:key :length-not-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take one argument; recieved " (number-vals (nth matches 3) "b-length-one") :arg
+                                                           ".\n"))}
+
    {:key :length-not-two
     :class "ExceptionInfo"
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take two arguments; recieved " (number-vals (nth matches 3) "b-length-two") :arg
-                                                           ".\n"))}; recieved a different number of arguments.\n"))}
+                                                           ".\n"))}
+
+   {:key :length-not-two-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two arguments; recieved " (number-vals (nth matches 3) "b-length-two") :arg
+                                                           ".\n"))}
 
    {:key :length-not-three
     :class "ExceptionInfo"
     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three arguments; recieved " (number-vals (nth matches 3) "b-length-three") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-three-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-three")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
                                                            " can only take three arguments; recieved " (number-vals (nth matches 3) "b-length-three") :arg
                                                            ".\n"))}
