@@ -146,6 +146,11 @@
   "extract a macro name from a qualified name"
   (nth (re-matches #"(.*)/(.*)" mname) 2))
 
+  ;;; get-spec-text: string -> string
+  (defn get-spec-text [full-error]
+    "return the string that failed a given spec from a spec error"
+  (nth (re-matches #"(.*):args \((.*)\)}, compiling(.*)" full-error) 2))
+
 (defn pretty-print-single-value
   "returns a pretty-printed value that is not a collection"
   [value]

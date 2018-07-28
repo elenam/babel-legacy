@@ -104,3 +104,16 @@
 
 (expect "a" (check-divide "a"))
 (expect "/" (check-divide ""))
+
+;;; Return spec error string Tests (These will need to be passed in functions without
+;;; the error message filter, this is simply a proof of concept at the moment wiht excerpts from the spec error being used)
+
+;;;; (import 3)
+(expect "3"
+        (get-spec-text " :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x278fa0f8 'clojure.spec.alpha$regex_spec_impl$reify__2436@278fa0f8'],  :value (3), :args (3)}, compiling:(/tmp/"))
+;;;; (when-first [a [3] b [4]] 3)
+(expect "[a [3] b [4]] 3"
+        (get-spec-text "], :value ([a [3] b [4]] 3), :args ([a [3] b [4]] 3)}, compiling:(/tmp/form-init1299280992515962485.clj:1:1)"))
+;;;; user=> (map (fn (* 4 VARIABLE-NAME)) (range 1 10))
+(expect "(* 4 VARIABLE-NAME)"
+        (get-spec-text "], :value ((* 4 VARIABLE-NAME)), :args ((* 4 VARIABLE-NAME))}, compiling:(/tmp/form-init231752514381864372.clj:1:6)"))
