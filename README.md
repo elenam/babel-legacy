@@ -10,7 +10,7 @@ Copy ``babel`` and ``errors`` into your src directory, and then make sure your `
 
 ## logging
 
-See details at [logging manual](./doc/logging)
+See details at [logging manual](/doc/logging)
 
 ## License
 
