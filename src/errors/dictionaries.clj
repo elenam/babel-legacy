@@ -304,6 +304,15 @@
       (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
       :else n)))
 
+(defn check-function-name
+  "check-function-name takes a string and converts it into a new string
+  that has \" function \" added to the end if it is not
+  anonymous-function"
+  [n]
+  (cond
+    (= n "anonymous-function") "anonymous-function"
+    :else (str "function " n)))
+
 (defn get-dictionary-type
   "get-dictionary-type takes a string and returns the corresponding type
    if the string is \"nil\" we return an empty string so the result in the
