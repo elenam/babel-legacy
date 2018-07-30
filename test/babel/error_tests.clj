@@ -9,7 +9,10 @@
 
 ;;start logging
 (start-log)
-(expect nil (add-log "error-tests.clj"))
+(expect nil (add-log
+              (do
+                (def file-name "this file")
+                (:file (meta #'file-name)))))
 
 
 ;;test non erroring commands

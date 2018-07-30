@@ -12,7 +12,10 @@
 ;############################################
 
 ;;start logging
-(expect nil (add-log "spec-macro-test.clj"))
+(expect nil (add-log
+              (do
+                (def file-name "this file")
+                (:file (meta #'file-name)))))
 
 (expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
         (get-error "(defn hello [x] (let [y 2 z] (+ x y)))"))

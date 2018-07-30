@@ -119,8 +119,7 @@
 ;;makes the category html
 (defn make-category
   []
-  (if (not (.exists (clojure.java.io/as-file "./log/log_category.html")))
-    (spit "./log/log_category.html" (category-preset) :append false)))
+  (spit "./log/log_category.html" (category-preset) :append false))
 
 ;;start of txt and html test log, including preset up
 (defn start-l

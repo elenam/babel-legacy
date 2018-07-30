@@ -6,7 +6,11 @@ Paper describing its use and development availible [here](https://github.com/Clo
 
 ## Usage
 
-Copy ``babel`` and ``errors`` into your src directory, and then make sure your ``project.clj`` has compatible version of all packages used in our ``project.clj``. Be sure to include the ``:nrepl-middleware`` keys. 
+Copy ``babel`` and ``errors`` into your src directory, and then make sure your ``project.clj`` has compatible version of all packages used in our ``project.clj``. Be sure to include the ``:nrepl-middleware`` keys.
+
+## logging
+
+See details at [logging manual](./doc/logging)
 
 ## License
 
