@@ -52,7 +52,7 @@
 
 (expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
 
-(expect "A symbol cannot take 3 arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
+(expect "A function symbol cannot take 3 arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
 
 (expect "Cannot call nil as a function.\n" (get-error "(nil)"))
 
@@ -81,14 +81,14 @@
 
 (expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
 
-(expect "Function hello cannot be called with 1 argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+(expect "A function hello cannot be called with 1 argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
 
-(expect "Function hello cannot be called with 3 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
+(expect "A function hello cannot be called with 3 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
 
-(expect "Function hello cannot be called with 0 arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
+(expect "A function hello cannot be called with 0 arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
 
 ;; Should not use "Function" here, but ok for now
-(expect "Function anonymous-function cannot be called with 1 argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
+(expect "A anonymous-function cannot be called with 1 argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
 
 (expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
@@ -114,6 +114,10 @@
         (get-error "(re-pattern nil)"))
 
 (expect "Position -2 is outside of the string.\n" (get-error "(subs \"a\" 3)"))
+
+(expect "3 cannot be opened as an InputStream.\n" (get-error "(slurp 3)"))
+
+(expect "The file a.txt does not exist.\n" (get-error "(slurp \"a.txt\")"))
 
 ;; TO-DO: clean up function names
 ;; Note: this test runs correctly, but it redefines fn every time it runs.

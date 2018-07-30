@@ -356,6 +356,12 @@
     :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (nth matches 1) " argument(s) but was given " (nth matches 2) :arg ".\n"))}
 
+    {:key :illegal-input-stream
+    :class "IllegalArgumentException"
+    :match (beginandend "Cannot open \\<(.*)\\> as an InputStream")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg
+                                                           " cannot be opened as an InputStream.\n"))}
+
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################
@@ -600,9 +606,19 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion."
     " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
 
-    ;#####################
+    ;#################################
+    ;### File Not Found Exceptions ###
+    ;#################################
+
+    {:key :file-does-not-exist
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(No such file or directory\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    ;###############
     ;### Warning ###
-    ;#####################
+    ;###############
 
     {:key :other
      :class "WARNING:"
