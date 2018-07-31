@@ -117,3 +117,12 @@
 ;;;; user=> (map (fn (* 4 VARIABLE-NAME)) (range 1 10))
 (expect "(* 4 VARIABLE-NAME)"
         (get-spec-text "], :value ((* 4 VARIABLE-NAME)), :args ((* 4 VARIABLE-NAME))}, compiling:(/tmp/form-init231752514381864372.clj:1:6)"))
+
+;;;; user=> (defn hello [x] (let [y 2 z] (+ x y)))
+(expect "[y 2 z] (+ x y)"
+        (get-spec-text "Default Error: Call to clojure.core/let did not conform to spec:\nIn: [0] val: () fails spec: :
+        clojure.core.specs.alpha/bindings at: [:args :bindings :init-expr] predicate: any?,  Insufficient input\n #:clojure.spec.
+        alpha{:problems [{:path [:args :bindings :init-expr], :reason \"Insufficient input\", :pred clojure.core/any?, :val (), :via
+        [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436
+        0x2377a56c \"clojure.spec.alpha$regex_spec_impl$reify__2436@2377a56c\"], :value ([y 2 z] (+ x y)), :args ([y 2 z] (+ x y))}, compiling:(/tmp/form-init8683
+          024422163155580.clj:1:17) \n\n"))
