@@ -249,6 +249,15 @@
     "9" "nine"
     n))
 
+(defn number-arg
+  "number-arg takes a positive integer as a string and changes it to a
+   string with the numbers corresponding spelling followed by
+   \"argument(s)\""
+  [n]
+  (if (= n "1")
+    (str (number-word n) " argument")
+    (str (number-word n) " arguments")))
+
 (defn number-vals
   "number-vals takes two strings, one which are the arguments that caused
    an error and the length required of the thing it errored on. It returns the
@@ -310,8 +319,8 @@
   anonymous-function"
   [n]
   (cond
-    (= n "anonymous-function") "anonymous-function"
-    :else (str "function " n)))
+    (= n "anonymous-function") "This anonymous function"
+    :else (str "The function " n)))
 
 (defn get-dictionary-type
   "get-dictionary-type takes a string and returns the corresponding type

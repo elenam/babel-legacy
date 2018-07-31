@@ -354,7 +354,7 @@
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
     :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (nth matches 1) " argument(s) but was given " (nth matches 2) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
 
     {:key :illegal-input-stream
     :class "IllegalArgumentException"
@@ -395,19 +395,19 @@
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (check-function-name (get-function-name (nth matches 2))) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot take " (number-arg (nth matches 1)) :arg ".\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined-one-arg
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+) ")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (check-function-name (get-function-name (nth matches 1))) :arg " cannot be called with 1 argument.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 1))) :arg " cannot be called with one argument.\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined-other
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*) ")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (check-function-name (get-function-name (nth matches 2))) :arg " cannot be called with " (nth matches 1) :arg " arguments.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot be called with " (number-arg (nth matches 1)) :arg ".\n"))}
 
     ;#####################
     ;### Syntax Errors ###
@@ -435,7 +435,7 @@
     {:key :string-index-out-of-bounds
     :class "StringIndexOutOfBoundsException"
     :match (beginandend "String index out of range: (\\S+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (nth matches 1) :arg " is outside of the string.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (number-word (nth matches 1)) :arg " is outside of the string.\n"))}
 
     {:key :index-out-of-bounds-index-not-provided
     :class "IndexOutOfBoundsException"

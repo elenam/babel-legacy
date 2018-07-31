@@ -52,7 +52,7 @@
 
 (expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
 
-(expect "A function symbol cannot take 3 arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
+(expect "The function symbol cannot take three arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
 
 (expect "Cannot call nil as a function.\n" (get-error "(nil)"))
 
@@ -71,7 +71,7 @@
 
 (expect "% can only be followed by & or a number.\n" (get-error "(#(+ %a 1) 2 3)"))
 
-(expect "Position 5 is outside of the string.\n" (get-error "(nth \"hello\" 5)"))
+(expect "Position five is outside of the string.\n" (get-error "(nth \"hello\" 5)"))
 
 (expect "An index in a sequence is out of bounds or invalid.\n" (get-error "(nth (seq [1 2 3]) 5)"))
 
@@ -81,14 +81,14 @@
 
 (expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
 
-(expect "A function hello cannot be called with 1 argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
+(expect "The function hello cannot be called with one argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
 
-(expect "A function hello cannot be called with 3 arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
+(expect "The function hello cannot be called with three arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
 
-(expect "A function hello cannot be called with 0 arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
+(expect "The function hello cannot be called with zero arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
 
 ;; Should not use "Function" here, but ok for now
-(expect "A anonymous-function cannot be called with 1 argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
+(expect "This anonymous function cannot be called with one argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
 
 (expect "Too many arguments to if.\n" (get-error "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
@@ -96,9 +96,11 @@
 
 (expect "Loop requires a vector for its binding.\n" (get-error "(loop x 5 (+ x 5))"))
 
-(expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
+(expect "Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
 
-(expect "Mismatch between the number of arguments of outside function and recur: recur must take 1 argument(s) but was given 2.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
+(expect "Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
+
+(expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
 
 ;; This is not a good error message, but we can't do better. The real cause is destructuring.
 (expect "Function nth does not allow a map as an argument.\n" (get-error " (defn f [[x y]] (+ x y)) (f {2 3})"))
