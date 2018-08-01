@@ -47,7 +47,7 @@
 		                  ;; source: https://groups.google.com/forum/?fromgroups#!topic/clojure/rd-MDXvn3q8
                       :clojure.lang.Named "a keyword or a symbol"
                       :clojure.lang.nil "nil"
-                      :java.io.BufferedReader "a BufferedReader"})
+                      :java.io.BufferedReader "a file or an input stream"})
 
 ;; matching type interfaces to beginner-friendly names.
 ;; Note: since a type may implement more than one interface,

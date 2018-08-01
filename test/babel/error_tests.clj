@@ -102,7 +102,7 @@
 
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
 
-(expect "Attempted to use a number, but a BufferedReader was expected.\n" (get-error "(line-seq 3)"))
+(expect "Attempted to use a number, but a file or an input stream was expected.\n" (get-error "(line-seq 3)"))
 
 (expect "let is a macro and cannot be passed to a function.\n" (get-error "(map let let)"))
 
@@ -164,7 +164,8 @@
 (expect "In function denominator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(denominator 3)"))
 (expect "In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(numerator 3)"))
 (expect "In function map, the second argument is expected to be a collection, but is a regular expression pattern #\"h\" instead.\n" (get-error "(map [3 2 3 4 5] #\"h\")"))
-(expect "In function even?, the first argument is expected to be a number, but is unrecognized type java.io.BufferedReader  instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
+(expect "In function even?, the first argument is expected to be a number, but is unrecognized type java.lang.Object  instead.\n" (get-error "(even? (new Object))"))
+(expect "In function even?, the first argument is expected to be a number, but is a file or an input stream java.io.BufferedReader instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
 (expect "In function even?, the first argument is expected to be a number, but is a function even? instead.\n" (get-error "(even? (read-string (first (reverse (line-seq (clojure.java.io/reader \"usethistext.txt\"))))))"))
 
 (expect "conj can only take one or more arguments; recieved no arguments.\n" (get-error "(conj)"))
