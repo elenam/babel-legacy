@@ -322,6 +322,7 @@
     (= n "anonymous-function") "This anonymous function"
     :else (str "The function " n)))
 
+
 (defn get-dictionary-type
   "get-dictionary-type takes a string and returns the corresponding type
    if the string is \"nil\" we return an empty string so the result in the
@@ -340,6 +341,13 @@
         (clojure.string/replace #"class " "")
         get-type
         (str " ")))))
+
+(defn skip-anon-function
+  "return the parameter or an empty string if it's an anonymous function"
+  [s]
+  (if (and (= (get-dictionary-type s) "a function ") (check-if-anonymous-function (get-function-name s)))
+      ""
+      s))
 
 (defn check-divide
   "check-divide takes a string and returns either \"/\" or n

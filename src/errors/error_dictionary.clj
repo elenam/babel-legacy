@@ -240,7 +240,7 @@
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
                                                               ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              (nth matches 5) :arg
+                                                              (skip-anon-function (nth matches 5)) :arg
                                                               " instead.\n"))}
 
     {:key :exception-info-or-one-line-functions
@@ -250,7 +250,7 @@
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
                                                               ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              (nth matches 5) :arg
+                                                              (skip-anon-function (nth matches 5)) :arg
                                                               " instead.\n"))}
 
     {:key :exception-info-or
@@ -260,7 +260,7 @@
                                                             ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
                                                             ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                            (nth matches 4) :arg
+                                                            (skip-anon-function (nth matches 4)) :arg
                                                             " instead.\n"))}
 
     {:key :exception-info-or-one-line
@@ -270,7 +270,7 @@
                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                           (nth matches 4) :arg
+                                                           (skip-anon-function (nth matches 4)) :arg
                                                            " instead.\n"))}
 
    ;#############################

@@ -104,3 +104,7 @@
 
 (expect "a" (check-divide "a"))
 (expect "/" (check-divide ""))
+
+(expect "3" (skip-anon-function "3"))
+(expect "map" (skip-anon-function "clojure.core/map"))
+;(expect "" (skip-anon-function "utilities.spec_generator$eval1916$fn__1917"))
