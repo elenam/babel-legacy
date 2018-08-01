@@ -616,6 +616,12 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
                                                            " does not exist.\n"))}
 
+    {:key :file-does-not-exist-windows
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(The system cannot find the file specified\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
     ;###############
     ;### Warning ###
     ;###############
