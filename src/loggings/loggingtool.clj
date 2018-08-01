@@ -1,10 +1,10 @@
-(ns babel.testingtool
+(ns loggings.loggingtool
   (:require
    [expectations :refer :all]
    [clojure.tools.nrepl :as repl]
    [babel.processor :as processor])
   (:use
-   [babel.html-log]))
+   [loggings.html-log]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj
@@ -85,4 +85,4 @@
   [file-name]
   (add-l file-name))
 
-(println "babel.testingtool loaded")
+(println "babel.loggingtool loaded")

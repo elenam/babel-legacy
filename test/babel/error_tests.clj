@@ -2,7 +2,7 @@
   (:require
    [expectations :refer :all])
   (:use
-   [babel.testingtool :only [get-error start-log add-log]]))
+   [loggings.loggingtool :only [get-error start-log add-log]]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj

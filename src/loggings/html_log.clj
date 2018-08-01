@@ -1,4 +1,4 @@
-(ns babel.html-log
+(ns loggings.html-log
   (:use hiccup.core))
 
 ;;counter atom
