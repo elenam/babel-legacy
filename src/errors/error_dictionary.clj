@@ -19,6 +19,11 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
     " must come in pairs, but one of them does not have a match.\n"))}
 
+    {:key :vector-expected-for-bindings
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, instead, " (nth matches 5) :arg " was given.\n"))}
+
     {:key :binding-requires-a-pair
      :class "ExceptionInfo"
      :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input")
@@ -36,6 +41,246 @@
        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
        (nth matches 5) :arg " is used instead of a variable name.\n"))}
+
+       {:key :wrong-binding-name-defn-args
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure.core.specs.alpha/defn-args (.*) predicate: simple-symbol\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+        (nth matches 5) :arg " is used instead of a function name.\n"))}
+
+        {:key :vector-expected-for-arg-list-second-var-arg
+         :class "ExceptionInfo"
+         :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) (.*) \(")
+         :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 9) :arg " was given.\n"))}
+
+      {:key :vector-expected-for-arg-list
+       :class "ExceptionInfo"
+       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) \(")
+       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 8) :arg " was given.\n"))}\
+
+       {:key :vector-expected-for-arg-list
+        :class "ExceptionInfo"
+        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
+
+
+
+
+   {:key :length-not-greater-zero
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-zero")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-divide (nth matches 2)) :arg
+                                                           " can only take one or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-zero") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-zero-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-zero")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-divide (nth matches 2)) :arg
+                                                           " can only take one or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-zero") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-two
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-two") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-greater-two-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-two") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-zero-or-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-to-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take zero or one arguments; recieved " (number-vals (nth matches 3) "b-length-zero-or-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-zero-or-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-zero-to-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take zero or one arguments; recieved " (number-vals (nth matches 3) "b-length-zero-or-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-two-or-three
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two-to-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or three arguments; recieved " (number-vals (nth matches 3) "b-length-two-or-three") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-two-or-three-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two-to-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two or three arguments; recieved " (number-vals (nth matches 3) "b-length-two-or-three") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-one
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take one argument; recieved " (number-vals (nth matches 3) "b-length-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-one-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-one")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take one argument; recieved " (number-vals (nth matches 3) "b-length-one") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-two
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two arguments; recieved " (number-vals (nth matches 3) "b-length-two") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-two-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-two")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take two arguments; recieved " (number-vals (nth matches 3) "b-length-two") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-three
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three arguments; recieved " (number-vals (nth matches 3) "b-length-three") :arg
+                                                           ".\n"))}
+
+   {:key :length-not-three-macro
+    :class "ExceptionInfo"
+    :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-three")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " can only take three arguments; recieved " (number-vals (nth matches 3) "b-length-three") :arg
+                                                           ".\n"))}
+
+   {:key :0-not-valid
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails spec: :(.*)/b-not-zero") ;at: \\[:args :(\\S*)\\](.*)(\\n(.*)(\\n)?)*")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (check-divide (nth matches 2)) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg
+                                                           " cannot be 0.\n"))}
+
+   #_{:key :count-less-than-int
+    :class "ExceptionInfo"
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval:"); (.*) fails at: [(.*)] predicate: (.*), (.*) input"); (.*) fails at: [(.*)] predicate: (.*) \\(b-not-greater-count (.*)\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (check-divide (nth matches 2)) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg
+                                                           " cannot be 0.\n"))}
+   {:key :exception-info-extra-input
+    :class "ExceptionInfo"
+    ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+    ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args(.*)\\] predicate: \\(cat (.*) (.*)\\),  Extra input")
+    ;:match #"(.*)(\n(.*))*(\n)?"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " cannot take as many arguments as are currently in it, needs fewer arguments.\n"))}
+
+   {:key :exception-info-insufficient-input
+    :class "ExceptionInfo"
+    ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+    ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails at: \\[:args(.*)\\] predicate: (\\S*),  Insufficient input")
+    ;:match #"(.*)(\n(.*))*(\n)?"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                           " cannot take as few arguments as are currently in it, needs more arguments.\n"))}
+
+   {:key :exception-info
+    :class "ExceptionInfo"
+    ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+    ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args :(\\S*)\\] predicate: (\\S*)\\n")
+    ;:match #"(.*)(\n(.*))*(\n)?"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg
+                                                           " is expected to be a "  (?-name (nth matches 6)) :type
+                                                           ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                           (nth matches 4) :arg
+                                                           " instead.\n"))}
+    ;:make-msg-info-obj (fn [matches] (str "In function " (nth matches 0)))}
+
+    {:key :exception-info-or-after-in-0
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                              ", the " (arg-str (nth matches 3)) :arg
+                                                              " is expected to be a "  (?-name (nth matches 6)) :type
+                                                              ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                              (nth matches 4) :arg
+                                                              " instead.\n"))}
+
+    {:key :exception-info-functions
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
+      :make-msg-info-obj
+      (fn [matches]
+        (let
+          [actual-val (nth matches 5)
+           val-type (get-dictionary-type actual-val)
+           [print-type print-val] (if (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"] [val-type (get-function-name actual-val)])]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                              ", the " (arg-str (nth matches 3)) :arg
+                                                              " is expected to be a "  (?-name (nth matches 9)) :type
+                                                              ", but is " print-type :type
+                                                              print-val :arg
+                                                              " instead.\n")))}
+
+    {:key :exception-info-or-one-line-functions
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n  (.*)/(.*)")
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                              ", the " (arg-str (nth matches 3)) :arg
+                                                              " is expected to be a "  (?-name (nth matches 9)) :type
+                                                              ", but is " (get-dictionary-type (nth matches 5)) :type
+                                                              ;(skip-anon-function (nth matches 5)) :arg
+                                                              (nth matches 5) :arg
+                                                              " instead.\n"))}
+
+    {:key :exception-info-or
+     :class "ExceptionInfo"
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(.*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[0\\]")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
+                                                            " is expected to be a "  (?-name (nth matches 6)) :type
+                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                            ;(skip-anon-function (nth matches 4)) :arg
+                                                            (nth matches 4) :arg
+                                                            " instead.\n"))}
+
+    {:key :exception-info-or-one-line
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args(.*)\\] predicate: (.*)\\n  (.*)/(.*)")
+      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
+                                                           " is expected to be a "  (?-name (nth matches 6)) :type
+                                                           ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                           ;(skip-anon-function (nth matches 4)) :arg
+                                                           (nth matches 4) :arg
+                                                           " instead.\n"))}
 
    ;#############################
    ;### Class Cast Exceptions ###
@@ -110,6 +355,24 @@
     :match (beginandend "Duplicate key: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash-map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
 
+    {:key :loop-req-vector
+    :class "IllegalArgumentException"
+    :match (beginandend "loop requires a vector for its binding (\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Loop requires a vector for its binding.\n"))}
+
+    {:key :recur-arg-mismatch
+    :class "IllegalArgumentException"
+    :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
+
+    {:key :illegal-input-stream
+    :class "IllegalArgumentException"
+    :match (beginandend "Cannot open \\<(.*)\\> as an InputStream")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg
+                                                           " cannot be opened as an InputStream.\n"))}
+
+
+  ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################
    ;### Assertion Errors ###
    ;########################
@@ -130,22 +393,30 @@
     ;### Arity Exceptions ###
     ;########################
 
+    ;; Need to revisit this one: we might want to add a spec to it
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: core/keyword")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A keyword can only take one or two arguments.\n"))}
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/keyword")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A function " "keyword" :arg " can only take one or two arguments, but "
+    (nth matches 1) " were passed to it.\n"))}
 
     {:key :wrong-number-of-args-passed-to-core
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: core/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (nth matches 2) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot take " (number-arg (nth matches 1)) :arg ".\n"))}
 
-    {:key :wrong-number-of-args-passed-to-user-defined
+    {:key :wrong-number-of-args-passed-to-user-defined-one-arg
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args (\\S*) passed to: (\\S*)/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 3) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 1))) :arg " cannot be called with one argument.\n"))}
+
+    {:key :wrong-number-of-args-passed-to-user-defined-other
+    ;we may want to find a way to make this less general
+    :class "ArityException"
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot be called with " (number-arg (nth matches 1)) :arg ".\n"))}
 
     ;#####################
     ;### Syntax Errors ###
@@ -154,8 +425,7 @@
    {:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
     :match (beginandend "Unable to resolve symbol: (.+) in this context")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
-                                                           (nth matches 1) :arg " is undefined.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (change-if (nth matches 1)) :arg ".\n"))}
 
    ;############################
    ;### Arithmetic Exception ###
@@ -172,8 +442,8 @@
 
     {:key :string-index-out-of-bounds
     :class "StringIndexOutOfBoundsException"
-    :match (beginandend "String index out of range: (\\d+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (nth matches 1) :arg " is outside of the string.\n"))}
+    :match (beginandend "String index out of range: (\\S+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (number-word (nth matches 1)) :arg " is outside of the string.\n"))}
 
     {:key :index-out-of-bounds-index-not-provided
     :class "IndexOutOfBoundsException"
@@ -200,7 +470,7 @@
     ;### Unsupported Operation Exceptions ###
     ;########################################
 
-    #_{:key :unsupported-operation-wrong-type-of-argument
+    {:key :unsupported-operation-wrong-type-of-argument
     ;need to test
     :class "UnsupportedOperationException"
     :match (beginandend "(\\S*) not supported on this type: (\\S*)")
@@ -263,8 +533,8 @@
 
     {:key :compiler-exception-cannot-take-value-of-macro
    :class "RuntimeException"
-   :match (beginandend "Can't take value of a macro: (\\S*)")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro, cannot be passed to a function.\n"))}
+   :match (beginandend "Can't take value of a macro: (\\S*),")
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro and cannot be passed to a function.\n"))}
 
    #_{:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
@@ -299,8 +569,8 @@
 
     {:key :compiler-exception-end-of-file
     :class "RuntimeException"
-    :match (beginandend "EOF while reading, starting at line (.+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "End of file, starting at line.\nProbably a non-closing parenthesis or bracket.\n"))}
+    :match (beginandend "EOF while reading, starting at line (\\d+) ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Unexpected end of file, starting at line " (nth matches 1) ". Probably a non-closing parenthesis or bracket.\n"))}
 
     {:key :compiler-exception-end-of-file-string
     ;this cannot be done in repl needs to be tested still
@@ -329,6 +599,64 @@
     :match (beginandend "arg literal must be %, %& or %integer")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
+    {:key :illegal-state-validater
+    :class "IllegalStateException"
+    :match (beginandend "Invalid reference state  (\\S*)\\.validate")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: failed validation.\n"))}
+
+    {:key :illegal-state-transaction
+    :class "IllegalStateException"
+    :match (beginandend "No transaction running  (\\S*)\\.LockingTransaction(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: trying to lock a transaction that is not running.\n"))}
+
+    {:key :illegal-state-transaction-IO
+    :class "IllegalStateException"
+    :match (beginandend "I/O in transaction")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: I/0 in transaction.\n"))}
+
+    ;###################################
+    ;### Memory and Stack Exceptions ###
+    ;###################################
+
+    {:key :out-of-memory
+    :class "OutOfMemoryError"
+    :match (beginandend "Java heap space ")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation.\n"))}
+
+    {:key :stack-overflow-with-name
+    :class "StackOverflowError"
+    :match (beginandend "\\s*(\\S+)\\s+")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion.\n"
+    " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
+
+    ;#################################
+    ;### File Not Found Exceptions ###
+    ;#################################
+
+    {:key :file-does-not-exist
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(No such file or directory\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    {:key :file-does-not-exist-windows
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(The system cannot find the file specified\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    ;###############
+    ;### Warning ###
+    ;###############
+
+    {:key :other
+     :class "WARNING:"
+     :match (beginandend "(\\S*) already refers to: (\\S*) in namespace: (\\S*), being replaced by: (\\S*)")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Warning: " (nth matches 1) :arg
+                                                            " already refers to: " (nth matches 2) :arg
+                                                            " in namespace: " (nth matches 3) :arg
+                                                            " being replaced by " (nth matches 4) :arg
+                                                            ".\n\n"))}
 
    ;#####################
    ;### Default Error ###

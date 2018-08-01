@@ -2,7 +2,8 @@
   (:require  [clojure.tools.nrepl :as repl]
              [clojure.spec.test.alpha :as stest]
              [errors.messageobj :as m-obj]
-             [errors.prettify-exception :as p-exc]))
+             [errors.prettify-exception :as p-exc]
+             [corefns.corefns :as cf]))
 
 ;;an atom that record original error response
 (def recorder (atom {:msg "" :detail ""}))
@@ -32,6 +33,7 @@
                                                                                               (update-recorder-msg (inp-message :err))
                                                                                               (inp-message :err)))))))
     ;(assoc inp-message :err (str (inp-message :err))) ;; Debugging
+    ;(assoc inp-message :err (str "\n" inp-message "\n" (p-exc/process-spec-errors (inp-message :err)))) ;; Debugging
     inp-message))
 
 (println "babel.processor loaded")
