@@ -108,6 +108,11 @@
 
 (expect "You are not using if correctly.\n" (get-error "if"))
 
+(expect "Recur can only occur as a tail call: no operations can be done after its return.\n" (get-error "(loop [x 5] (recur x)(recur x))"))
+
+;(expect "Variable name was expected but 5 was used instead.\n" (get-error "(loop [5 y])"))
+
+
 ;; This is not a good error message, but we can't do better. The real cause is destructuring.
 (expect "Function nth does not allow a map as an argument.\n" (get-error " (defn f [[x y]] (+ x y)) (f {2 3})"))
 

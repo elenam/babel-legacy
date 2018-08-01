@@ -5,8 +5,8 @@
 ;; A vector of error dictionaries from the most specific one to the most general one.
 ;; Order matters because the vector is searched from top to bottom.
 
-(defn beginandend [x]
-  (re-pattern (str "(?s)" x "(.*)")))
+; (defn beginandend [x]
+;   (re-pattern (str "(?s)" x "(.*)")))
 
 (def error-dictionary
   [;########################
@@ -36,32 +36,43 @@
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
       " must be only one name and one value, but more parameters were given.\n"))}
 
-      {:key :wrong-binding-name
-       :class "ExceptionInfo"
-       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
-       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
-       (nth matches 5) :arg " is used instead of a variable name.\n"))}
+   {:key :wrong-binding-name
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+    (nth matches 5) :arg " is used instead of a variable name.\n"))}
 
-       {:key :wrong-binding-name-defn-args
-        :class "ExceptionInfo"
-        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure.core.specs.alpha/defn-args (.*) predicate: simple-symbol\?")
-        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
-        (nth matches 5) :arg " is used instead of a function name.\n"))}
+   {:key :wrong-binding-name-defn-args
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure.core.specs.alpha/defn-args (.*) predicate: simple-symbol\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In " (nth matches 2) :arg " "
+    (nth matches 5) :arg " is used instead of a function name.\n"))}
 
-        {:key :vector-expected-for-arg-list-second-var-arg
-         :class "ExceptionInfo"
-         :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) (.*) \(")
-         :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 9) :arg " was given.\n"))}
+   {:key :vector-expected-for-arg-list-second-var-arg
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) (.*) \(")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 9) :arg " was given.\n"))}
 
-      {:key :vector-expected-for-arg-list
-       :class "ExceptionInfo"
-       :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) \(")
-       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 8) :arg " was given.\n"))}\
+   {:key :vector-expected-for-arg-list
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?(.*):args \((.*) \(")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, instead, " (nth matches 8) :arg " was given.\n"))}\
 
-       {:key :vector-expected-for-arg-list
-        :class "ExceptionInfo"
-        :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
-        :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
+   {:key :vector-expected-for-arg-list-general
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
+
+   {:key :vector-expected-for-arg-list-general
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
+
+  ;  {:key :insufficient-input
+  ;   :class "ExceptionInfo"
+  ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:\n(.*) :reason Insufficient Input")
+  ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There was insuffieint input for a function call\n"))}\
+
 
 
 
