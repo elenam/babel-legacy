@@ -46,7 +46,8 @@
 		                  ;; got this in a seesaw error message. Not sure what other types are "Named"
 		                  ;; source: https://groups.google.com/forum/?fromgroups#!topic/clojure/rd-MDXvn3q8
                       :clojure.lang.Named "a keyword or a symbol"
-                      :clojure.lang.nil "nil"})
+                      :clojure.lang.nil "nil"
+                      :java.io.BufferedReader "a BufferedReader"})
 
 ;; matching type interfaces to beginner-friendly names.
 ;; Note: since a type may implement more than one interface,
@@ -278,6 +279,14 @@
         (clojure.string/replace #"class " "")
         get-type
         (str " ")))))
+
+(defn change-if
+  "change-if takes a string and will output a string based on if
+   the string is \"if\" or not"
+   [x]
+   (if (= x "if")
+     "You are not using if correctly"
+     (str "Name " x " is undefined")))
 
 (defn check-divide
   "check-divide takes a string and returns either \"/\" or n

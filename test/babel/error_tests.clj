@@ -67,7 +67,7 @@
 (expect "Parameters for cond must come in pairs, but one of them does not have a match.\n" (get-error "(cond (seq? [1 2]) 5 (seq? [1 3]))"))
 (expect "Parameters for loop must come in pairs, but one of them does not have a match.\n" (get-error "(defn s [s] (loop [s]))"))
 
-(expect "with-open, is a macro, cannot be passed to a function.\n" (get-error "(defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))")) ;credit: https://stackoverflow.com/questions/5751262/cant-take-value-of-a-macro-clojure
+(expect "with-open is a macro and cannot be passed to a function.\n" (get-error "(defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))")) ;credit: https://stackoverflow.com/questions/5751262/cant-take-value-of-a-macro-clojure
 
 (expect "% can only be followed by & or a number.\n" (get-error "(#(+ %a 1) 2 3)"))
 
@@ -102,7 +102,11 @@
 
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
 
-(expect "Attempted to use a number, but unrecognized type java.io.BufferedReader was expected.\n" (get-error "(line-seq 3)"))
+(expect "Attempted to use a number, but a BufferedReader was expected.\n" (get-error "(line-seq 3)"))
+
+(expect "let is a macro and cannot be passed to a function.\n" (get-error "(map let let)"))
+
+(expect "You are not using if correctly.\n" (get-error "if"))
 
 ;; This is not a good error message, but we can't do better. The real cause is destructuring.
 (expect "Function nth does not allow a map as an argument.\n" (get-error " (defn f [[x y]] (+ x y)) (f {2 3})"))
@@ -131,6 +135,12 @@
 ;; Note: this test runs correctly, but it redefines fn every time it runs.
 ;; Restarting nrepl is required after the tests are run.
 #_(expect #"Warning: fn already refers to: \#'clojure.core/fn in namespace: utilities\.spec_generator, being replaced by: \#'utilities\.spec_generator/fn(.*)" (get-error "(defn fn [x] x)"))
+
+#_(expect "IllegalState: failed validation.\n" (get-error "(def a (atom [3])) (set-validator! a #(every? odd? %)) (swap! a into [2])"))
+(expect "IllegalState: failed validation.\n" (get-error "(ref 0 :validator pos?)"))
+#_(expect "IllegalState: trying to lock a transaction that is not running.\n" (get-error "(def b (ref 3)) (ref-set b 6)"))
+#_(expect "IllegalState: trying to lock a transaction that is not running.\n" (get-error "(ensure b)"))
+(expect "IllegalState: I/0 in transaction.\n" (get-error "(dosync (io! (println \"h\")))"))
 
 ;##### Spec Testing #####
 

@@ -450,8 +450,7 @@
    {:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
     :match (beginandend "Unable to resolve symbol: (.+) in this context")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
-                                                           (nth matches 1) :arg " is undefined.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (change-if (nth matches 1)) :arg ".\n"))}
 
    ;############################
    ;### Arithmetic Exception ###
@@ -559,8 +558,8 @@
 
     {:key :compiler-exception-cannot-take-value-of-macro
    :class "RuntimeException"
-   :match (beginandend "Can't take value of a macro: (\\S*)")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro, cannot be passed to a function.\n"))}
+   :match (beginandend "Can't take value of a macro: (\\S*),")
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro and cannot be passed to a function.\n"))}
 
    #_{:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
@@ -625,6 +624,21 @@
     :match (beginandend "arg literal must be %, %& or %integer")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
+    {:key :illegal-state-validater
+    :class "IllegalStateException"
+    :match (beginandend "Invalid reference state  (\\S*)\\.validate")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: failed validation.\n"))}
+
+    {:key :illegal-state-transaction
+    :class "IllegalStateException"
+    :match (beginandend "No transaction running  (\\S*)\\.LockingTransaction(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: trying to lock a transaction that is not running.\n"))}
+
+    {:key :illegal-state-transaction-IO
+    :class "IllegalStateException"
+    :match (beginandend "I/O in transaction")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: I/0 in transaction.\n"))}
+
     ;###################################
     ;### Memory and Stack Exceptions ###
     ;###################################
@@ -647,6 +661,12 @@
     {:key :file-does-not-exist
     :class "FileNotFoundException"
     :match (beginandend "(.*) \\(No such file or directory\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    {:key :file-does-not-exist-windows
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(The system cannot find the file specified\\)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
                                                            " does not exist.\n"))}
 
