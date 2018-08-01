@@ -79,13 +79,25 @@
                    }
                    }
 
-                 }"]
+               }
+               function checkData() {
+                   var nonNilResults = document.getElementsByClassName(\"nonNilResult\");
+                   var nilResults = document.getElementsByClassName(\"nilResult\");
+                   if (nonNilResults.length != 0 || nilResults.length != 0) {
+                     document.getElementById(\"loadingError\").style.display=\"none\";
+                   }
+
+               }
+               window.onload = checkData;"]
         [:p "Display options:"]
         [:div#displayOptions
          [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
          [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
          [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
-         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]]))
+         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]]
+        [:div#loadingError {:style "display:block"}
+         [:hr]
+         [:h4 "Error loading test data!!!"]]))
 
 ;;adds a new log to the category
 (defn add-category
@@ -119,7 +131,9 @@
 ;;makes the category html
 (defn make-category
   []
-  (spit "./log/log_category.html" (category-preset) :append false))
+  (do
+    (clojure.java.io/make-parents "./log/log_category.html")
+    (spit "./log/log_category.html" (category-preset) :append false)))
 
 ;;start of txt and html test log, including preset up
 (defn start-l
@@ -128,6 +142,7 @@
     (update-time)
     (make-category)
     (spit "./log/log_category.html" (add-category current-time) :append true)
+    (clojure.java.io/make-parents "./log/history/test_logs.html")
     (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
     (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
 
