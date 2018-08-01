@@ -599,6 +599,21 @@
     :match (beginandend "arg literal must be %, %& or %integer")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
+    {:key :illegal-state-validater
+    :class "IllegalStateException"
+    :match (beginandend "Invalid reference state  (\\S*)\\.validate")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: failed validation.\n"))}
+
+    {:key :illegal-state-transaction
+    :class "IllegalStateException"
+    :match (beginandend "No transaction running  (\\S*)\\.LockingTransaction(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: trying to lock a transaction that is not running.\n"))}
+
+    {:key :illegal-state-transaction-IO
+    :class "IllegalStateException"
+    :match (beginandend "I/O in transaction")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: I/0 in transaction.\n"))}
+
     ;###################################
     ;### Memory and Stack Exceptions ###
     ;###################################

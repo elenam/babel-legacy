@@ -102,7 +102,7 @@
 
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
 
-(expect "Attempted to use a number, but unrecognized type java.io.BufferedReader was expected.\n" (get-error "(line-seq 3)"))
+(expect "Attempted to use a number, but a BufferedReader was expected.\n" (get-error "(line-seq 3)"))
 
 (expect "let is a macro and cannot be passed to a function.\n" (get-error "(map let let)"))
 
@@ -136,6 +136,12 @@
 ;; Restarting nrepl is required after the tests are run.
 #_(expect #"Warning: fn already refers to: \#'clojure.core/fn in namespace: utilities\.spec_generator, being replaced by: \#'utilities\.spec_generator/fn(.*)" (get-error "(defn fn [x] x)"))
 
+#_(expect "IllegalState: failed validation.\n" (get-error "(def a (atom [3])) (set-validator! a #(every? odd? %)) (swap! a into [2])"))
+(expect "IllegalState: failed validation.\n" (get-error "(ref 0 :validator pos?)"))
+#_(expect "IllegalState: trying to lock a transaction that is not running.\n" (get-error "(def b (ref 3)) (ref-set b 6)"))
+#_(expect "IllegalState: trying to lock a transaction that is not running.\n" (get-error "(ensure b)"))
+(expect "IllegalState: I/0 in transaction.\n" (get-error "(dosync (io! (println \"h\")))"))
+
 ;##### Spec Testing #####
 
 ;; Note: spec-ed functions come out as anonymous at this point because the name refers to spec, not to the function. This will be fixed.
@@ -158,7 +164,7 @@
 (expect "In function denominator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(denominator 3)"))
 (expect "In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(numerator 3)"))
 (expect "In function map, the second argument is expected to be a collection, but is a regular expression pattern #\"h\" instead.\n" (get-error "(map [3 2 3 4 5] #\"h\")"))
-(expect "In function even?, the first argument is expected to be a number, but is unrecognized type java.io.BufferedReader java.io.BufferedReader instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
+(expect "In function even?, the first argument is expected to be a number, but is a BufferedReader java.io.BufferedReader instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
 (expect "In function even?, the first argument is expected to be a number, but is a function even? instead.\n" (get-error "(even? (read-string (first (reverse (line-seq (clojure.java.io/reader \"usethistext.txt\"))))))"))
 
 (expect "conj can only take one or more arguments; recieved no arguments.\n" (get-error "(conj)"))
