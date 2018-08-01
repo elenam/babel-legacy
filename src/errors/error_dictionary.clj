@@ -236,12 +236,18 @@
     {:key :exception-info-functions
       :class "ExceptionInfo"
       :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
-      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+      :make-msg-info-obj
+      (fn [matches]
+        (let
+          [actual-val (nth matches 5)
+           val-type (get-dictionary-type actual-val)
+           [print-type print-val] (if (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"] [val-type (get-function-name actual-val)])]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
-                                                              ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              (skip-anon-function (nth matches 5)) :arg
-                                                              " instead.\n"))}
+                                                              ", but is " print-type :type
+                                                              print-val :arg
+                                                              " instead.\n")))}
 
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
@@ -250,7 +256,8 @@
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
                                                               ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              (skip-anon-function (nth matches 5)) :arg
+                                                              ;(skip-anon-function (nth matches 5)) :arg
+                                                              (nth matches 5) :arg
                                                               " instead.\n"))}
 
     {:key :exception-info-or
@@ -260,7 +267,8 @@
                                                             ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
                                                             ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                            (skip-anon-function (nth matches 4)) :arg
+                                                            ;(skip-anon-function (nth matches 4)) :arg
+                                                            (nth matches 4) :arg
                                                             " instead.\n"))}
 
     {:key :exception-info-or-one-line
@@ -270,7 +278,8 @@
                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                           (skip-anon-function (nth matches 4)) :arg
+                                                           ;(skip-anon-function (nth matches 4)) :arg
+                                                           (nth matches 4) :arg
                                                            " instead.\n"))}
 
    ;#############################

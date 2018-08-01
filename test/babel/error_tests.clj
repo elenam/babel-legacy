@@ -134,8 +134,12 @@
 
 ;##### Spec Testing #####
 
-(expect #"In function conj, the first argument is expected to be a collection, but is a function (\S*) instead.\n" (get-error "(conj even? \"a\")")) ;not the result we want but good for now
-(expect #"In function map, the second argument is expected to be a collection, but is a function (\S*) instead.\n" (get-error "(map even? even?)")) ;not the result we want but good for now
+;; Note: spec-ed functions come out as anonymous at this point because the name refers to spec, not to the function. This will be fixed.
+(expect #"In function conj, the first argument is expected to be a collection, but is an anonymous function instead.\n" (get-error "(conj even? \"a\")")) ;not the result we want but good for now
+(expect #"In function map, the second argument is expected to be a collection, but is an anonymous function instead.\n" (get-error "(map even? even?)")) ;not the result we want but good for now
+(expect #"In function map, the second argument is expected to be a collection, but is an anonymous function instead.\n" (get-error "(map even? #(+ % 2))"))
+(expect #"In function map, the second argument is expected to be a collection, but is a function f instead.\n" (get-error "(defn f [x] (+ x 2)) (map even? f)"))
+(expect #"In function map, the second argument is expected to be a collection, but is a function f\? instead.\n" (get-error "(defn f? [x] (+ x 2)) (map even? f?)"))
 (expect #"In function denominator, the first argument is expected to be a ratio, but is a function (\S*) instead.\n" (get-error "(denominator even?)")) ;not the result we want but good for now
 (expect "In function map, the first argument is expected to be a function, but is nil instead.\n" (get-error "(map nil)"))
 (expect "In function conj, the first argument is expected to be a collection, but is a character \\a instead.\n" (get-error "(conj \\a \"a\")"))
@@ -151,7 +155,7 @@
 (expect "In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(numerator 3)"))
 (expect "In function map, the second argument is expected to be a collection, but is a regular expression pattern #\"h\" instead.\n" (get-error "(map [3 2 3 4 5] #\"h\")"))
 (expect "In function even?, the first argument is expected to be a number, but is unrecognized type java.io.BufferedReader java.io.BufferedReader instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
-(expect "In function even?, the first argument is expected to be a number, but is unrecognized type even? even? instead.\n" (get-error "(even? (read-string (first (reverse (line-seq (clojure.java.io/reader \"usethistext.txt\"))))))"))
+(expect "In function even?, the first argument is expected to be a number, but is a function even? instead.\n" (get-error "(even? (read-string (first (reverse (line-seq (clojure.java.io/reader \"usethistext.txt\"))))))"))
 
 (expect "conj can only take one or more arguments; recieved no arguments.\n" (get-error "(conj)"))
 (expect "map can only take one or more arguments; recieved no arguments.\n" (get-error "(map)"))

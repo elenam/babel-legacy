@@ -19,15 +19,19 @@
 (expect "first" (get-function-name "clojure.lang.RT.first"))
 (expect "first" (get-function-name "clojure.lang.RT.first--5678"))
 (expect "somethingElse" (get-function-name "somethingElse"))
+(expect "best-approximation" (get-function-name "errors.dictionaries/best-approximation"))
+(expect "anonymous function" (get-function-name "fn_test"))
 
-(expect "anonymous-function" (check-if-anonymous-function "fn"))
-(expect "anonymous-function" (check-if-anonymous-function "fn_test"))
-(expect "anonymous-function" (check-if-anonymous-function "fn_"))
+(expect "anonymous function" (check-if-anonymous-function "fn"))
+(expect "anonymous function" (check-if-anonymous-function "fn_test"))
+(expect "anonymous function" (check-if-anonymous-function "fn_"))
 (expect "random_function" (check-if-anonymous-function "random_function"))
 
 (expect "a function" (best-approximation "clojure.spec.test.alpha$spec_checking_fn$fn__2943"))
 (expect "unrecognized type 3" (best-approximation "3"))
 (expect "unrecognized type \"a\"" (best-approximation "\"a\""))
+(expect "a function" (best-approximation "clojure.core/map"))
+(expect "a function" (best-approximation "errors.dictionaries/best-approximation"))
 
 (expect "a string" (get-type "java.lang.String"))
 (expect "a number" (get-type "java.lang.Long"))
@@ -104,7 +108,3 @@
 
 (expect "a" (check-divide "a"))
 (expect "/" (check-divide ""))
-
-(expect "3" (skip-anon-function "3"))
-(expect "map" (skip-anon-function "clojure.core/map"))
-;(expect "" (skip-anon-function "utilities.spec_generator$eval1916$fn__1917"))
