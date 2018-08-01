@@ -18,7 +18,7 @@ Logging tool provides you a transparent testing environment. It records your tes
 
 ## Logging contents
 
-![This is the logging screen shot](/log/logging.png)
+![This is the logging screen shot](/doc/logging.png)
 
 ## Trouble shooting
 
