@@ -102,8 +102,12 @@
 
 (expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
 
+(expect "Attempted to use a number, but unrecognized type java.io.BufferedReader was expected.\n" (get-error "(line-seq 3)"))
+
 ;; This is not a good error message, but we can't do better. The real cause is destructuring.
 (expect "Function nth does not allow a map as an argument.\n" (get-error " (defn f [[x y]] (+ x y)) (f {2 3})"))
+
+
 
 ;; it doesn't look like we can run this test; works correctly in repl
 #_(expect "Clojure ran out of memory, likely due to an infinite computation.\n" (get-error "(range)"))
@@ -119,7 +123,9 @@
 
 (expect "3 cannot be opened as an InputStream.\n" (get-error "(slurp 3)"))
 
-(expect "The file a.txt does not exist.\n" (get-error "(slurp \"a.txt\")"))
+(expect #"The file a\.txt does not exist(.*)" (get-error "(slurp \"a.txt\")"))
+
+(expect "No value found for key 3. Every key for a hash-map must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
 
 ;; TO-DO: clean up function names
 ;; Note: this test runs correctly, but it redefines fn every time it runs.
@@ -143,6 +149,9 @@
 (expect "In function map, the first argument is expected to be a function, but is a number 3 instead.\n" (get-error "(map 3 [3])"))
 (expect "In function denominator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(denominator 3)"))
 (expect "In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(numerator 3)"))
+(expect "In function map, the second argument is expected to be a collection, but is a regular expression pattern #\"h\" instead.\n" (get-error "(map [3 2 3 4 5] #\"h\")"))
+(expect "In function even?, the first argument is expected to be a number, but is unrecognized type java.io.BufferedReader java.io.BufferedReader instead.\n" (get-error "(even? (clojure.java.io/reader \"usethistext.txt\"))"))
+(expect "In function even?, the first argument is expected to be a number, but is unrecognized type even? even? instead.\n" (get-error "(even? (read-string (first (reverse (line-seq (clojure.java.io/reader \"usethistext.txt\"))))))"))
 
 (expect "conj can only take one or more arguments; recieved no arguments.\n" (get-error "(conj)"))
 (expect "map can only take one or more arguments; recieved no arguments.\n" (get-error "(map)"))
@@ -168,3 +177,7 @@
 
 ;; lazy sequences as unrelated function arguments aren't evaluated when a spec fails:
 (expect "In function map, the first argument is expected to be a function, but is a number 5 instead.\n" (get-error "(map 5 (lazy-cat [2 3] [(/ 1 0) 8]))"))
+
+(expect "In function even?, the first argument is expected to be a number, but is a function clojure.spec.test.alpha$spec_checking_fn$fn__2943 instead.\n" (get-error "(odd? (even? even?))"))
+
+(expect "In function even?, the first argument is expected to be a number, but is a list (2 3 1/2 8) instead.\n" (get-error "(map #(+ % (even? (lazy-cat [2 3] [(/ 1 2) 8]))) [3])"))
