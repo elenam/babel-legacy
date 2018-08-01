@@ -341,6 +341,14 @@
         get-type
         (str " ")))))
 
+(defn change-if
+  "change-if takes a string and will output a string based on if
+   the string is \"if\" or not"
+   [x]
+   (if (= x "if")
+     "You are not using if correctly"
+     (str "Name " x " is undefined")))
+
 (defn check-divide
   "check-divide takes a string and returns either \"/\" or n
    this is only used for / because / is removed from the resulting
