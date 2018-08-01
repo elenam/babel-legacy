@@ -1,6 +1,5 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
-            [loggings.loggingtool :only [read-log]]
             [clojure.tools.nrepl.middleware])
   (:import clojure.tools.nrepl.transport.Transport))
 

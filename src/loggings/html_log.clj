@@ -181,9 +181,10 @@
   (spit "./log/last_test.txt" (log-content inp-code total modified original) :append true))
 
 ;;read the exsiting txt log content
-(defn read-log
-  []
-  (println (slurp "./log/last_test.txt")))
+;;this is disabled because it is removed from the middleware
+#_(defn read-log
+   []
+   (println (slurp "./log/last_test.txt")))
 
 ;;define html content
 (defn html-content

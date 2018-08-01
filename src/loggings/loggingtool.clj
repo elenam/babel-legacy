@@ -84,5 +84,3 @@
 (defn add-log
   [file-name]
   (add-l file-name))
-
-(println "babel.loggingtool loaded")
