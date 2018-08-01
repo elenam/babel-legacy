@@ -46,7 +46,8 @@
 		                  ;; got this in a seesaw error message. Not sure what other types are "Named"
 		                  ;; source: https://groups.google.com/forum/?fromgroups#!topic/clojure/rd-MDXvn3q8
                       :clojure.lang.Named "a keyword or a symbol"
-                      :clojure.lang.nil "nil"})
+                      :clojure.lang.nil "nil"
+                      :java.io.BufferedReader "a BufferedReader"})
 
 ;; matching type interfaces to beginner-friendly names.
 ;; Note: since a type may implement more than one interface,
@@ -70,9 +71,10 @@
 ;;; best-approximation: type -> string
 (defn best-approximation [t]
   "returns a string representation of a type t not listed in the type-dictionary for user-friendly error messages"
-  (let [attempt (resolve (symbol t))
-        type (if attempt attempt (clojure.lang.RT/loadClassForName (str "clojure.lang." t))) ;; may need to add clojure.lang. for some types.
-        matched-type (if type (first (filter #(isa? type (first %)) general-types)))]
+  (let [first-attempt (resolve (symbol t))
+        attempt (if (= (type first-attempt) clojure.lang.Var) (type (var-get first-attempt)) first-attempt)
+        type1 (or attempt (clojure.lang.RT/loadClassForName (str "clojure.lang." t))) ;; may need to add clojure.lang. for some types.
+        matched-type (if type1 (first (filter #(isa? type1 (first %)) general-types)))]
     (if matched-type (second matched-type) (str "unrecognized type " t))))
 
 ;;; get-type: type -> string
@@ -110,7 +112,7 @@
    if it is an anonymous function, its name otherwise"
   [fname]
   (if (or (= fname "fn") (re-matches #"fn_(.*)" fname) (re-matches #"fn-(.*)" fname))
-    "anonymous-function" fname))
+    "anonymous function" fname))
 
 ;;; get-match-name: string -> string
 (defn get-match-name
@@ -145,77 +147,6 @@
 (defn get-macro-name [mname]
   "extract a macro name from a qualified name"
   (nth (re-matches #"(.*)/(.*)" mname) 2))
-
-  (defn beginandend [x]
-    (re-pattern (str "(?s)" x "(.*)")))
-
-  (defn get-spec-text [full-error]
-    "return the string that failed a given spec from a spec error"
-  (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
-
-(defn pretty-print-single-value
-  "returns a pretty-printed value that is not a collection"
-  [value]
-  ;; need to check for nil first because .getName fails otherwise
-  (if (nil? value) "nil"
-      (let [fname (.getName (type value))]
-        (cond (string? value) (str "\"" value "\"")  ; strings are printed in double quotes
-            ; extract a function from the class fname (easier than from value):
-              (= (get-type fname) "a function") (get-function-name fname)
-              (coll? value) "(...)"
-              :else value))))
-
-(defn delimeters
-  "takes a collection and returns a vector of its delimeters as a vector of two strings"
-  [coll]
-  (cond
-    (vector? coll) ["[" "]"]
-    (set? coll) ["#{" "}"]
-    (map? coll) ["{" "}"]
-    :else ["(" ")"]))
-
-(defn add-commas
-  "takes a sequence and returns a sequence of the same elements with a comma
-  inserted after every 3rd element in every 4-element group"
-  [sq]
-  (loop [result [] s sq n 1]
-    (if (empty? s) result
-        (if (= n 4)
-          (recur (into result ["," (first s)]) (rest s) 1)
-          (recur (conj result (first s)) (rest s) (inc n))))))
-
-(defn add-spaces-etc
-  "takes a sequence s and a limit n and returns the elements of s with spaces in-between
-  and with ... at the end if s is longer than n"
-  [s n is-map]
-  (let [seq-with-spaces (interpose " " (take n s))
-        seq-done (if is-map (add-commas seq-with-spaces) seq-with-spaces)]
-    (if (> (count s) n)  (concat seq-done '("...")) seq-done)))
-
-(defn pretty-print-nested-values
-  "returns a vector of pretty-printed values. If it's a collection, uses the first limit
-  number as the number of elements it prints, passes the rest of the limit numbers
-  to the call that prints the nested elements. If no limits passed, returns (...)
-  for a collection and teh string of a value for a single value"
-  [value & limits]
-  (if (or (not limits) (not (coll? value))) (pretty-print-single-value value)
-      (let [[open close] (delimeters value)
-          ;; a sequence of a map is a sequence of vectors, turning it into a flat sequence:
-            flat-seq (if (map? value) (flatten (seq value)) value)]
-        (conj (into [open] (add-spaces-etc
-                            (take (inc (first limits)) (map #(apply pretty-print-nested-values (into [%] (rest limits))) flat-seq))
-                            (first limits)
-                            (map? value)))
-              close))))
-
-(defn preview-arg
-  "returns a pretty-printed value of a preview of an arbitrary collection or value.
-  The input consists of a value and a variable number of integers that indicate
-  how many elements of a collection are displayed at each level. The rest of the
-  sequence is truncated, ... is included to indicate truncated sequences."
-  [& params]
-  (let [pretty-val (apply pretty-print-nested-values params)]
-    (if (coll? pretty-val) (cs/join (flatten pretty-val)) (str pretty-val))))
 
 ;;; arg-str: non-negative integer as a string -> string
 (defn arg-str
@@ -255,6 +186,15 @@
     "8" "eight"
     "9" "nine"
     n))
+
+(defn number-arg
+  "number-arg takes a positive integer as a string and changes it to a
+   string with the numbers corresponding spelling followed by
+   \"argument(s)\""
+  [n]
+  (if (= n "1")
+    (str (number-word n) " argument")
+    (str (number-word n) " arguments")))
 
 (defn number-vals
   "number-vals takes two strings, one which are the arguments that caused
@@ -311,6 +251,22 @@
       (clojure.string/includes? n "object") (str "function") ;watch to make sure this doesn't break anything
       :else n)))
 
+(defn check-function-name
+  "check-function-name takes a string and converts it into a new string
+  that has \" function \" added to the end if it is not
+  anonymous function"
+  [n]
+  (cond
+    (= n "anonymous function") "This anonymous function"
+    :else (str "The function " n)))
+
+    (defn beginandend [x]
+      (re-pattern (str "(?s)" x "(.*)")))
+
+    (defn get-spec-text [full-error]
+      "return the string that failed a given spec from a spec error"
+    (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
+
 (defn get-dictionary-type
   "get-dictionary-type takes a string and returns the corresponding type
    if the string is \"nil\" we return an empty string so the result in the
@@ -330,17 +286,17 @@
         get-type
         (str " ")))))
 
+(defn change-if
+  "change-if takes a string and will output a string based on if
+   the string is \"if\" or not"
+   [x]
+   (if (= x "if")
+     "You are not using if correctly"
+     (str "Name " x " is undefined")))
+
 (defn check-divide
   "check-divide takes a string and returns either \"/\" or n
    this is only used for / because / is removed from the resulting
    error message so this adds it back in."
   [n]
   (if (= n "") "/" n))
-
-(defn get-compile-error-location
-  "takes a message of a compiler error and returns
-  the location part that matches after 'compiling',
-  as a hashmap. Returns an empty hashmap (no keys)
-  when there is no match"
-  [m]
-  (zipmap [:file :line :char] (rest (rest (re-matches #"(.*), compiling:\((.+):(.+):(.+)\)" m)))))

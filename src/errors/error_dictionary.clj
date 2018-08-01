@@ -247,12 +247,18 @@
     {:key :exception-info-functions
       :class "ExceptionInfo"
       :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
-      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+      :make-msg-info-obj
+      (fn [matches]
+        (let
+          [actual-val (nth matches 5)
+           val-type (get-dictionary-type actual-val)
+           [print-type print-val] (if (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"] [val-type (get-function-name actual-val)])]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
-                                                              ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              (nth matches 5) :arg
-                                                              " instead.\n"))}
+                                                              ", but is " print-type :type
+                                                              print-val :arg
+                                                              " instead.\n")))}
 
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
@@ -261,6 +267,7 @@
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
                                                               ", but is " (get-dictionary-type (nth matches 5)) :type
+                                                              ;(skip-anon-function (nth matches 5)) :arg
                                                               (nth matches 5) :arg
                                                               " instead.\n"))}
 
@@ -271,6 +278,7 @@
                                                             ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
                                                             ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                            ;(skip-anon-function (nth matches 4)) :arg
                                                             (nth matches 4) :arg
                                                             " instead.\n"))}
 
@@ -281,6 +289,7 @@
                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
+                                                           ;(skip-anon-function (nth matches 4)) :arg
                                                            (nth matches 4) :arg
                                                            " instead.\n"))}
 
@@ -365,7 +374,13 @@
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
     :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (nth matches 1) " argument(s) but was given " (nth matches 2) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
+
+    {:key :illegal-input-stream
+    :class "IllegalArgumentException"
+    :match (beginandend "Cannot open \\<(.*)\\> as an InputStream")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg
+                                                           " cannot be opened as an InputStream.\n"))}
 
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
@@ -400,19 +415,19 @@
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: core/(\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A " (get-function-name (nth matches 2)) :arg " cannot take " (nth matches 1) :arg " arguments.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot take " (number-arg (nth matches 1)) :arg ".\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined-one-arg
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+) ")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (get-function-name (nth matches 1)) :arg " cannot be called with 1 argument.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 1))) :arg " cannot be called with one argument.\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined-other
     ;we may want to find a way to make this less general
     :class "ArityException"
     :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*) ")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (get-function-name (nth matches 2)) :arg " cannot be called with " (nth matches 1) :arg " arguments.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot be called with " (number-arg (nth matches 1)) :arg ".\n"))}
 
     ;#####################
     ;### Syntax Errors ###
@@ -421,8 +436,7 @@
    {:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
     :match (beginandend "Unable to resolve symbol: (.+) in this context")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Name "
-                                                           (nth matches 1) :arg " is undefined.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (change-if (nth matches 1)) :arg ".\n"))}
 
    ;############################
    ;### Arithmetic Exception ###
@@ -440,7 +454,7 @@
     {:key :string-index-out-of-bounds
     :class "StringIndexOutOfBoundsException"
     :match (beginandend "String index out of range: (\\S+)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (nth matches 1) :arg " is outside of the string.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Position " (number-word (nth matches 1)) :arg " is outside of the string.\n"))}
 
     {:key :index-out-of-bounds-index-not-provided
     :class "IndexOutOfBoundsException"
@@ -530,8 +544,8 @@
 
     {:key :compiler-exception-cannot-take-value-of-macro
    :class "RuntimeException"
-   :match (beginandend "Can't take value of a macro: (\\S*)")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro, cannot be passed to a function.\n"))}
+   :match (beginandend "Can't take value of a macro: (\\S*),")
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro and cannot be passed to a function.\n"))}
 
    #_{:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
@@ -596,6 +610,21 @@
     :match (beginandend "arg literal must be %, %& or %integer")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "% can only be followed by & or a number.\n"))}
 
+    {:key :illegal-state-validater
+    :class "IllegalStateException"
+    :match (beginandend "Invalid reference state  (\\S*)\\.validate")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: failed validation.\n"))}
+
+    {:key :illegal-state-transaction
+    :class "IllegalStateException"
+    :match (beginandend "No transaction running  (\\S*)\\.LockingTransaction(\\S*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: trying to lock a transaction that is not running.\n"))}
+
+    {:key :illegal-state-transaction-IO
+    :class "IllegalStateException"
+    :match (beginandend "I/O in transaction")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "IllegalState: I/0 in transaction.\n"))}
+
     ;###################################
     ;### Memory and Stack Exceptions ###
     ;###################################
@@ -608,12 +637,28 @@
     {:key :stack-overflow-with-name
     :class "StackOverflowError"
     :match (beginandend "\\s*(\\S+)\\s+")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion."
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion.\n"
     " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
 
-    ;#####################
+    ;#################################
+    ;### File Not Found Exceptions ###
+    ;#################################
+
+    {:key :file-does-not-exist
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(No such file or directory\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    {:key :file-does-not-exist-windows
+    :class "FileNotFoundException"
+    :match (beginandend "(.*) \\(The system cannot find the file specified\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+                                                           " does not exist.\n"))}
+
+    ;###############
     ;### Warning ###
-    ;#####################
+    ;###############
 
     {:key :other
      :class "WARNING:"

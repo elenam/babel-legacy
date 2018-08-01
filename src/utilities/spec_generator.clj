@@ -409,31 +409,48 @@
  [& vars]
  (map #(clojure.string/includes? % "Persistent") vars))
 
-(defn check-persist
-  "check-persist takes a function and returns true if the function
-   has a Persistent in the arglist."
-  [vars]
-  (->> vars
-       meta
-       :arglists
-       (map #(map type %))
-       (map #(map str %))
-       (map vec)
-       vec
-       (apply apply-persist)
-       (some #(= true %))
-       boolean?))
+(defn apply-types
+ "apply-persist checks if \"Persistent\" is anywhere in a
+  sequence."
+ [x vars]
+ (map #(= % x) vars))
+
+(defn check-types
+  "check-types takes a function and returns true if the function
+   has a Persistent in the arglists if apply-persist is passed as x
+   or the type corresponds to whatever is passed to x."
+  [vars x]
+  (let [y (cond->> vars
+            true meta
+            true :arglists
+            (= x "apply-persist") (map #(map type %))
+            true (map #(map str %))
+            true (map vec)
+            true vec)
+        z (if (= x "apply-persist")
+             (map #(apply-persist %) y)
+             (map #(apply-types x %) y))]
+           (boolean? (some #(= (seq [true]) %) z))))
 
 (defn println-recur
   "This function shows everything required for a defn, to work with this
   there can be an intermediate step."
-  [all-vars]
-  (when
-    (not (empty? all-vars))
-    (try
-      (println (pre-re-defn (first all-vars)))
-      (catch java.lang.ClassCastException e))
-    (println-recur (rest all-vars))))
+  ([all-vars]
+   (when
+     (not (empty? all-vars))
+     (try
+       (println (pre-re-defn (first all-vars)))
+       (catch java.lang.ClassCastException e))
+     (println-recur (rest all-vars))))
+   ([all-vars x]
+    (loop [rem-args all-vars
+           result []]
+      (cond
+         (empty? rem-args) (println result)
+         (check-types (first rem-args) x)
+           (recur (rest rem-args)
+                  (conj result (str (first rem-args) "\n")))
+         :else (recur (rest rem-args) result)))))
 
 (defn println-recur-spec
   "This function generates basic specs for a library."
@@ -466,7 +483,7 @@
            exceptions "Exceptions: \n"]
       (cond
         (empty? rem-args) [normal macros exceptions]
-        (check-persist (first rem-args))
+        (check-types (first rem-args) "apply-persist")
           (recur (rest rem-args)
             normal
             macros
@@ -492,7 +509,7 @@
            exceptions "Exceptions: \n"]
       (cond
         (empty? rem-args) (spit "h.txt" (apply str [normal macros exceptions]))
-        (check-persist (first rem-args))
+        (check-types (first rem-args) "apply-persist")
           (recur (rest rem-args)
             normal
             macros
