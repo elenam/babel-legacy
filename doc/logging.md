@@ -13,5 +13,14 @@ Logging tool provides you a transparent testing environment. It records your tes
                 (def file-name "this file")
                 (:file (meta #'file-name)))))``
    at the beginning of each testing file to get the tested file names.
+6. After running the test, a log folder will be generated in you project. Open the log_category.html to check the logs.
+7. There is also a txt version log which records the latest test result.
 
 ## Logging contents
+
+![This is the logging screen shot](/logging.png)
+
+## Trouble shooting
+
+1. If you delete a log in the /log/history folder, it's name will still remain in the log_category until next time you run the test.
+2. If the log file shows "Error loading test data!!!", it is likely that your test is broken.
