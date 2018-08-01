@@ -5,8 +5,8 @@
 ;; A vector of error dictionaries from the most specific one to the most general one.
 ;; Order matters because the vector is searched from top to bottom.
 
-(defn beginandend [x]
-  (re-pattern (str "(?s)" x "(.*)")))
+; (defn beginandend [x]
+;   (re-pattern (str "(?s)" x "(.*)")))
 
 (def error-dictionary
   [;########################
