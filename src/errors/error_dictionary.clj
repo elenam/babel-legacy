@@ -241,7 +241,10 @@
         (let
           [actual-val (nth matches 5)
            val-type (get-dictionary-type actual-val)
-           [print-type print-val] (if (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"] [val-type (get-function-name actual-val)])]
+           [print-type print-val] (cond (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"]
+                                        (= val-type "a function ") [val-type (get-function-name actual-val)]
+                                        (re-find #"unrecognized type" val-type) [val-type ""]
+                                        :else [val-type actual-val])]
            (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
@@ -252,35 +255,57 @@
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
       :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n  (.*)/(.*)")
-      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
+      :make-msg-info-obj
+      (fn [matches]
+        (let
+          [actual-val (nth matches 5)
+           val-type (get-dictionary-type actual-val)
+           [print-type print-val] (cond (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"]
+                                        (= val-type "a function ") [val-type (get-function-name actual-val)]
+                                        (re-find #"unrecognized type" val-type) [val-type ""]
+                                        :else [val-type actual-val])]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 9)) :type
-                                                              ", but is " (get-dictionary-type (nth matches 5)) :type
-                                                              ;(skip-anon-function (nth matches 5)) :arg
-                                                              (nth matches 5) :arg
-                                                              " instead.\n"))}
+                                                              ", but is " print-type :type
+                                                              print-val :arg
+                                                              " instead.\n")))}
 
     {:key :exception-info-or
      :class "ExceptionInfo"
      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(.*)\\] fails at: \\[:args(.*)\\] predicate: (.*)\\n(\\n(.*)(\\n)?)*In: \\[0\\]")
-     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                            ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
+     :make-msg-info-obj (fn [matches]
+       (let
+         [actual-val (nth matches 4)
+          val-type (get-dictionary-type actual-val)
+          [print-type print-val] (cond (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"]
+                                       (= val-type "a function ") [val-type (get-function-name actual-val)]
+                                       (re-find #"unrecognized type" val-type) [val-type ""]
+                                       :else [val-type actual-val])]
+          (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                            ", the " (arg-str (nth matches 3)) :arg
                                                             " is expected to be a "  (?-name (nth matches 6)) :type
-                                                            ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                            ;(skip-anon-function (nth matches 4)) :arg
-                                                            (nth matches 4) :arg
-                                                            " instead.\n"))}
+                                                            ", but is " print-type :type
+                                                            print-val :arg
+                                                            " instead.\n")))}
 
     {:key :exception-info-or-one-line
       :class "ExceptionInfo"
       :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args(.*)\\] predicate: (.*)\\n  (.*)/(.*)")
-      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           ", the " (arg-str (nth matches 3)) :arg ;(arg-str (+ 1 (Integer. (nth matches 3)))) :arg
+      :make-msg-info-obj (fn [matches]
+        (let
+          [actual-val (nth matches 4)
+           val-type (get-dictionary-type actual-val)
+           [print-type print-val] (cond (and (= val-type "a function ") (= (get-function-name actual-val) "anonymous function")) ["" "an anonymous function"]
+                                        (= val-type "a function ") [val-type (get-function-name actual-val)]
+                                        (re-find #"unrecognized type" val-type) [val-type ""]
+                                        :else [val-type actual-val])]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg
                                                            " is expected to be a "  (?-name (nth matches 6)) :type
-                                                           ", but is " (get-dictionary-type (nth matches 4)) :type
-                                                           ;(skip-anon-function (nth matches 4)) :arg
-                                                           (nth matches 4) :arg
-                                                           " instead.\n"))}
+                                                           ", but is " print-type :type
+                                                           print-val :arg
+                                                           " instead.\n")))}
 
    ;#############################
    ;### Class Cast Exceptions ###
