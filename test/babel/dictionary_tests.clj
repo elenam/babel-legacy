@@ -130,3 +130,8 @@
         [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436
         0x2377a56c \"clojure.spec.alpha$regex_spec_impl$reify__2436@2377a56c\"], :value ([y 2 z] (+ x y)), :args ([y 2 z] (+ x y))}, compiling:(/tmp/form-init8683
           024422163155580.clj:1:17) \n\n"))
+
+(expect ["" "an anonymous function"] (type-and-val "clojure.spec.test.alpha$spec_checking_fn$fn__2943"))
+(expect ["a function " "best-approximation"] (type-and-val "errors.dictionaries/best-approximation"))
+(expect ["a vector " "[1 2 3]"] (type-and-val "[1 2 3]"))
+(expect ["a string " "\"hello\""] (type-and-val "\"hello\""))
