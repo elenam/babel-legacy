@@ -18,7 +18,17 @@ Logging tool provides you a transparent testing environment. It records your tes
 
 ## Logging contents
 
-![This is the logging screen shot](/doc/logging.png)
+This is how the test log looks like:
+
+![This is the logging screen shot](/img/logging0000.png)
+
+You are able to filter out the nil result:
+
+![This is the logging screen shot](/img/logging0001.png)
+
+You are also able to see the testing details that are retrieved from our middleware:
+
+![This is the logging screen shot](/img/logging0002.png)
 
 ## Trouble shooting
 
