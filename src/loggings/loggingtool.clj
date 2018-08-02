@@ -61,29 +61,45 @@
   "takes a testing expr and return its modified error message"
   [inp-code]
   (do
-    (save-log
-      inp-code
-      (:total @counter)
-      (get-modified-error inp-code)
-      (get-original-error inp-code))
-    (write-html
-      inp-code
-      (:total @counter)
-      (:partial @counter)
-      (get-modified-error inp-code)
-      (get-original-error inp-code)
-      (get-error-detail inp-code))
-    (processor/reset-recorder)
+    (if (= (:log? @counter) true)
+      (do
+        (save-log
+          inp-code
+          (:total @counter)
+          (get-modified-error inp-code)
+          (get-original-error inp-code))
+        (write-html
+          inp-code
+          (:total @counter)
+          (:partial @counter)
+          (get-modified-error inp-code)
+          (get-original-error inp-code)
+          (get-error-detail inp-code))
+        (processor/reset-recorder))
+        nil)
     (record-error inp-code)))
+
+;;---- a switch that turns the logging system on/off ----
+(defn- do-log
+  "takes a boolean and turn on/off the log system"
+  [boo]
+  (cond (= boo true) (swap! counter assoc :log? true)
+        (= boo false) (swap! counter assoc :log? false)
+        :else nil))
 
 ;;calls start-l from html-log
 (defn start-log
   "used to create log file"
-  []
-  (start-l))
+  [boo]
+  (cond (= boo false) (do-log false)
+        (= boo true) (do
+                    (do-log true)
+                    (start-l))
+        :else (start-l)))
 
 ;;calls add-l from html-log
 (defn add-log
   "takes a file name and inserts it to the log"
   [file-name]
-  (add-l file-name))
+  (if (= (:log? @counter) true)
+      (add-l file-name)))

@@ -2,12 +2,12 @@
   (:use hiccup.core))
 
 ;;counter atom that count the amount of testing units.
-(def counter (atom {:total 1 :partial 1}))
+(def counter (atom {:total 1 :partial 1 :log? true}))
 
 ;;reset the counter
 (defn- reset-counter
   []
-  (def counter (atom {:total 1 :partial 1})))
+  (def counter (atom {:total 1 :partial 1 :log? true})))
 
 ;;sets time with the file name format
 (declare current-time)

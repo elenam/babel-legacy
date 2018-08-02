@@ -8,7 +8,7 @@
 ;;this must be the same port specified in project.clj
 
 ;;start logging
-(start-log)
+(start-log true)
 (expect nil (add-log
               (do
                 (def file-name "this file")
