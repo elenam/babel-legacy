@@ -639,7 +639,7 @@
     :class "StackOverflowError"
     :match (beginandend "\\s*(\\S+)\\s+")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation or infinite recursion.\n"
-    " Detected in function " (get-function-name (nth matches 1)) ".\n"))}
+    " Detected in function " (get-function-name (nth matches 1)) :arg ".\n"))}
 
     ;#################################
     ;### File Not Found Exceptions ###
@@ -648,14 +648,22 @@
     {:key :file-does-not-exist
     :class "FileNotFoundException"
     :match (beginandend "(.*) \\(No such file or directory\\)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1) :arg
                                                            " does not exist.\n"))}
 
     {:key :file-does-not-exist-windows
     :class "FileNotFoundException"
     :match (beginandend "(.*) \\(The system cannot find the file specified\\)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1)
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The file " (nth matches 1) :arg
                                                            " does not exist.\n"))}
+
+    {:key :file-not-found-on-load
+    :class "FileNotFoundException"
+    :match (beginandend "Could not locate (\\S+).class or (\\S+).clj on classpath(.*)load")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The system was looking for a class "
+                                                           (str (nth matches 2) ".class") :arg
+                                                           " or a file " (str (nth matches 2) ".clj") :arg
+                                                           ", but neither one exists.\n"))}
 
     ;###############
     ;### Warning ###
