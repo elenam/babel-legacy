@@ -10,7 +10,7 @@ Copy ``babel``, ``errors``, and ``loggings`` into your src directory, and then m
 
 ## logging
 
-To provide a transparent testing environment, the logging system create logs that record your testing code, its actual modified error message and its original error message.
+To provide a transparent testing environment, the logging system creates logs that record your testing code, its actual modified error message and its original error message.
 
 See details at [logging manual](/doc/logging.md).
 

@@ -14,21 +14,21 @@ Logging tool provides you a transparent testing environment. It records your tes
                 (:file (meta #'file-name)))))``
    at the beginning of each testing file to get the tested file names.
 6. After running the test, a log folder will be generated in you project. Open the log_category.html to check the logs.
-7. There is also a txt version log which records the latest test result.
+7. There is also a .txt version log which records the latest test result.
 
 ## Logging contents
 
 This is how the test log looks like:
 
-![This is the logging screen shot](/img/logging0000.png)
+![This is the logging screen shot](/doc/img/logging0000.png)
 
 You are able to filter out the nil result:
 
-![This is the logging screen shot](/img/logging0001.png)
+![This is the logging screen shot](/doc/img/logging0001.png)
 
 You are also able to see the testing details that are retrieved from our middleware:
 
-![This is the logging screen shot](/img/logging0002.png)
+![This is the logging screen shot](/doc/img/logging0002.png)
 
 ## Trouble shooting
 
