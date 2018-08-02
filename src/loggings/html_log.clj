@@ -24,29 +24,43 @@
         [:script
          "function hideModified() {
            var x = document.getElementsByClassName(\"modifiedError\");
+           var y = document.getElementsByClassName(\"nilmodifiedError\");
            if (document.getElementById(\"modified\").checked != true) {
-             var i;
+             var i, j;
              for (i = 0; i < x.length; i++) {
                x[i].style.display='none';
              }
+             for (j = 0; j < y.length; j++) {
+               y[j].style.display='none';
+             }
              } else {
-             var i;
+             var i, j;
              for (i = 0; i < x.length; i++) {
                x[i].style.display='block';
+             }
+             for (j = 0; j < y.length; j++) {
+               y[j].style.display='block';
              }
              }
            }
            function hideOriginal() {
              var x = document.getElementsByClassName(\"originalError\");
+             var y = document.getElementsByClassName(\"niloriginalError\");
              if (document.getElementById(\"original\").checked != true) {
-               var i;
+               var i, j;
                for (i = 0; i < x.length; i++) {
                  x[i].style.display='none';
                }
+               for (j = 0; j < y.length; j++) {
+                 y[j].style.display='none';
+               }
                } else {
-               var i;
+               var i, j;
                for (i = 0; i < x.length; i++) {
                  x[i].style.display='block';
+               }
+               for (j = 0; j < y.length; j++) {
+                 y[j].style.display='block';
                }
                }
              }
@@ -80,6 +94,30 @@
                    }
 
                }
+               function colorBlindMode() {
+                 var x = document.getElementsByClassName(\"modifiedError\");
+                 var y = document.getElementsByClassName(\"originalError\");
+                 var p = document.getElementById(\"modified\");
+                 var q = document.getElementById(\"original\");
+                 if (document.getElementById(\"colorBlind\").checked == true) {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.color='FE7F00';
+                     y[i].style.color='3E18A9';
+                     p.style.color='FE7F00';
+                     q.style.color='3E18A9';
+                   }
+                   } else {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.color='00AE0C';
+                     y[i].style.color='D10101';
+                     p.style.color='00AE0C';
+                     q.style.color='D10101';
+                   }
+                   }
+
+               }
                function checkData() {
                    var nonNilResults = document.getElementsByClassName(\"nonNilResult\");
                    var nilResults = document.getElementsByClassName(\"nilResult\");
@@ -94,7 +132,8 @@
          [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
          [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
          [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
-         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]]
+         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
+         [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]
         [:div#loadingError {:style "display:block"}
          [:hr]
          [:h4 "Error loading test data!!!"]]))
@@ -206,8 +245,8 @@
              [:p {:style "width:50%;float:left"} "#" partial ":<br />"]
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#808080"} "modified error: nil<br />"]
-           [:p {:class "originalError" :style "color:#808080"} "original error: nil<br />"]
+           [:p {:class "nilmodifiedError" :style "color:#808080"} "modified error: nil<br />"]
+           [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]
            [:p {:class "errorDetail" :style "color:#808080;display:none"} "error detail: nil<br /><br />"]])))
 
 

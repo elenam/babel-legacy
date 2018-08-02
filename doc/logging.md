@@ -14,7 +14,7 @@ Logging tool provides you a transparent testing environment. It records your tes
                 (def file-name "this file")
                 (:file (meta #'file-name)))))``
    at the beginning of each testing file to get the tested file names.
-7. Function ``(get-error *testing-expr*)`` will return the modified error message of the testing-expr and generate the log.
+7. IMPORTANT! Only calling function ``(get-error *testing-expr*)`` will generate the log.
 8. After running the test, a log folder will be generated in you project. Open the log_category.html to check the logs.
 9. There is also a .txt version log which records the latest test log.
 

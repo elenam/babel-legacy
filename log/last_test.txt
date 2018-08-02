@@ -1,0 +1,920 @@
+Thu Aug 02 19:45:54 EDT 2018
+#1:
+
+code input: (+ 5 8)
+
+modified error: nil
+
+original error: nil
+
+
+#2:
+
+code input: (prn "error")
+
+modified error: nil
+
+original error: nil
+
+
+#3:
+
+code input: (take 5 (filter #(> 8 %) (repeatedly #(rand-int 10))))
+
+modified error: nil
+
+original error: nil
+
+
+#4:
+
+code input: (/ 70 0)
+
+modified error: Tried to divide by zero
+
+original error: "ArithmeticException Divide by zero  clojure.lang.Numbers.divide (Numbers.java:163)\n"
+
+
+#5:
+
+code input: (/ 70 8 0)
+
+modified error: Tried to divide by zero
+
+original error: "ArithmeticException Divide by zero  clojure.lang.Numbers.divide (Numbers.java:163)\n"
+
+
+#6:
+
+code input: (smoked-cod)
+
+modified error: Name smoked-cod is undefined.
+
+original error: "CompilerException java.lang.RuntimeException: Unable to resolve symbol: smoked-cod in this context, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#7:
+
+code input: (Ebeneezer)
+
+modified error: Name Ebeneezer is undefined.
+
+original error: "CompilerException java.lang.RuntimeException: Unable to resolve symbol: Ebeneezer in this context, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#8:
+
+code input: (+ 8 "seventeen")
+
+modified error: Attempted to use a string, but a number was expected.
+
+original error: "ClassCastException java.lang.String cannot be cast to java.lang.Number  clojure.lang.Numbers.add (Numbers.java:128)\n"
+
+
+#9:
+
+code input: (+ "hello" 3)
+
+modified error: Attempted to use a string, but a number was expected.
+
+original error: "ClassCastException java.lang.String cannot be cast to java.lang.Number  clojure.lang.Numbers.add (Numbers.java:128)\n"
+
+
+#10:
+
+code input: (assoc {} 1 "hello" 2)
+
+modified error: The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.
+
+original error: "IllegalArgumentException assoc expects even number of arguments after map/vector, found odd number  clojure.core/assoc--5138 (core.clj:195)\n"
+
+
+#11:
+
+code input: (keyword "hello" "goodbye" "hello")
+
+modified error: A function keyword can only take one or two arguments, but 3 were passed to it.
+
+original error: "ArityException Wrong number of args (3) passed to: core/keyword  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#12:
+
+code input: (hash-map :1 1, :2)
+
+modified error: No value found for key :2. Every key for a hash-map must be followed by a value.
+
+original error: "IllegalArgumentException No value supplied for key: :2  clojure.lang.PersistentHashMap.create (PersistentHashMap.java:77)\n"
+
+
+#13:
+
+code input: (symbol "hello" "goodbye" "hello")
+
+modified error: The function symbol cannot take three arguments.
+
+original error: "ArityException Wrong number of args (3) passed to: core/symbol  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#14:
+
+code input: (nil)
+
+modified error: Cannot call nil as a function.
+
+original error: "CompilerException java.lang.IllegalArgumentException: Can't call nil, form: (nil), compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#15:
+
+code input: {1 1 1 1}
+
+modified error: You cannot use the same key in a hash-map twice, but you have duplicated the key 1.
+
+original error: "IllegalArgumentException Duplicate key: 1  clojure.lang.PersistentArrayMap.createWithCheck (PersistentArrayMap.java:71)\n"
+
+
+#16:
+
+code input: (def elements-that-can-contain-simple-types #_=> #{:xs:attribute
+
+modified error: Unexpected end of file, starting at line 1. Probably a non-closing parenthesis or bracket.
+
+original error: "RuntimeException EOF while reading, starting at line 1  clojure.lang.Util.runtimeException (Util.java:221)\n"
+
+
+#17:
+
+code input: (+ 1.2.2 0)
+
+modified error: Invalid number: 1.2.2.
+
+original error: "RuntimeException Unmatched delimiter: )  clojure.lang.Util.runtimeException (Util.java:221)\n"
+
+
+#18:
+
+code input: (/string "abcd")
+
+modified error: You cannot use / in this position.
+
+original error: "RuntimeException Unmatched delimiter: )  clojure.lang.Util.runtimeException (Util.java:221)\n"
+
+
+#19:
+
+code input: (cond (seq? [1 2]) 5 (seq? [1 3]))
+
+modified error: Parameters for cond must come in pairs, but one of them does not have a match.
+
+original error: "CompilerException java.lang.IllegalArgumentException: cond requires an even number of forms, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#20:
+
+code input: (defn s [s] (loop [s]))
+
+modified error: Parameters for loop must come in pairs, but one of them does not have a match.
+
+original error: "CompilerException java.lang.IllegalArgumentException: loop requires an even number of forms in binding vector in utilities.spec_generator:1, compiling:(/tmp/form-init7190693610382132319.clj:1:13) \n"
+
+
+#21:
+
+code input: (defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))
+
+modified error: with-open is a macro and cannot be passed to a function.
+
+original error: "CompilerException java.lang.RuntimeException: Can't take value of a macro: #'clojure.core/with-open, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#22:
+
+code input: (#(+ %a 1) 2 3)
+
+modified error: % can only be followed by & or a number.
+
+original error: "RuntimeException Unmatched delimiter: )  clojure.lang.Util.runtimeException (Util.java:221)\n"
+
+
+#23:
+
+code input: (nth "hello" 5)
+
+modified error: Position five is outside of the string.
+
+original error: "StringIndexOutOfBoundsException String index out of range: 5  java.lang.String.charAt (String.java:658)\n"
+
+
+#24:
+
+code input: (nth (seq [1 2 3]) 5)
+
+modified error: An index in a sequence is out of bounds or invalid.
+
+original error: "IndexOutOfBoundsException   clojure.lang.RT.nthFrom (RT.java:921)\n"
+
+
+#25:
+
+code input: (clojure.hello/union #{1 2 3} #{3 4})
+
+modified error: Name clojure.hello is undefined.
+
+original error: "ClassNotFoundException clojure.hello  java.net.URLClassLoader.findClass (URLClassLoader.java:381)\n"
+
+
+#26:
+
+code input: {:body {(str "hello")}}
+
+modified error: A hash map must consist of key/value pairs; you have a key that's missing a value.
+
+original error: "RuntimeException Unmatched delimiter: }  clojure.lang.Util.runtimeException (Util.java:221)\n"
+
+
+#27:
+
+code input: (defn hello [x y] (* x y)) (hello 1)
+
+modified error: The function hello cannot be called with one argument.
+
+original error: "ArityException Wrong number of args (1) passed to: spec-generator/hello  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#28:
+
+code input: (defn hello [x y] (* x y)) (hello 1 2 3)
+
+modified error: The function hello cannot be called with three arguments.
+
+original error: "ArityException Wrong number of args (3) passed to: spec-generator/hello  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#29:
+
+code input: (defn hello [x & xs] (* x 1)) (hello)
+
+modified error: The function hello cannot be called with zero arguments.
+
+original error: "ArityException Wrong number of args (0) passed to: spec-generator/hello  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#30:
+
+code input: (map #(+ %1 %2) [1 2 3])
+
+modified error: This anonymous function cannot be called with one argument.
+
+original error: "ArityException Wrong number of args (1) passed to: spec-generator/eval14121/fn--14122  clojure.lang.AFn.throwArity (AFn.java:429)\n"
+
+
+#31:
+
+code input: (if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))
+
+modified error: Too many arguments to if.
+
+original error: "CompilerException java.lang.RuntimeException: Too many arguments to if, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#32:
+
+code input: (if (= 0 0))
+
+modified error: Too few arguments to if.
+
+original error: "CompilerException java.lang.RuntimeException: Too few arguments to if, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#33:
+
+code input: (loop x 5 (+ x 5))
+
+modified error: Loop requires a vector for its binding.
+
+original error: "IllegalArgumentException loop requires a vector for its binding in utilities.spec_generator:1  clojure.core/loop (core.clj:4547)\n"
+
+
+#34:
+
+code input: (defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))
+
+modified error: Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.
+
+original error: "CompilerException java.lang.IllegalArgumentException: Mismatched argument count to recur, expected: 1 args, got: 2, compiling:(/tmp/form-init7190693610382132319.clj:1:40) \n"
+
+
+#35:
+
+code input: (loop [x 5] (if (< x 1) "hi" (recur (dec x) (print x))))
+
+modified error: Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.
+
+original error: "CompilerException java.lang.IllegalArgumentException: Mismatched argument count to recur, expected: 1 args, got: 2, compiling:(/tmp/form-init7190693610382132319.clj:1:30) \n"
+
+
+#36:
+
+code input: (map #(+ % "a") [3])
+
+modified error: Attempted to use a string, but a number was expected.
+
+original error: "ClassCastException java.lang.String cannot be cast to java.lang.Number  clojure.lang.Numbers.add (Numbers.java:128)\n"
+
+
+#37:
+
+code input: (line-seq 3)
+
+modified error: Attempted to use a number, but a file or an input stream was expected.
+
+original error: "ClassCastException java.lang.Long cannot be cast to java.io.BufferedReader  clojure.core/line-seq (core.clj:3077)\n"
+
+
+#38:
+
+code input: (map let let)
+
+modified error: let is a macro and cannot be passed to a function.
+
+original error: "CompilerException java.lang.RuntimeException: Can't take value of a macro: #'clojure.core/let, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#39:
+
+code input: if
+
+modified error: You are not using if correctly.
+
+original error: "CompilerException java.lang.RuntimeException: Unable to resolve symbol: if in this context, compiling:(/tmp/form-init7190693610382132319.clj:1:1491) \n"
+
+
+#40:
+
+code input: (loop [x 5] (recur x)(recur x))
+
+modified error: Recur can only occur as a tail call: no operations can be done after its return.
+
+original error: "CompilerException java.lang.UnsupportedOperationException: Can only recur from tail position, compiling:(/tmp/form-init7190693610382132319.clj:1:13) \n"
+
+
+#41:
+
+code input:  (defn f [[x y]] (+ x y)) (f {2 3})
+
+modified error: Function nth does not allow a map as an argument.
+
+original error: "UnsupportedOperationException nth not supported on this type: PersistentArrayMap  clojure.lang.RT.nthFrom (RT.java:983)\n"
+
+
+#42:
+
+code input: (re-pattern nil)
+
+modified error: An attempt to access a non-existing object:   java.util.regex.Pattern.<init> (Pattern.java:1350)
+ (NullPointerException).
+
+original error: "NullPointerException   java.util.regex.Pattern.<init> (Pattern.java:1350)\n"
+
+
+#43:
+
+code input: (subs "a" 3)
+
+modified error: Position -2 is outside of the string.
+
+original error: "StringIndexOutOfBoundsException String index out of range: -2  java.lang.String.substring (String.java:1931)\n"
+
+
+#44:
+
+code input: (slurp 3)
+
+modified error: 3 cannot be opened as an InputStream.
+
+original error: "IllegalArgumentException Cannot open <3> as an InputStream.  clojure.java.io/fn--10946 (io.clj:167)\n"
+
+
+#45:
+
+code input: (slurp "a.txt")
+
+modified error: The file a.txt does not exist.
+
+original error: "FileNotFoundException a.txt (No such file or directory)  java.io.FileInputStream.open0 (FileInputStream.java:-2)\n"
+
+
+#46:
+
+code input: (map #(slurp "usethistext.txt" %) [3])
+
+modified error: No value found for key 3. Every key for a hash-map must be followed by a value.
+
+original error: "IllegalArgumentException No value supplied for key: 3  clojure.lang.PersistentHashMap.create (PersistentHashMap.java:77)\n"
+
+
+#47:
+
+code input: (ref 0 :validator pos?)
+
+modified error: IllegalState: failed validation.
+
+original error: "IllegalStateException Invalid reference state  clojure.lang.ARef.validate (ARef.java:33)\n"
+
+
+#48:
+
+code input: (dosync (io! (println "h")))
+
+modified error: IllegalState: I/0 in transaction.
+
+original error: "IllegalStateException I/O in transaction  utilities.spec-generator/eval14347/fn--14348 (form-init7190693610382132319.clj:1)\n"
+
+
+#49:
+
+code input: (conj even? "a")
+
+modified error: In function conj, the first argument is expected to be a collection, but is an anonymous function instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :any :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :any :collection :clojure.spec.alpha/nil] predicate: nil?\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :collectionandany :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :collectionandany :collection :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#50:
+
+code input: (map even? even?)
+
+modified error: In function map, the second argument is expected to be a collection, but is an anonymous function instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#51:
+
+code input: (map even? #(+ % 2))
+
+modified error: In function map, the second argument is expected to be a collection, but is an anonymous function instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: #object[utilities.spec_generator$eval14390$fn__14391 0x74783d2d \"utilities.spec_generator$eval14390$fn__14391@74783d2d\"] fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: #object[utilities.spec_generator$eval14390$fn__14391 0x74783d2d \"utilities.spec_generator$eval14390$fn__14391@74783d2d\"] fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#52:
+
+code input: (defn f [x] (+ x 2)) (map even? f)
+
+modified error: In function map, the second argument is expected to be a collection, but is a function f instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: #object[utilities.spec_generator$f 0x9c91167 \"utilities.spec_generator$f@9c91167\"] fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: #object[utilities.spec_generator$f 0x9c91167 \"utilities.spec_generator$f@9c91167\"] fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#53:
+
+code input: (defn f? [x] (+ x 2)) (map even? f?)
+
+modified error: In function map, the second argument is expected to be a collection, but is a function f? instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: #object[utilities.spec_generator$f_QMARK_ 0x5f5fbfc2 \"utilities.spec_generator$f_QMARK_@5f5fbfc2\"] fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: #object[utilities.spec_generator$f_QMARK_ 0x5f5fbfc2 \"utilities.spec_generator$f_QMARK_@5f5fbfc2\"] fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#54:
+
+code input: (denominator even?)
+
+modified error: In function denominator, the first argument is expected to be a ratio, but is an anonymous function instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/denominator did not conform to spec:\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :a :a] predicate: ratio?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#55:
+
+code input: (map nil)
+
+modified error: In function map, the first argument is expected to be a function, but is nil instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [0] val: nil fails at: [:args :function] predicate: ifn?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#56:
+
+code input: (conj \a "a")
+
+modified error: In function conj, the first argument is expected to be a collection, but is a character \a instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nIn: [0] val: \\a fails at: [:args :any :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: \\a fails at: [:args :any :collection :clojure.spec.alpha/nil] predicate: nil?\nIn: [0] val: \\a fails at: [:args :collectionandany :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: \\a fails at: [:args :collectionandany :collection :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#57:
+
+code input: (conj "a" 3)
+
+modified error: In function conj, the first argument is expected to be a collection, but is a string "a" instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nIn: [0] val: \"a\" fails at: [:args :any :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: \"a\" fails at: [:args :any :collection :clojure.spec.alpha/nil] predicate: nil?\nIn: [0] val: \"a\" fails at: [:args :collectionandany :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: \"a\" fails at: [:args :collectionandany :collection :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#58:
+
+code input: (even? "a")
+
+modified error: In function even?, the first argument is expected to be a number, but is a string "a" instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: \"a\" fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#59:
+
+code input: (rand-int "3")
+
+modified error: In function rand-int, the first argument is expected to be a number, but is a string "3" instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/rand-int did not conform to spec:\nIn: [0] val: \"3\" fails at: [:args :a] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#60:
+
+code input: (conj 3)
+
+modified error: In function conj, the first argument is expected to be a collection, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nIn: [0] val: 3 fails at: [:args :any :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: 3 fails at: [:args :any :collection :clojure.spec.alpha/nil] predicate: nil?\nIn: [0] val: 3 fails at: [:args :collectionandany :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: 3 fails at: [:args :collectionandany :collection :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#61:
+
+code input: (conj 3 3)
+
+modified error: In function conj, the first argument is expected to be a collection, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nIn: [0] val: 3 fails at: [:args :any :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: 3 fails at: [:args :any :collection :clojure.spec.alpha/nil] predicate: nil?\nIn: [0] val: 3 fails at: [:args :collectionandany :collection :clojure.spec.alpha/pred] predicate: coll?\nIn: [0] val: 3 fails at: [:args :collectionandany :collection :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#62:
+
+code input: (map even? 3)
+
+modified error: In function map, the second argument is expected to be a collection, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: 3 fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: 3 fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#63:
+
+code input: (map even? [3] [3] [3] [3] 3)
+
+modified error: In function map, the 6th argument is expected to be a collection, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [5] val: 3 fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [5] val: 3 fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#64:
+
+code input: (map 3 [3])
+
+modified error: In function map, the first argument is expected to be a function, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [0] val: 3 fails at: [:args :function] predicate: ifn?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#65:
+
+code input: (denominator 3)
+
+modified error: In function denominator, the first argument is expected to be a ratio, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/denominator did not conform to spec:\nIn: [0] val: 3 fails at: [:args :a :a] predicate: ratio?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#66:
+
+code input: (numerator 3)
+
+modified error: In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/numerator did not conform to spec:\nIn: [0] val: 3 fails at: [:args :a] predicate: ratio?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#67:
+
+code input: (map [3 2 3 4 5] #"h")
+
+modified error: In function map, the second argument is expected to be a collection, but is a regular expression pattern #"h" instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [1] val: #\"h\" fails at: [:args :collections :clojure.spec.alpha/pred] predicate: coll?\nIn: [1] val: #\"h\" fails at: [:args :collections :clojure.spec.alpha/nil] predicate: nil?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#68:
+
+code input: (even? (new Object))
+
+modified error: In function even?, the first argument is expected to be a number, but is unrecognized type java.lang.Object  instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: #object[java.lang.Object 0x479756da \"java.lang.Object@479756da\"] fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#69:
+
+code input: (even? (clojure.java.io/reader "usethistext.txt"))
+
+modified error: In function even?, the first argument is expected to be a number, but is a file or an input stream java.io.BufferedReader instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: #object[java.io.BufferedReader 0x1c277fba \"java.io.BufferedReader@1c277fba\"] fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#70:
+
+code input: (even? (read-string (first (reverse (line-seq (clojure.java.io/reader "usethistext.txt"))))))
+
+modified error: In function even?, the first argument is expected to be a number, but is a function even? instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: even? fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#71:
+
+code input: (conj)
+
+modified error: conj can only take one or more arguments; recieved no arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/conj did not conform to spec:\nval: nil fails spec: :corefns.corefns/b-length-greater-zero at: [:args] predicate: b-length-greater0?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#72:
+
+code input: (map)
+
+modified error: map can only take one or more arguments; recieved no arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nval: nil fails spec: :corefns.corefns/b-length-greater-zero at: [:args] predicate: b-length-greater0?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#73:
+
+code input: (rand-int)
+
+modified error: rand-int can only take one argument; recieved no arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/rand-int did not conform to spec:\nval: nil fails spec: :corefns.corefns/b-length-one at: [:args] predicate: b-length1?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#74:
+
+code input: (rand-int 2 3 4)
+
+modified error: rand-int can only take one argument; recieved three arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/rand-int did not conform to spec:\nval: (2 3 4) fails spec: :corefns.corefns/b-length-one at: [:args] predicate: b-length1?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#75:
+
+code input: (denominator)
+
+modified error: denominator cannot take as few arguments as are currently in it, needs more arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/denominator did not conform to spec:\nval: () fails at: [:args :a :a] predicate: ratio?,  Insufficient input\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#76:
+
+code input: (denominator 1/3 3)
+
+modified error: denominator cannot take as many arguments as are currently in it, needs fewer arguments.
+
+original error: "ExceptionInfo Call to #'clojure.core/denominator did not conform to spec:\nIn: [1] val: (3) fails at: [:args :a] predicate: (cat :a ratio?),  Extra input\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#77:
+
+code input: (even? [(map #(/ % 0) [1 2])])
+
+modified error: Tried to divide by zero
+
+original error: "ArithmeticException Divide by zero  clojure.lang.Numbers.divide (Numbers.java:163)\n"
+
+
+#78:
+
+code input: (even? [(map 2 [1 2])])
+
+modified error: In function map, the first argument is expected to be a function, but is a number 2 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [0] val: 2 fails at: [:args :function] predicate: ifn?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#79:
+
+code input: (even? (lazy-cat [2 3] (map 5 [1 2])))
+
+modified error: Attempted to use a number, but a function was expected.
+
+original error: "ClassCastException java.lang.Long cannot be cast to clojure.lang.IFn  clojure.core/map/fn--5587 (core.clj:2745)\n"
+
+
+#80:
+
+code input: (even? (doall (lazy-cat [2 3] (map 5 [1 2]))))
+
+modified error: In function map, the first argument is expected to be a function, but is a number 5 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [0] val: 5 fails at: [:args :function] predicate: ifn?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#81:
+
+code input: (map 5 (lazy-cat [2 3] [(/ 1 0) 8]))
+
+modified error: In function map, the first argument is expected to be a function, but is a number 5 instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/map did not conform to spec:\nIn: [0] val: 5 fails at: [:args :function] predicate: ifn?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#82:
+
+code input: (odd? (even? even?))
+
+modified error: In function even?, the first argument is expected to be a number, but is an anonymous function instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: #object[clojure.spec.test.alpha$spec_checking_fn$fn__2943 0x140e60f0 \"clojure.spec.test.alpha$spec_checking_fn$fn__2943@140e60f0\"] fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#83:
+
+code input: (map #(+ % (even? (lazy-cat [2 3] [(/ 1 2) 8]))) [3])
+
+modified error: In function even?, the first argument is expected to be a number, but is a list (2 3 1/2 8) instead.
+
+original error: "ExceptionInfo Call to #'clojure.core/even? did not conform to spec:\nIn: [0] val: (2 3 1/2 8) fails at: [:args :number] predicate: number?\n  clojure.core/ex-info (core.clj:4739)\n"
+
+
+#84:
+
+code input: (defn hello [x] (let [y 2 z] (+ x y)))
+
+modified error: Parameters for let must come in pairs, but one of them does not have a match.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/let did not conform to spec:\nIn: [0] val: () fails spec: :clojure.core.specs.alpha/bindings at: [:args :bindings :init-expr] predicate: any?,  Insufficient input\n #:clojure.spec.alpha{:problems [{:path [:args :bindings :init-expr], :reason \"Insufficient input\", :pred clojure.core/any?, :val (), :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x173f645e \"clojure.spec.alpha$regex_spec_impl$reify__2436@173f645e\"], :value ([y 2 z] (+ x y)), :args ([y 2 z] (+ x y))}, compiling:(/tmp/form-init7190693610382132319.clj:1:17) \n"
+
+
+#85:
+
+code input: (defn hello [x] (let [y] (+ x y)))
+
+modified error: Parameters for let must come in pairs, but one of them does not have a match.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/let did not conform to spec:\nIn: [0] val: () fails spec: :clojure.core.specs.alpha/bindings at: [:args :bindings :init-expr] predicate: any?,  Insufficient input\n #:clojure.spec.alpha{:problems [{:path [:args :bindings :init-expr], :reason \"Insufficient input\", :pred clojure.core/any?, :val (), :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x173f645e \"clojure.spec.alpha$regex_spec_impl$reify__2436@173f645e\"], :value ([y] (+ x y)), :args ([y] (+ x y))}, compiling:(/tmp/form-init7190693610382132319.clj:1:17) \n"
+
+
+#86:
+
+code input:  (let [[a b]] (+ a b))
+
+modified error: Parameters for let must come in pairs, but one of them does not have a match.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/let did not conform to spec:\nIn: [0] val: () fails spec: :clojure.core.specs.alpha/bindings at: [:args :bindings :init-expr] predicate: any?,  Insufficient input\n #:clojure.spec.alpha{:problems [{:path [:args :bindings :init-expr], :reason \"Insufficient input\", :pred clojure.core/any?, :val (), :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x173f645e \"clojure.spec.alpha$regex_spec_impl$reify__2436@173f645e\"], :value ([[a b]] (+ a b)), :args ([[a b]] (+ a b))}, compiling:(/tmp/form-init7190693610382132319.clj:1:2) \n"
+
+
+#87:
+
+code input:  (let a (+ a 2))
+
+modified error: Parameters for let require a vector, instead, a was given.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/let did not conform to spec:\nIn: [0] val: a fails spec: :clojure.core.specs.alpha/bindings at: [:args :bindings] predicate: vector?\n #:clojure.spec.alpha{:problems [{:path [:args :bindings], :pred clojure.core/vector?, :val a, :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x173f645e \"clojure.spec.alpha$regex_spec_impl$reify__2436@173f645e\"], :value (a (+ a 2)), :args (a (+ a 2))}, compiling:(/tmp/form-init7190693610382132319.clj:1:2) \n"
+
+
+#88:
+
+code input: (if-let [x] x)
+
+modified error: Parameters for if-let must be a pair, but only one element is given.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/if-let did not conform to spec:\nIn: [0] val: () fails spec: :clojure.core.specs.alpha/binding at: [:args :bindings :init-expr] predicate: any?,  Insufficient input\n #:clojure.spec.alpha{:problems [{:path [:args :bindings :init-expr], :reason \"Insufficient input\", :pred clojure.core/any?, :val (), :via [:clojure.core.specs.alpha/binding], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x306b7836 \"clojure.spec.alpha$regex_spec_impl$reify__2436@306b7836\"], :value ([x] x), :args ([x] x)}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#89:
+
+code input: (if-let [x 2 y] x)
+
+modified error: Parameters for if-let must be only one name and one value, but more parameters were given.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/if-let did not conform to spec:\nIn: [0 2] val: (y) fails spec: :clojure.core.specs.alpha/binding at: [:args :bindings] predicate: (cat :binding :clojure.core.specs.alpha/binding-form :init-expr any?),  Extra input\n #:clojure.spec.alpha{:problems [{:path [:args :bindings], :reason \"Extra input\", :pred (clojure.spec.alpha/cat :binding :clojure.core.specs.alpha/binding-form :init-expr clojure.core/any?), :val (y), :via [:clojure.core.specs.alpha/binding], :in [0 2]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x306b7836 \"clojure.spec.alpha$regex_spec_impl$reify__2436@306b7836\"], :value ([x 2 y] x), :args ([x 2 y] x)}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#90:
+
+code input: (let [2 3] 8)
+
+modified error: In let 2 is used instead of a variable name.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#91:
+
+code input: (defn [b c] (+ 4 3))
+
+modified error: In defn [b c] is used instead of a function name.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/defn did not conform to spec:\nIn: [0] val: [b c] fails spec: :clojure.core.specs.alpha/defn-args at: [:args :name] predicate: simple-symbol?\n #:clojure.spec.alpha{:problems [{:path [:args :name], :pred clojure.core/simple-symbol?, :val [b c], :via [:clojure.core.specs.alpha/defn-args :clojure.core.specs.alpha/defn-args], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x225f0900 \"clojure.spec.alpha$regex_spec_impl$reify__2436@225f0900\"], :value ([b c] (+ 4 3)), :args ([b c] (+ 4 3))}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#92:
+
+code input: (defn afunc2 x (+ 3 x))
+
+modified error: An argument for defn required a vector, instead, x was given.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#93:
+
+code input: (defn- [b c] (+ 4 3))
+
+modified error: In defn- [b c] is used instead of a function name.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/defn- did not conform to spec:\nIn: [0] val: [b c] fails spec: :clojure.core.specs.alpha/defn-args at: [:args :name] predicate: simple-symbol?\n #:clojure.spec.alpha{:problems [{:path [:args :name], :pred clojure.core/simple-symbol?, :val [b c], :via [:clojure.core.specs.alpha/defn-args :clojure.core.specs.alpha/defn-args], :in [0]}], :spec #object[clojure.spec.alpha$regex_spec_impl$reify__2436 0x2e2667c0 \"clojure.spec.alpha$regex_spec_impl$reify__2436@2e2667c0\"], :value ([b c] (+ 4 3)), :args ([b c] (+ 4 3))}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#94:
+
+code input: (defn- afunc2 x (+ 3 x))
+
+modified error: An argument for defn- required a vector, instead, x was given.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#95:
+
+code input: (map (fn fn-name1 VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))
+
+modified error: An argument for fn required a vector, instead, VARIABLE-NAME was given.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#96:
+
+code input: (map (fn VARIABLE-NAME (* 4 VARIABLE-NAME)) (range 1 10))
+
+modified error: An argument for fn required a vector, instead, VARIABLE-NAME was given.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#97:
+
+code input: (map (fn (* 4 VARIABLE-NAME)) (range 1 10))
+
+modified error: An argument for fn required a vector, but no vector was passed.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#98:
+
+code input: (let [x 7] (fn [r] (fn p (+ p p))))
+
+modified error: An argument for fn required a vector, instead, p was given.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#99:
+
+code input: (if-some [[a b]] (+ a b) (+ b a))
+
+modified error: Parameters for if-some must come in pairs, but one of them does not have a match.
+
+original error: "NullPointerException   java.util.regex.Matcher.getTextLength (Matcher.java:1283)\n"
+
+
+#100:
+
+code input: (if-some a (+ a 2) (+ 2 a))
+
+modified error: Parameters for if-some require a vector, instead, a was given.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/if-some did not conform to spec:\nIn: [0] val: a fails spec: :clojure.core.specs.alpha/bindings at: [:args :a :bindings] predicate: vector?\nIn: [0] val: a fails spec: :clojure.core.specs.alpha/bindings at: [:args :b :bindings] predicate: vector?\n #:clojure.spec.alpha{:problems ({:path [:args :a :bindings], :pred clojure.core/vector?, :val a, :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]} {:path [:args :b :bindings], :pred clojure.core/vector?, :val a, :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}), :spec #object[clojure.spec.alpha$and_spec_impl$reify__2111 0x333ad82a \"clojure.spec.alpha$and_spec_impl$reify__2111@333ad82a\"], :value (a (+ a 2) (+ 2 a)), :args (a (+ a 2) (+ 2 a))}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#101:
+
+code input: (if-some a (+ a 2))
+
+modified error: Parameters for if-some require a vector, instead, a was given.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/if-some did not conform to spec:\nIn: [0] val: a fails spec: :clojure.core.specs.alpha/bindings at: [:args :a :bindings] predicate: vector?\nIn: [0] val: a fails spec: :clojure.core.specs.alpha/bindings at: [:args :b :bindings] predicate: vector?\n #:clojure.spec.alpha{:problems ({:path [:args :a :bindings], :pred clojure.core/vector?, :val a, :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]} {:path [:args :b :bindings], :pred clojure.core/vector?, :val a, :via [:clojure.core.specs.alpha/bindings :clojure.core.specs.alpha/bindings], :in [0]}), :spec #object[clojure.spec.alpha$and_spec_impl$reify__2111 0x333ad82a \"clojure.spec.alpha$and_spec_impl$reify__2111@333ad82a\"], :value (a (+ a 2)), :args (a (+ a 2))}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
+#102:
+
+code input: (if-some [a 2])
+
+modified error: if-some can only take two or three arguments; recieved one argument.
+
+original error: "CompilerException clojure.lang.ExceptionInfo: Call to clojure.core/if-some did not conform to spec:\nval: ([a 2]) fails spec: :corefns.corefns/b-length-two-to-three at: [:args] predicate: b-length2-to-3?\n #:clojure.spec.alpha{:problems [{:path [:args], :pred corefns.corefns/b-length2-to-3?, :val ([a 2]), :via [:corefns.corefns/b-length-two-to-three], :in []}], :spec #object[clojure.spec.alpha$and_spec_impl$reify__2111 0x333ad82a \"clojure.spec.alpha$and_spec_impl$reify__2111@333ad82a\"], :value ([a 2]), :args ([a 2])}, compiling:(/tmp/form-init7190693610382132319.clj:1:1) \n"
+
+
