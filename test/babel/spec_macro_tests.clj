@@ -1,7 +1,8 @@
 (ns babel.spec-macro-tests
   (:require
-   [babel.error-tests :refer :all]
-   [expectations :refer :all]))
+   [expectations :refer :all])
+  (:use
+   [loggings.loggingtool :only [get-error start-log add-log]]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj
@@ -9,6 +10,12 @@
 ;############################################
 ;########## Testing for 'let' ###############
 ;############################################
+
+;;start logging
+(expect nil (add-log
+              (do
+                (def file-name "this file")
+                (:file (meta #'file-name)))))
 
 (expect "Parameters for let must come in pairs, but one of them does not have a match.\n"
         (get-error "(defn hello [x] (let [y 2 z] (+ x y)))"))
