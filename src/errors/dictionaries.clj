@@ -260,12 +260,16 @@
     (= n "anonymous function") "This anonymous function"
     :else (str "The function " n)))
 
-    (defn beginandend [x]
-      (re-pattern (str "(?s)" x "(.*)")))
+(defn beginandend
+  "beginandend puts (?s) at the beginning of a string and (.*) at the end
+   of a string and turns it into a regex" 
+  [x]
+  (re-pattern (str "(?s)" x "(.*)")))
 
-    (defn get-spec-text [full-error]
-      "return the string that failed a given spec from a spec error"
-    (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
+(defn get-spec-text
+  "return the string that failed a given spec from a spec error"
+  [full-error]
+  (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
 
 (defn get-dictionary-type
   "get-dictionary-type takes a string and returns the corresponding type

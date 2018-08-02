@@ -58,7 +58,7 @@
 (expect "Parameters for cond must come in pairs, but one of them does not have a match.\n" (get-error "(cond (seq? [1 2]) 5 (seq? [1 3]))"))
 (expect "Parameters for loop must come in pairs, but one of them does not have a match.\n" (get-error "(defn s [s] (loop [s]))"))
 
-(expect "with-open is a macro and cannot be passed to a function.\n" (get-error "(defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))")) ;credit: https://stackoverflow.com/questions/5751262/cant-take-value-of-a-macro-clojure
+(expect "with-open is a macro and cannot be used by itself or passed to a function.\n" (get-error "(defn makeStructs [fName] with-open[r (reader (file fName))] (let [r res (doall (map makeStruct (line-seq r)))] (. r close) res))")) ;credit: https://stackoverflow.com/questions/5751262/cant-take-value-of-a-macro-clojure
 
 (expect "% can only be followed by & or a number.\n" (get-error "(#(+ %a 1) 2 3)"))
 
@@ -95,7 +95,7 @@
 
 (expect "Attempted to use a number, but a file or an input stream was expected.\n" (get-error "(line-seq 3)"))
 
-(expect "let is a macro and cannot be passed to a function.\n" (get-error "(map let let)"))
+(expect "let is a macro and cannot be used by itself or passed to a function.\n" (get-error "(map let let)"))
 
 (expect "You are not using if correctly.\n" (get-error "if"))
 

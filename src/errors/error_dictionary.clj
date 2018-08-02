@@ -546,7 +546,7 @@
     {:key :compiler-exception-cannot-take-value-of-macro
    :class "RuntimeException"
    :match (beginandend "Can't take value of a macro: (\\S*),")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro and cannot be passed to a function.\n"))}
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-macro-name (nth matches 1)) :arg " is a macro and cannot be used by itself or passed to a function.\n"))}
 
    #_{:key :compiler-exception-cannot-resolve-symbol
     :class "RuntimeException"
