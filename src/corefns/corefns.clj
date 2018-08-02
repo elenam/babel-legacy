@@ -161,3 +161,45 @@
 
 (s/fdef clojure.core/pvalues :args (s/and ::b-length-zero-or-greater (s/cat :a (s/* any?))))
 (stest/instrument `clojure.core/pvalues)
+
+(s/def ::innervector (s/cat :a symbol? :b (s/* (s/cat :a keyword :b (s/or :a symbol?
+                                                                          :b (s/nilable coll?))))))
+(s/def ::requiredlist (s/or :a (s/cat :a symbol?)
+                            :b (s/cat :a symbol? :b (s/and vector? ::innervector))))
+(s/def ::requirelist (s/and list? ::requiredlist))
+(s/def ::requiredvector (s/or :a (s/cat :a symbol?)
+                              :b (s/cat :a symbol? :b (s/* (s/cat :a keyword? :b (s/or :a symbol?
+                                                                                       :b (s/nilable coll?)
+                                                                                       :c keyword?))))
+                              :c (s/cat :a symbol? :b (s/and vector? ::innervector))))
+(s/def ::requirevector (s/and vector? ::requiredvector))
+(s/def ::importlists (s/and (s/nilable coll?) ::importlist))
+(s/def ::importlist (s/cat :a (s/+ (s/or :a string?
+                                         :b symbol?
+                                         :c class?
+                                         :d ::quotelist))))
+(s/def ::quotelist (s/cat :a (s/+ (s/or :a string?
+                                        :b symbol?
+                                        :c class?))))
+
+(s/fdef clojure.core/require
+  :args (s/and ::b-length-greater-zero
+               (s/+ (s/cat :a (s/or :a ::requirelist :b ::requirevector :c symbol? :d class?) :b (s/* keyword?)))))
+(stest/instrument `clojure.core/require)
+
+(s/fdef clojure.core/use
+  :args (s/and ::b-length-greater-zero
+               (s/cat :a (s/+ (s/or :a ::requirelist :b ::requirevector :c symbol? :d class?)) :b (s/* keyword?))))
+(stest/instrument `clojure.core/use)
+
+(s/fdef clojure.core/refer
+  :args (s/and ::b-length-greater-zero
+               (s/cat :a symbol? :b (s/* (s/cat :a keyword? :b (s/* (s/nilable coll?)))))))
+(stest/instrument `clojure.core/refer)
+
+(s/fdef clojure.core/import
+  :args (s/and ::b-length-zero-or-greater
+               (s/cat :a (s/* (s/or :a symbol?
+                                    :b ::importlists
+                                    :c class?)))))
+(stest/instrument `clojure.core/import)
