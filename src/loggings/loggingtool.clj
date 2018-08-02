@@ -39,25 +39,26 @@
 
 
 ;;theses 4 funtions get specific error msg from repl
-(defn get-modified-error
+(defn- get-modified-error
   [inp-code]
   (msgs-to-error (trap-response inp-code)))
 
 ;;get original error msg by key
-(defn get-original-error-by-key
+(defn- get-original-error-by-key
   [key]
   (:value (first (filter :value (trap-response (str "(" key " @babel.processor/recorder)"))))))
 
-(defn get-original-error
+(defn- get-original-error
   [inp-code]
   (get-original-error-by-key :msg))
 
-(defn get-error-detail
+(defn- get-error-detail
   [inp-code]
   (get-original-error-by-key :detail))
 
 ;;the execution funtion for the tests
 (defn get-error
+  "takes a testing expr and return its modified error message"
   [inp-code]
   (do
     (save-log
@@ -77,10 +78,12 @@
 
 ;;calls start-l from html-log
 (defn start-log
+  "used to create log file"
   []
   (start-l))
 
 ;;calls add-l from html-log
 (defn add-log
+  "takes a file name and inserts it to the log"
   [file-name]
   (add-l file-name))
