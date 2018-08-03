@@ -231,6 +231,7 @@
                                               (if (= x 1)
                                                 (str "one argument")
                                                 (str "no arguments")))
+        (= failedlength "b-length-zero-to-three") (str (number-word (str x)) " arguments")
         :else failedlength))
       "no arguments"))
 
@@ -245,6 +246,7 @@
     "ifn?" "function"
     "fn?" "function"
     "object" "function"
+    "seqable?" "collection"
     (cond
       (= "?" (subs n (- (count n) 1))) (subs n 0 (- (count n) 1))
       (= "\r" (subs n (- (count n) 1))) (?-name (subs n 0 (- (count n) 1)))

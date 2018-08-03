@@ -14,6 +14,8 @@
                                      (= (count coll) 2)))
 (defn b-length2-to-3? [coll] (or (= (count coll) 2)
                                      (= (count coll) 3)))
+(defn b-length0-to-3? [coll] (and (>= (count coll) 0)
+                                     (<= (count coll) 3)))
 (defn b-length-0greater? [coll] (>= (count coll) 0))
 (defn b-length-greater0? [coll] (> (count coll) 0))
 (defn b-length-greater1? [coll] (> (count coll) 1))
@@ -34,6 +36,7 @@
 (s/def ::b-length-zero-to-one b-length0-to-1?)
 (s/def ::b-length-one-to-two b-length1-to-2?)
 (s/def ::b-length-two-to-three b-length2-to-3?)
+(s/def ::b-length-zero-to-three b-length0-to-3?)
 
 (s/def ::length-one-anything (s/and ::b-length-one (s/cat :any any?)))
 (s/def ::length-one-number (s/and ::b-length-one (s/cat :number number?)))
@@ -92,15 +95,26 @@
   :args ::length-one-number)
 (stest/instrument `clojure.core/even?)
 
+(s/fdef clojure.core/odd?
+  :args ::length-one-number)
+(stest/instrument `clojure.core/odd?)
+
 (s/fdef clojure.core/conj
   :args (s/and ::b-length-greater-zero
                (s/or :any (s/cat :collection (s/nilable coll?)) ;conj can take anything but the intent of conj is that a single argument will be a collection
                      :collectionandany (s/cat :collection (s/nilable coll?) :any (s/+ any?)))))
 (stest/instrument `clojure.core/conj)
 
+(s/fdef clojure.core/into
+  :args (s/and ::b-length-zero-to-three
+               (s/or :c (s/cat :a (s/nilable coll?) :b ifn? :c seqable?)
+                     :b (s/cat :a (s/nilable coll?) :b seqable?)
+                     :a (s/cat :a (s/? seqable?)))))
+(stest/instrument `clojure.core/into)
+
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
-               (s/cat :function ifn? :collections (s/* (s/nilable coll?))))) ;change to a + to block transducers
+               (s/cat :function ifn? :collections (s/* seqable?)))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
 (s/fdef clojure.core/mod
