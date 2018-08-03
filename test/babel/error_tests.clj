@@ -125,14 +125,17 @@
 
 (expect #"The file a\.txt does not exist(.*)" (get-error "(slurp \"a.txt\")"))
 
-(expect "The system was looking for a class nonsense.class or a file nonsense.clj, but neither one exists.\n"
+(expect "The system was looking for a class nonsense.class or a file nonsense.clj, but neither one was found.\n"
         (get-error "(require 'nonsense)"))
 
-(expect "The system was looking for a class nonsense/1/2.class or a file nonsense/1/2.clj, but neither one exists.\n"
+(expect "The system was looking for a class nonsense/1/2.class or a file nonsense/1/2.clj, but neither one was found.\n"
         (get-error "(require 'nonsense.1.2)"))
 
 (expect "You cannot use nonsense/1 in this position.\n"
         (get-error "(require 'nonsense/1)"))
+
+#_(expect "The system was looking for a class clojure/string/stuff.class or a file clojure/string/stuff.clj, but neither one was found."
+        (get-error "(require '[clojure.string.stuff :as stuff])"))
 
 (expect "No value found for key 3. Every key for a hash-map must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
 

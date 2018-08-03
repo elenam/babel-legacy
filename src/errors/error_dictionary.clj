@@ -663,7 +663,7 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The system was looking for a class "
                                                            (str (nth matches 2) ".class") :arg
                                                            " or a file " (str (nth matches 2) ".clj") :arg
-                                                           ", but neither one exists.\n"))}
+                                                           ", but neither one was found.\n"))}
 
     ;###############
     ;### Warning ###
