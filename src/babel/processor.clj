@@ -8,22 +8,23 @@
 ;;an atom that record original error response
 (def recorder (atom {:msg "" :detail ""}))
 
-;;reset the recorder
 (defn reset-recorder
+  "This function reset the recorder atom"
   []
   (def recorder (atom {:msg "" :detail ""})))
 
-;;update recorded message
 (defn update-recorder-msg
+  "takes an unfixed error message, and put it into the recorder"
   [inp-message]
   (swap! recorder assoc :msg inp-message))
 
-;;update recorded detail
 (defn update-recorder-detail
+  "takes error message details, and put them into the recorder"
   [inp-message]
   (swap! recorder assoc :detail inp-message))
 
-(defn modify-errors "takes a nREPL response, and returns a message with the errors fixed"
+(defn modify-errors
+  "takes a nREPL response, and returns a message with the errors fixed"
   [inp-message]
   (if (contains? inp-message :err)
     ;;replace the assoced value with a function call as needed.

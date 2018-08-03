@@ -1,52 +1,66 @@
 (ns loggings.html-log
   (:use hiccup.core))
 
-;;counter atom
-(def counter (atom {:total 1 :partial 1}))
+;;counter atom that count the amount of testing units.
+(def counter (atom {:total 1 :partial 1 :log? true}))
 
-;;reset atom
-(defn reset-counter
+;;reset the counter
+(defn- reset-counter
   []
-  (def counter (atom {:total 1 :partial 1})))
+  (def counter (atom {:total 1 :partial 1 :log? true})))
 
 ;;sets time with the file name format
 (declare current-time)
-(defn update-time
+(defn- update-time
   []
   (def current-time (.format (java.text.SimpleDateFormat. "MM'_'dd'_'yyyy'_T'HH'_'mm'_'ss") (new java.util.Date))))
 
 ;;preset html log contents
-(defn html-log-preset
+(defn- html-log-preset
   []
   (html [:title "Babel testing log"]
-        [:h3 {:style "padding-top:10px"} "Testing log : "]
+        [:h3 {:style "padding-top:100px"} "Testing log : "]
         [:h4 (new java.util.Date)]
         [:script
          "function hideModified() {
            var x = document.getElementsByClassName(\"modifiedError\");
+           var y = document.getElementsByClassName(\"nilmodifiedError\");
            if (document.getElementById(\"modified\").checked != true) {
-             var i;
+             var i, j;
              for (i = 0; i < x.length; i++) {
                x[i].style.display='none';
              }
+             for (j = 0; j < y.length; j++) {
+               y[j].style.display='none';
+             }
              } else {
-             var i;
+             var i, j;
              for (i = 0; i < x.length; i++) {
                x[i].style.display='block';
+             }
+             for (j = 0; j < y.length; j++) {
+               y[j].style.display='block';
              }
              }
            }
            function hideOriginal() {
              var x = document.getElementsByClassName(\"originalError\");
+             var y = document.getElementsByClassName(\"niloriginalError\");
              if (document.getElementById(\"original\").checked != true) {
-               var i;
+               var i, j;
                for (i = 0; i < x.length; i++) {
                  x[i].style.display='none';
                }
+               for (j = 0; j < y.length; j++) {
+                 y[j].style.display='none';
+               }
                } else {
-               var i;
+               var i, j;
                for (i = 0; i < x.length; i++) {
                  x[i].style.display='block';
+               }
+               for (j = 0; j < y.length; j++) {
+                 y[j].style.display='block';
                }
                }
              }
@@ -80,6 +94,30 @@
                    }
 
                }
+               function colorBlindMode() {
+                 var x = document.getElementsByClassName(\"modifiedError\");
+                 var y = document.getElementsByClassName(\"originalError\");
+                 var p = document.getElementById(\"modified\");
+                 var q = document.getElementById(\"original\");
+                 if (document.getElementById(\"colorBlind\").checked == true) {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.color='FE7F00';
+                     y[i].style.color='3E18A9';
+                     p.style.color='FE7F00';
+                     q.style.color='3E18A9';
+                   }
+                   } else {
+                   var i;
+                   for (i = 0; i < x.length; i++) {
+                     x[i].style.color='00AE0C';
+                     y[i].style.color='D10101';
+                     p.style.color='00AE0C';
+                     q.style.color='D10101';
+                   }
+                   }
+
+               }
                function checkData() {
                    var nonNilResults = document.getElementsByClassName(\"nonNilResult\");
                    var nilResults = document.getElementsByClassName(\"nilResult\");
@@ -89,25 +127,27 @@
 
                }
                window.onload = checkData;"]
-        [:p "Display options:"]
-        [:div#displayOptions
-         [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
-         [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
-         [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
-         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]]
+        [:div#displayOptions {:style "position:fixed;background-color: lightyellow;top:0px;left:0px;right:0px;border-bottom:1px solid gray;width:100%;padding-bottom:10px"}
+         [:p {:style "padding-left:5px"} "Display options:"]
+          [:div
+           [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
+           [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
+           [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
+           [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
+           [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]]
         [:div#loadingError {:style "display:block"}
          [:hr]
          [:h4 "Error loading test data!!!"]]))
 
 ;;adds a new log to the category
-(defn add-category
+(defn- add-category
   [file-name]
   (html
     [:p
      [:a {:href (str "./history/" file-name ".html") :class "logFiles"} (str file-name ".html")]]))
 
 ;;returns html format content of existing logs
-(defn check-existing-log
+(defn- check-existing-log
   []
   (loop [dir (rest (file-seq (clojure.java.io/file "./log/history/")))
          coll [:body]]
@@ -118,7 +158,7 @@
                (conj coll (str "<p><a href=\"." (subs (str target) 5) "\" class=\"logFiles\"> "(subs (str target) 14)" </a></p>")))))))
 
 ;;category html page presetting
-(defn category-preset
+(defn- category-preset
   []
   (html
     [:title "Log Category"]
@@ -129,7 +169,7 @@
     (check-existing-log)))
 
 ;;makes the category html
-(defn make-category
+(defn- make-category
   []
   (do
     (clojure.java.io/make-parents "./log/log_category.html")
@@ -147,7 +187,7 @@
     (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
 
 ;;sets html division for different test files
-(defn log-division
+(defn- log-division
   [file-name]
   (html
     [:div {:class "fileDivision"}
@@ -162,7 +202,7 @@
       (spit (str "./log/history/" current-time ".html") (log-division file-name) :append true)))
 
 ;;content that is going to be put into the log
-(defn log-content
+(defn- log-content
   [inp-code total modified original]
   (if
     (not= modified nil)
@@ -187,7 +227,7 @@
    (println (slurp "./log/last_test.txt")))
 
 ;;define html content
-(defn html-content
+(defn- html-content
   [inp-code total partial modified original detail]
   (if
     (not= modified nil)
@@ -206,8 +246,8 @@
              [:p {:style "width:50%;float:left"} "#" partial ":<br />"]
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#808080"} "modified error: nil<br />"]
-           [:p {:class "originalError" :style "color:#808080"} "original error: nil<br />"]
+           [:p {:class "nilmodifiedError" :style "color:#808080"} "modified error: nil<br />"]
+           [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]
            [:p {:class "errorDetail" :style "color:#808080;display:none"} "error detail: nil<br /><br />"]])))
 
 
