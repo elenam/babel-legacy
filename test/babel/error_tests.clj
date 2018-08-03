@@ -30,8 +30,8 @@
 (expect "Name Ebeneezer is undefined.\n" (get-error "(Ebeneezer)"))
 
 ;;class-cast-exception
-(expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ 8 \"seventeen\")"))
-(expect "Attempted to use a string, but a number was expected.\n" (get-error "(+ \"hello\" 3)"))
+(expect "Expected a number, but a string was given instead.\n" (get-error "(+ 8 \"seventeen\")"))
+(expect "Expected a number, but a string was given instead.\n" (get-error "(+ \"hello\" 3)"))
 ;(expect "Attempted to use a number, but a function was expected.\n" (get-error "(map 5 [3])"))
 
 (expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
@@ -91,9 +91,9 @@
 
 (expect "Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
 
-(expect "Attempted to use a string, but a number was expected.\n" (get-error "(map #(+ % \"a\") [3])"))
+(expect "Expected a number, but a string was given instead.\n" (get-error "(map #(+ % \"a\") [3])"))
 
-(expect "Attempted to use a number, but a file or an input stream was expected.\n" (get-error "(line-seq 3)"))
+(expect "Expected a file or an input stream, but a number was given instead.\n" (get-error "(line-seq 3)"))
 
 (expect "let is a macro and cannot be used by itself or passed to a function.\n" (get-error "(map let let)"))
 
@@ -193,7 +193,7 @@
 (expect "In function map, the first argument is expected to be a function, but is a number 2 instead.\n" (get-error "(even? [(map 2 [1 2])])"))
 
 ;; spec isn't checked on secondary errors in arguments that failed (if they are lazy sequences). This is not a spec error:
-(expect "Attempted to use a number, but a function was expected.\n" (get-error "(even? (lazy-cat [2 3] (map 5 [1 2])))"))
+(expect "Expected a function, but a number was given instead.\n" (get-error "(even? (lazy-cat [2 3] (map 5 [1 2])))"))
 
 ;; If the sequence evaluation is forced, we get a spec error:
 (expect "In function map, the first argument is expected to be a function, but is a number 5 instead.\n" (get-error "(even? (doall (lazy-cat [2 3] (map 5 [1 2]))))"))
