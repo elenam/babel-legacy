@@ -19,7 +19,7 @@
 (defn- html-log-preset
   []
   (html [:title "Babel testing log"]
-        [:h3 {:style "padding-top:10px"} "Testing log : "]
+        [:h3 {:style "padding-top:100px"} "Testing log : "]
         [:h4 (new java.util.Date)]
         [:script
          "function hideModified() {
@@ -127,13 +127,14 @@
 
                }
                window.onload = checkData;"]
-        [:p "Display options:"]
-        [:div#displayOptions
-         [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
-         [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
-         [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
-         [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
-         [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]
+        [:div#displayOptions {:style "position:fixed;background-color: lightyellow;top:0px;left:0px;right:0px;border-bottom:1px solid gray;width:100%;padding-bottom:10px"}
+         [:p {:style "padding-left:5px"} "Display options:"]
+          [:div
+           [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
+           [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
+           [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
+           [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
+           [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]]
         [:div#loadingError {:style "display:block"}
          [:hr]
          [:h4 "Error loading test data!!!"]]))
