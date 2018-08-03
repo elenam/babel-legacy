@@ -1,6 +1,5 @@
-(ns utilities.spec_generator)
-   ;(:require [corefns.assert_handling :refer :all]))
-
+(ns utilities.spec_generator
+   (:require [clojure.string :as str]))
 
 ;;the only part of this hash map we still use is :has-type
 ;;the other parts used to be useful when I was also doing the re-defining, and may yet be useful
@@ -14,12 +13,10 @@
                 :strs  {:check "check-if-strings?",   :has-type "string",   :argument "strs", :arg-vec ["&" "strs"]},
                 :f     {:check "check-if-function?",  :has-type "function", :argument "f",    :arg-vec ["f"]},
                 :fs    {:check "check-if-functions?", :has-type "function", :argument "fs",   :arg-vec ["&" "fs"]}
-                ;:args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
                 :args  {:check nil,                   :has-type "arg",      :argument "args", :arg-vec ["&" "args"]}})
 
-
 (def re-type-replace
-  "This hashmap used for replacing the keywords with strings"
+  "This hashmap used for replacing the keywords with strings."
   '{
     :arg   ":a any?"
     :coll  ":a (s/nilable coll?)"
@@ -29,183 +26,434 @@
     :strs  ":a string?"
     :f     ":a ifn?"
     :fs    ":a ifn?"
-    :args  ":a (s/+ args)" ;s+ or s*
+    :args  ":a (s/* args)"
+    :colls* ":a (s/* (s/nilable coll?))"
+    :strs*  ":a (s/* string?)"
+    :fs*    ":a (s/* function?)"
+    :args*  ":a (s/* any?)"
     :r ":a ratio?"
+    :arg? ":a (s/? any?)"
+    :coll? ":a (s/? (s/nilable coll?))"
+    :n? ":a (s/? number?)"
+    :str? ":a (s/? string?)"
+    :f? ":a (s/? ifn?)"
+    :r? ":a (s/? ratio?)"
+    :nil? ":a (s/? something)"
+    :colls+ ":a (s/+ (s/nilable coll?))"
+    :strs+  ":a (s/+ string?)"
+    :fs+    ":a (s/+ function?)"
+    :args+  ":a (s/+ any?)"
     nil ":a something"})
 
-;;mapping of rich hickey's argument names in doc-strings to a more consistent naming scheme
-;; (def arg-type (merge
-;;                      (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
-;;                      (zipmap [:n :number :step :start :end :size] (repeat :n)),
-;;                      (zipmap [:arg :val :argument :x :y] (repeat :arg)),
-;;                      (zipmap [:f :function :pred] (repeat :f)),
-;;                      (zipmap [:fs :functions :preds] (repeat :fs)),
-;;                      (zipmap [:colls :cs] (repeat :colls)),
-;;                      (zipmap [:string :str :s] (repeat :str)),
-;;                      (zipmap [:strs :strings :ss] (repeat :strs)),
-;;                      (zipmap [:more :args :vals :arguments :xs :ys] (repeat :args))))
-(def arg-type (merge ;this changes the various possible arguments into the various corresponding types, like :x into :arg
-                     (zipmap [:seq] (repeat :seq)), ; added
-                     (zipmap [:map] (repeat :map-or-vector)), ;added
-                     (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5] (repeat :coll)),
-                     (zipmap [:maps] (repeat :maps-or-vectors)), ;added
+(def type-replace
+  "This hashmap used for replacing the keywords with strings."
+  '{
+    :arg   :arg
+    :coll  :coll
+    :n     :n
+    :colls :colls
+    :str   :str
+    :strs  :strs
+    :f     :f
+    :fs    :fs
+    :args  [:coll :args]
+    :r :r
+    nil nil})
+
+(def type-multi
+  "This hashmap used for checking that certain keys exist."
+  '{
+    [:coll :colls] :colls
+    [:str :strs]  :strs
+    [:f :fs]    :fs
+    [:arg :args]  :args})
+
+(def type-single
+  "This hashmap used for checking that certain keys exist and replacing them."
+  '{
+    [:arg]   :arg?
+    [:coll]  :coll?
+    [:n]     :n?
+    [:str]   :str?
+    [:f]     :f?
+    [:r]     :r?
+    [nil] :nil?})
+
+(def type-single-no-vec
+  "This hashmap used for checking that certain keys exist and replacing them."
+  '{
+    :arg   :arg?
+    :coll  :coll?
+    :n     :n?
+    :str   :str?
+    :f     :f?
+    :r     :r?
+    nil :nil?})
+
+(def type-multi-replace
+  "This hashmap used for checking that certain keys exist and replacing them."
+  '{
+    :colls :colls*
+    :strs  :strs*
+    :fs    :fs*
+    :args  :args*})
+
+(def type-multi-replace+
+  "This hashmap used for replacing keys."
+  '{
+    :colls :colls+
+    :strs  :strs+
+    :fs    :fs+
+    :args  :args+})
+
+(def arg-type (merge
+                     (zipmap [:seq] (repeat :seq)),
+                     (zipmap [:map] (repeat :map-or-vector)),
+                     (zipmap [:coll :c :c1 :c2 :c3 :c4 :c5 :m :ks] (repeat :coll)),
+                     (zipmap [:maps] (repeat :maps-or-vectors)),
                      (zipmap [:n :number :step :start :end :size] (repeat :n)),
                      (zipmap [:r] (repeat :r)),
-                     (zipmap [:arg :key :val :argument :x :y :test] (repeat :arg)), ; key is added
-                     ;(zipmap ["(s/cat :a any?)" :key :val :argument :x :y] (repeat :arg)), ; key is added
+                     (zipmap [:arg :key :val :argument :x :y :test :not-found :init-val-or-seq :size-or-seq :body] (repeat :arg)),
                      (zipmap [:f :function :pred] (repeat :f)),
                      (zipmap [:fs :functions :preds] (repeat :fs)),
                      (zipmap [:colls :cs] (repeat :colls)),
                      (zipmap [:string :str :s] (repeat :str)),
                      (zipmap [:strs :strings :ss] (repeat :strs)),
-                     (zipmap [:more :args :vals :arguments :xs :ys] (repeat :args))))
+                     (zipmap [:more :args :vals :arguments :xs :ys :forms :filters :keyvals] (repeat :args))))
 
-;; returns the index of the last logically false member of the array
-;; coll -> number
-(defn last-false-index [coll]
-  (loop [remaining coll
-         i 1
-         j 0]
-     (if (empty? remaining) j (recur (rest remaining) (inc i) (if (first remaining) j i)))))
+(defn arglists->argtypes
+  "arglists->argtypes takes a list of lists of arguments as strings and
+   changes the arguments into keys corresponding to arg-type."
+  [arglists]
+  (map (fn [x] (map #(arg-type (keyword %)) x)) arglists))
 
-;;does the translating from the names rich hickey gave the arguments, to something consistent
-;;list of lists of strings -> list of lists of keys
-(defn arglists->argtypes [arglists] (map (fn [x] (map #(arg-type (keyword %)) x)) arglists)) ;changes things like :x to :arg
+(defn last-arglist
+  "last-arglist takes a list of lists and gets the longest list in the
+   list of lists."
+  [arglists]
+  (first (reverse (sort-by count arglists))))
 
-;;returns the longest collection in a collection of collections
-;;arglists -> arglist
-(defn last-arglist [arglists] (first (reverse (sort-by count arglists)))) ;gets the last collection in the collection
+(defn chompable?
+  "chompable? checks if there are no empty lists or lists with & in them in a
+   list of lists."
+  [arglists]
+  (or (not-any? #(< 1 (count %)) arglists)
+    (= "&" (name (first (rest (reverse (last-arglist arglists))))))))
 
-;;returns trus if an arglists has & ____ as an argument
-;;arglists -> boolean
-;takes the arglist which has been turned into a sequence of sequences of strings and makes sure each
-;that the last sequence in the sequence has no arguments which have a count less than 1
-;it also finds the name of the second to last argument and checks if it is &
-(defn chompable? [arglists] (or (not-any? #(< 1 (count %)) arglists)  (= "&" (name (first (rest (reverse (last-arglist arglists))))))))
-
-;;removes the second to last element of the longest coll in a coll of colls
-;;this is the `&` symbol in our case
-;;arglists -> arglists
-(defn remove-and [arglists]
+(defn remove-and
+  "remove-and removes the second to last element in the longest coll in a
+   coll of colls."
+  [arglists]
   (let [sorted-arglists (reverse (sort-by count arglists))
-	f-arglists (first sorted-arglists)
-	r-arglists (reverse (rest sorted-arglists))]
-	(sort-by count (conj r-arglists (into (vec (drop-last 2 f-arglists)) (take-last 1 f-arglists))))))
+	       f-arglists (first sorted-arglists)
+	       r-arglists (reverse (rest sorted-arglists))]
+     (->> (conj r-arglists (into (->> (drop-last 2 f-arglists)
+                                      vec)
+                                 (take-last 1 f-arglists)))
+          (sort-by count))))
 
-;;returns the last element of the longest coll in a coll of colls
-;;arglists -> keyword
-(defn last-arg [arglists] (keyword (str (name (first (reverse (first (reverse (sort-by count arglists)))))))))
+(defn last-arg
+  "last-arg returns the last element of the longest coll in a coll of colls."
+  [arglists]
+  (first (reverse (first (reverse (sort-by count arglists))))))
 
-;;checks the :type-data of each argument, returning true if they are all the same
-;;args -> boolean
-(defn same-type? [& args] ;need to look into why this always returns true but the function doesn't if you run it without the defn
-	(apply = (map #(:has-type (type-data %)) args))) ;this returns true for absolutely everything
- ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
+(defn second-to-last-arg
+  "second-to-last-arg returns the second to last element of the longest coll
+   in a coll of colls."
+  [arglists]
+  (first (rest (reverse (first (reverse (sort-by count arglists)))))))
 
-(defn same-type2? [& args] ;need to look into why this always returns true but the function doesn't if you run it without the defn
-	(map #(replace re-type-replace %) args)) ;this returns true for absolutely everything
- ;(apply not= nil (first (map #(:has-type (type-data %)) args))))
+(defn second-arglist
+  "second-arglist returns the second coll in a coll of colls."
+  [arglists]
+  (first (rest arglists)))
 
-;;helper function for chomp-arglists, appends last-arg to the end of the longest coll in arglists
-;;arglists -> arglists
-(defn append-last-arg [arglists last-arg]
-	(conj (vec (rest (reverse (sort-by count arglists)))) (conj (vec (first (reverse (sort-by count arglists)))) last-arg)))
+(defn argtypes->moretypes
+  "argtypes->moretypes takes a coll of colls of keywords and changes the
+   keywords depending on what it is and the position it is in within
+   the coll of colls."
+  [arglists]
+  (cond (and (empty? (first arglists))
+             (contains? type-multi [(second-to-last-arg arglists) (last-arg arglists)]))
+           (->> arglists
+                last-arg
+                (get type-multi-replace)
+                (conj [])
+                seq
+                (conj [])
+                seq)
+        (and (empty? (first arglists))
+             (= (count arglists) 2)
+             (= (count (second-arglist arglists)) 1)
+             (contains? type-single (vec (second-arglist arglists))))
+          (->> arglists
+               second-arglist
+               vec
+               (get type-single)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (and (= (count arglists) 1)
+             (= (count (first arglists)) 2)
+             (contains? type-multi (vec (first arglists))))
+          (->> arglists
+               last-arg
+               (get type-multi-replace+)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (and (empty? (first arglists))
+             (= (count arglists) 2)
+             (= (count (second-arglist arglists)) 1)
+             (contains? type-multi-replace (last-arg arglists)))
+          (->> arglists
+               last-arg
+               (get type-multi-replace)
+               (conj [])
+               seq
+               (conj [])
+               seq)
+        (contains? type-multi-replace (last-arg arglists))
+          (->> (conj (->> arglists
+                          (map seq)
+                          seq
+                          reverse
+                          rest)
+                     (->> (conj (->> arglists
+                                     (map seq)
+                                     seq
+                                     reverse
+                                     first
+                                     reverse
+                                     rest)
+                                (->> arglists
+                                     last-arg
+                                     (get type-multi-replace)))
+                          reverse))
+               reverse)
+        (and (empty? (first arglists))
+             (>= (count arglists) 2))
+           (conj (->> arglists
+                      rest
+                      rest
+                      reverse)
+                 (->> (conj (->> arglists
+                                 rest
+                                 first
+                                 rest
+                                 reverse)
+                            (->> arglists
+                                 rest
+                                 first
+                                 first
+                                 (get type-single-no-vec)))
+                      reverse))
+        :else arglists))
 
-;;removes redundant arguments in arglists
-;;arglists -> arglists
-(defn chomp-arglists [arglists]
-    (let [f-arglists (arglists->argtypes (remove-and arglists)) ;removes & and changing the various args to stuff like :arg
-	  last-arg (first (reverse (first (reverse (sort-by count f-arglists))))) ;gets the last argument in the last sequence
-          ]
-      (loop [rem-args f-arglists
-             diffs []]
-        (cond
-          (empty? rem-args) (append-last-arg (vec (filter #(<= (count %) (last-false-index diffs)) f-arglists)) last-arg)
-          :else (recur (drop-while empty? (map rest rem-args)) (into diffs [true]))))));(apply map same-type? (conj rem-args [last-arg]))))))))
-          ;:else (recur (drop-while empty? (map rest rem-args)) (into diffs (apply map same-type? (conj rem-args [last-arg]))))))))
-          ;reduces all the sequences in the sequence by one (rest) and removes those that are empty
-          ;the diffs [true] actually works because its what that function did
+(defn same-type2?
+ "same-type2? replaces keywords with corresponding strings in a coll."
+ [& args]
+	(map #(replace re-type-replace %) args))
 
-;;runs chomp-arglist if the & is present, else just translates to our representation
-;;arglists -> arglists
-(defn chomp-if-necessary [arglists]
-	(if (chompable? arglists) ;checks for & in the arglist essentially
-		(chomp-arglists arglists) ;look at chomp-arglists
-		(arglists->argtypes arglists))) ;changes an arglist to an argtype, like making "x" into :arg or "more" into :args
+(defn chomp-if-necessary
+ "chomp-if-necessary checks if a coll of colls is chompable. If it is
+  chompable it will go through remove-and and argtypes->moretypes. If it is
+  not chompable it will only go through arglists->argtypes."
+ [arglists]
+	(if (chompable? arglists)
+  (argtypes->moretypes (arglists->argtypes (remove-and arglists)))
+		(arglists->argtypes arglists)))
 
 (defn spec-length
-   "This function takes an argument n and changes it to a corresponding string"
-   [n]
-   (case n
-    1 "::b-length-one"
-    2 "::b-length-two"
-    3 "::b-length-three"
+   "This function takes an argument n and changes it to a corresponding string."
+   [n & [arg]]
+   (if arg
     (cond
-    (or (= n [2 1]) (= n [1 2])) "::b-length-one-or-two"
-    (or (= n [3 1]) (= n [1 3])) "::b-length-one-or-three"
-    (or (= n [3 2]) (= n [2 3])) "::b-length-two-or-three"
-    (= n :args )"::b-length-greater-zero"
-    :else  n)))
+      (not= nil (re-matches #":(\S*)s\*" (str arg))) (case n
+                                                       1 "::b-length-zero-or-greater"
+                                                       2 "::b-length-greater-zero"
+                                                       3 "::b-length-greater-one"
+                                                       4 "::b-length-greater-two"
+                                                       5 "::b-length-greater-three"
+                                                       6 "::b-length-greater-four"
+                                                       n)
+      (not= nil (re-matches #":(\S*)s+" (str arg))) (case n
+                                                       1 "::b-length-greater-zero"
+                                                       2 "::b-length-greater-one"
+                                                       3 "::b-length-greater-two"
+                                                       4 "::b-length-greater-three"
+                                                       5 "::b-length-greater-four"
+                                                       6 "::b-length-greater-five"
+                                                       n)
+      :else n)
+    (case n
+      1 "::b-length-one"
+      2 "::b-length-two"
+      3 "::b-length-three"
+      4 "::b-length-four"
+      5 "::b-length-five"
+      (cond
+        (= n [1 1]) "::b-length-one"
+        (= n [2 2]) "::b-length-one"
+        (or (= n [2 1]) (= n [1 2])) "::b-length-one-to-two"
+        (or (= n [3 1]) (= n [1 3])) "::b-length-one-to-three"
+        (or (= n [3 2]) (= n [2 3])) "::b-length-two-to-three"
+        (or (= n [4 3]) (= n [3 4])) "::b-length-three-to-four"
+        (or (= n [4 1]) (= n [1 4])) "::b-length-one-to-four"
+        (or (= n [4 2]) (= n [2 4])) "::b-length-two-to-four"
+        (or (= n [5 3]) (= n [3 5])) "::b-length-three-to-five"
+        (= n :args ) "::b-length-greater-zero"
+        (not= nil (re-matches #":(\S*)s\*" (str n))) "::b-length-greater-zero"
+        (not= nil (re-matches #":(\S*)s+" (str n))) "::b-length-greater-one"
+        (not= nil (re-matches #":(\S*)\?" (str n))) "::b-length-zero-or-one"
+        :else  n))))
 
 (defn args-and-range
   "This function helps keep the length of replace count down
-  it sends :args and a minimum and maximum to spec-length"
+  it sends :args and a minimum and maximum to spec-length."
   [arglist x]
-  (if (= :args (first (first arglist)))
+  (if (or (= :args (first (first arglist)))
+        (not= nil (re-matches #":(\S*)s(.*)" (str (first (first arglist)))))
+        (not= nil (re-matches #":(\S*)\?" (str (first (first arglist))))))
     (spec-length (first (first arglist)))
     (spec-length (vec (conj nil (apply min x) (apply max x))))))
 
 (defn replace-count
   "This function takes a vector, creates a vector with the count of the
-  vectors in the vector and outputs the corresponding string"
+  vectors in the vector and outputs the corresponding string."
   [arglist]
   (let [x (map count arglist)]
-    (if (and (= 1 (count x)) (not= :args (first (first arglist))))
+    (if (and (= 1 (count x))
+          (nil? (re-matches #":(\S*)s(.*)" (str (last-arg arglist))))
+          (not= :args (first (first arglist)))
+          (nil? (re-matches #":(\S*)s(.*)" (str (first (first arglist)))))
+          (nil? (re-matches #":(\S*)?" (str (first (first arglist))))))
       (spec-length (first x))
-      (args-and-range arglist x))))
+      (if (not= nil (re-matches #":(\S*)s(.*)" (str (last-arg arglist))))
+        (spec-length (count (first (reverse arglist))) (last-arg arglist))
+        (args-and-range arglist x)))))
 
-;; outputs a string of generated data for redefining functions with preconditions
-;; function -> string
-(defn pre-re-defn [fvar]
-;;   (println "pre-re-defn ing: " (:name (meta fvar)))
+(defn pre-re-defn
+  "takes a function, applies chomp-if-necessary on its arglist and
+   turns it into a string that outputs in a form that can be used
+   as a sort of intermediate step."
+  [fvar]
   (let [fmeta (meta fvar)]
-    (str "(re-defn #'" (:ns fmeta) "/" (:name fmeta) " "
-      (apply str (vec (interpose " " (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))) ")")))
+    (format "(re-defn #' %s/%s %s)\n"
+      (:ns fmeta)
+      (:name fmeta)
+      (->> (:arglists fmeta)
+           (map #(map name %))
+           (chomp-if-necessary)
+           (map vec)
+           (interpose "")
+           (vec)
+           (apply str)))))
 
-(defn pre-re-defn-spec [fvar]
-;;   (println "pre-re-defn ing: " (:name (meta fvar)))
+(defn pre-re-defn-spec
+  "takes a function, applies chomp-if-necessary on its arglist and
+   turns it into a string that outputs in the form of a spec."
+  [fvar]
   (let [fmeta (meta fvar)]
-    (clojure.string/replace
-      (clojure.string/replace
-        (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args " "(s/or :a (s/cat "
-            (apply str (vec (interpose ") \n              :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) ")))\n"
-            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
+    (-> (format "(s/fdef %s/%s :args (s/or :a (s/cat %s)))\n(stest/instrument `%s/%s)\n"
+          (:ns fmeta)
+          (:name fmeta)
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (apply same-type2?)
+               (map vec)
+               (interpose ") \n  :a (s/cat ")
+               (vec)
+               (apply str))
+          (:ns fmeta)
+          (:name fmeta))
+        (clojure.string/replace #"\[\"" "")
+        (clojure.string/replace #"\"\]" "")
+        (clojure.string/replace #"\"" ""))))
 
-(defn pre-re-defn-spec-babel [fvar]
+(defn pre-re-defn-spec-babel
+  "takes a function, applies chomp-if-necessary on its arglist and
+   turns it into a string that outputs in the form of a babel spec."
+  [fvar]
   (let [fmeta (meta fvar)]
-    (clojure.string/replace
-      (clojure.string/replace
-        (clojure.string/replace
-          (str "(s/fdef " (:ns fmeta) "/" (:name fmeta) " \n  :args (s/and " (replace-count (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))) " (s/or :a (s/cat "
-            (apply str (vec (interpose ") \n  :a (s/cat " (map vec (apply same-type2? (map vec (chomp-if-necessary (map #(map name %) (:arglists fmeta))))))))) "))))\n"
-            "(stest/instrument `" (:ns fmeta) "/" (:name fmeta) ")\n") #"\[\"" "") #"\"\]" "") #"\"" "")))
+    (-> (format "(s/fdef %s/%s :args (s/and %s (s/or :a (s/cat %s))))\n(stest/instrument `%s/%s)\n"
+          (:ns fmeta)
+          (:name fmeta)
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (replace-count))
+          (->> (:arglists fmeta)
+               (map #(map name %))
+               (chomp-if-necessary)
+               (map vec)
+               (apply same-type2?)
+               (map vec)
+               (interpose ") \n  :a (s/cat ")
+               (vec)
+               (apply str))
+          (:ns fmeta)
+          (:name fmeta))
+        (clojure.string/replace #"\[\"" "")
+        (clojure.string/replace #"\"\]" "")
+        (clojure.string/replace #"\"" ""))))
 
+(defn apply-persist
+ "apply-persist checks if \"Persistent\" is anywhere in a
+  sequence."
+ [& vars]
+ (map #(clojure.string/includes? % "Persistent") vars))
+
+(defn apply-types
+ "apply-persist checks if \"Persistent\" is anywhere in a
+  sequence."
+ [x vars]
+ (map #(= % x) vars))
+
+(defn check-types
+  "check-types takes a function and returns true if the function
+   has a Persistent in the arglists if apply-persist is passed as x
+   or the type corresponds to whatever is passed to x."
+  [vars x]
+  (let [y (cond->> vars
+            true meta
+            true :arglists
+            (= x "apply-persist") (map #(map type %))
+            true (map #(map str %))
+            true (map vec)
+            true vec)
+        z (if (= x "apply-persist")
+             (map #(apply-persist %) y)
+             (map #(apply-types x %) y))]
+           (boolean? (some #(= (seq [true]) %) z))))
 
 (defn println-recur
   "This function shows everything required for a defn, to work with this
-  there can be an intermediate step"
-  [all-vars]
-  (when
-    (not (empty? all-vars))
-    (try
-      (println (pre-re-defn (first all-vars)))
-      (catch java.lang.ClassCastException e))
-    (println-recur (rest all-vars))))
-;; (println-recur (vals (ns-publics 'clojure.core)))
+  there can be an intermediate step."
+  ([all-vars]
+   (when
+     (not (empty? all-vars))
+     (try
+       (println (pre-re-defn (first all-vars)))
+       (catch java.lang.ClassCastException e))
+     (println-recur (rest all-vars))))
+   ([all-vars x]
+    (loop [rem-args all-vars
+           result []]
+      (cond
+         (empty? rem-args) (println result)
+         (check-types (first rem-args) x)
+           (recur (rest rem-args)
+                  (conj result (str (first rem-args) "\n")))
+         :else (recur (rest rem-args) result)))))
 
 (defn println-recur-spec
-  "This function generates basic specs for a library"
+  "This function generates basic specs for a library."
   [all-vars]
   (when
     (not (empty? all-vars))
@@ -213,7 +461,6 @@
       (println (pre-re-defn-spec (first all-vars)))
       (catch java.lang.ClassCastException e))
     (println-recur-spec (rest all-vars))))
-;; (println-recur-spec (vals (ns-publics 'clojure.core)))
 
 (defn println-recur-spec-babel
   "This function generates specs that include length used in
@@ -225,10 +472,61 @@
       (println (pre-re-defn-spec-babel (first all-vars)))
       (catch java.lang.ClassCastException e))
     (println-recur-spec-babel (rest all-vars))))
-;; (println-recur-spec-babel (vals (ns-publics 'clojure.core)))
+
+(defn println-recur-vector
+  "This function generates specs that include length used in
+  babel only."
+  [all-vars]
+    (loop [rem-args all-vars
+           normal "Normal Cases: \n"
+           macros "Macros and Special Cases: \n"
+           exceptions "Exceptions: \n"]
+      (cond
+        (empty? rem-args) [normal macros exceptions]
+        (check-types (first rem-args) "apply-persist")
+          (recur (rest rem-args)
+            normal
+            macros
+            (str exceptions (first rem-args) "\n"))
+        :else (if (or ((meta (first rem-args)) :macro)
+                      ((meta (first rem-args)) :special-form))
+                (recur (rest rem-args)
+                  normal
+                  (str macros (pre-re-defn (first rem-args)) "\n")
+                  exceptions)
+                (recur (rest rem-args)
+                  (str normal (pre-re-defn (first rem-args)) "\n")
+                  macros
+                  exceptions)))))
+
+(defn println-recur-spec-babel-vector
+  "This function generates specs that include length used in
+  babel only and puts them into a file h.txt."
+  [all-vars]
+    (loop [rem-args all-vars
+           normal "Normal Cases: \n"
+           macros "Macros and Special Cases: \n"
+           exceptions "Exceptions: \n"]
+      (cond
+        (empty? rem-args) (spit "h.txt" (apply str [normal macros exceptions]))
+        (check-types (first rem-args) "apply-persist")
+          (recur (rest rem-args)
+            normal
+            macros
+            (str exceptions (first rem-args) "\n"))
+        :else (if (or ((meta (first rem-args)) :macro)
+                      ((meta (first rem-args)) :special-form))
+                (recur (rest rem-args)
+                  normal
+                  (str macros (pre-re-defn-spec-babel (first rem-args)) "\n")
+                  exceptions)
+                (recur (rest rem-args)
+                  (str normal (pre-re-defn-spec-babel (first rem-args)) "\n")
+                  macros
+                  exceptions)))))
 
 (defn println-recur-criminals
-  "This function shows everything that could not be run in pre-re-defn"
+  "This function shows everything that could not be run in pre-re-defn."
   [all-vars]
   (when
     (not (empty? all-vars))
@@ -237,47 +535,3 @@
       (catch java.lang.ClassCastException e
           (println (first all-vars))))
     (println-recur-criminals (rest all-vars))))
-;; (println-recur-criminals (vals (ns-publics 'clojure.core)))
-
-
-;;probably depricated since spec, but below is slightly buggy code to automate the re defining of functions
-;;This should be deleted after I am certain it is no longer useful.
-;
-;;;adds argument counts to the hashmap being passed around, this is a helper function
-;;;for the old way of redefining functions
-;;;coll -> coll
-;(defn add-counts [coll]
-;  (let [cnt-key (fn [k coll] (count (filter #(= % k) coll)))]
-;    (loop [coll-keys (keys coll)
-;           coll-vals (vals coll)
-;           out {}]
-;      (if (empty? coll-keys)
-;          out
-;          (recur (rest coll-keys) (rest coll-vals)
-;             (assoc out (first coll-keys) (assoc (first coll-vals) :cnt-str (if (= 1 (cnt-key (first coll-keys) (keys coll))) "" (cnt-key (first coll-keys) coll-keys)))))))))
-;
-;;; string vector vector -> string
-;(defn gen-checks [unqualified-name data]
-;  (reduce #(str %1 (str unqualified-name "(check-if-" (:type %2) "? \"" unqualified-name "\" " (:argument %2) (:cnt-str %2))) "" data))
-;
-;;; string vector -> string
-;(defn single-re-defn [fname fnamespace arg-types only]
-;  (let [f (symbol fname)
-;        unqualified-name  (name f)
-;        qualified-name (str  fnamespace "/"  unqualified-name)
-;        arg-data (add-counts (clj->ourtypes arg-types))
-;	do-apply (if (not (empty? (first arg-types))) (re-matches #".*s$" (first (reverse arg-types))) nil)
-;        arg-str (apply str (interpose " " (map #(str (:arg-str %) (:cnt-str %)) arg-data)))
-;        checks (gen-checks fname arg-data)
-;	]
-;        ;(println "arg-vec: " arg-vec)
-;    (str "  " (if only "" "(") "[" arg-str "]"
-;	(if (= (count checks) 0) "" (str "\n    {:pre [" checks "]}"))
-;       "\n" (str "           ("(if do-apply "apply " "") qualified-name " [" arg-str "])")
-;       (if only "" ")"))))
-;;
-;;; takes a function name, and a vector of vectors of arguments
-;;; note: arguments DO NOT end in a question mark.
-;(defn re-defn [fvar & arglists]
-;   (str "(defn " (:name (meta fvar)) "\n  \"" (:doc (meta fvar)) "\""
-;       (reduce #(str %1 "\n" (single-re-defn (:name (meta fvar)) (:ns (meta fvar)) %2 (= 1 (count arglists)))) "" arglists) ")"))

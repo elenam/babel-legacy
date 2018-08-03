@@ -5,7 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.nrepl "0.2.13"]
-                 [expectations "2.2.0-rc3"]]
+                 [expectations "2.2.0-rc3"]
+                 [hiccup "1.0.5"]]
   :plugins [[lein-expectations "0.0.8"]]
   :repl-options {:nrepl-middleware
                  [babel.middleware/interceptor]
