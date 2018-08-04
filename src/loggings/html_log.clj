@@ -97,8 +97,8 @@
                function colorBlindMode() {
                  var x = document.getElementsByClassName(\"modifiedError\");
                  var y = document.getElementsByClassName(\"originalError\");
-                 var p = document.getElementById(\"modified\");
-                 var q = document.getElementById(\"original\");
+                 var p = document.getElementById(\"modifiedA\");
+                 var q = document.getElementById(\"originalA\");
                  if (document.getElementById(\"colorBlind\").checked == true) {
                    var i;
                    for (i = 0; i < x.length; i++) {
@@ -131,8 +131,8 @@
          [:p {:style "padding-left:5px"} "Display options:"]
           [:div
            [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
-           [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
-           [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a {:style "color:#D10101;padding-right:20px"} "original error"]]
+           [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a#modifiedA {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
+           [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a#originalA {:style "color:#D10101;padding-right:20px"} "original error"]]
            [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
            [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]]
         [:div#loadingError {:style "display:block"}
@@ -218,7 +218,7 @@
 ;;saves the content into the txt log file
 (defn save-log
   [inp-code total modified original]
-  (spit "./log/last_test.txt" (log-content inp-code total modified original) :append true))
+  (spit "./log/last_test.txt" (log-content inp-code total modified (subs original 1 (- (.length original) 1))) :append true))
 
 ;;read the exsiting txt log content
 ;;this is disabled because it is removed from the middleware
@@ -253,5 +253,5 @@
 
 ;;write html content
 (defn write-html
-  [inp-code total partial modified origitnal detail]
-  (spit (str "./log/history/" current-time ".html") (html-content inp-code total partial modified origitnal detail) :append true))
+  [inp-code total partial modified original detail]
+  (spit (str "./log/history/" current-time ".html") (html-content inp-code total partial modified (subs original 1 (- (.length original) 1)) detail) :append true))

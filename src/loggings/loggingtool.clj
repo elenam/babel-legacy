@@ -1,8 +1,7 @@
 (ns loggings.loggingtool
   (:require
    [expectations :refer :all]
-   [clojure.tools.nrepl :as repl]
-   [babel.processor :as processor])
+   [clojure.tools.nrepl :as repl])
   (:use
    [loggings.html-log]))
 
@@ -27,7 +26,13 @@
 (defn msgs-to-error
   "takes a list of messages and returns nil if no :err is present, or the first present :err value"
   [list-of-messages]
-  (:err (first (filter :err list-of-messages))))
+  (let [with-err (filter :err list-of-messages)]
+    (loop [totals with-err
+           errs []]
+        (if (= (first totals) nil)
+            errs
+            (recur (rest totals)
+                   (conj errs (:err (first totals))))))))
 
 ;;takes a string and return its error message if applied, also adds counter atom
 (defn record-error
@@ -35,18 +40,18 @@
   [inp-code]
   (swap! counter update-in [:total] inc)
   (swap! counter update-in [:partial] inc)
-  (msgs-to-error (trap-response inp-code)))
+  (first (msgs-to-error (trap-response inp-code))))
 
 
 ;;theses 4 funtions get specific error msg from repl
 (defn- get-modified-error
   [inp-code]
-  (msgs-to-error (trap-response inp-code)))
+  (first (msgs-to-error (trap-response inp-code))))
 
 ;;get original error msg by key
 (defn- get-original-error-by-key
   [key]
-  (:value (first (filter :value (trap-response (str "(" key " @babel.processor/recorder)"))))))
+  (:value (first (filter :value (trap-response (str "(first (" key " @babel.processor/recorder))"))))))
 
 (defn- get-original-error
   [inp-code]
@@ -55,6 +60,11 @@
 (defn- get-error-detail
   [inp-code]
   (get-original-error-by-key :detail))
+
+;;this function triggers the babel.processor/reset-recorder
+(defn- reset-recorder
+  []
+  (trap-response (str "(babel.processor/reset-recorder)")))
 
 ;;the execution funtion for the tests
 (defn get-error
@@ -68,6 +78,7 @@
           (:total @counter)
           (get-modified-error inp-code)
           (get-original-error inp-code))
+        (reset-recorder)
         (write-html
           inp-code
           (:total @counter)
@@ -75,7 +86,7 @@
           (get-modified-error inp-code)
           (get-original-error inp-code)
           (get-error-detail inp-code))
-        (processor/reset-recorder))
+        (reset-recorder))
         nil)
     (record-error inp-code)))
 
