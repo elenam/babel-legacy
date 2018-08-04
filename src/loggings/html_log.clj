@@ -218,7 +218,7 @@
 ;;saves the content into the txt log file
 (defn save-log
   [inp-code total modified original]
-  (spit "./log/last_test.txt" (log-content inp-code total modified original) :append true))
+  (spit "./log/last_test.txt" (log-content inp-code total modified (subs original 1 (- (.length original) 1))) :append true))
 
 ;;read the exsiting txt log content
 ;;this is disabled because it is removed from the middleware
@@ -253,5 +253,5 @@
 
 ;;write html content
 (defn write-html
-  [inp-code total partial modified origitnal detail]
-  (spit (str "./log/history/" current-time ".html") (html-content inp-code total partial modified origitnal detail) :append true))
+  [inp-code total partial modified original detail]
+  (spit (str "./log/history/" current-time ".html") (html-content inp-code total partial modified (subs original 1 (- (.length original) 1)) detail) :append true))
