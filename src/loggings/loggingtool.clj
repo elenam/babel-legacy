@@ -73,6 +73,7 @@
   (do
     (if (= (:log? @counter) true)
       (do
+        (reset-recorder)
         (save-log
           inp-code
           (:total @counter)
@@ -85,8 +86,7 @@
           (:partial @counter)
           (get-modified-error inp-code)
           (get-original-error inp-code)
-          (get-error-detail inp-code))
-        (reset-recorder))
+          (get-error-detail inp-code)))
         nil)
     (record-error inp-code)))
 
