@@ -201,6 +201,12 @@
       (swap! counter assoc :partial 1)
       (spit (str "./log/history/" current-time ".html") (log-division file-name) :append true)))
 
+;;show '\n' at the end of message
+(defn- show-newline
+  [message]
+  (if (clojure.string/includes? message "\n")
+    (clojure.string/replace message #"\n" "\\\\n")))
+
 ;;content that is going to be put into the log
 (defn- log-content
   [inp-code total modified original]
@@ -208,8 +214,8 @@
     (not= modified nil)
     (str "#" total ":\n\n"
          "code input: " inp-code "\n\n"
-         "modified error: " (clojure.string/trim-newline modified) "\n\n"
-         "original error: " (clojure.string/trim-newline original) "\n\n\n")
+         "modified error: " (show-newline modified) "\n\n"
+         "original error: " original "\n\n\n")
     (str "#" total ":\n\n"
          "code input: " inp-code "\n\n"
          "modified error: nil\n\n"
@@ -218,7 +224,12 @@
 ;;saves the content into the txt log file
 (defn save-log
   [inp-code total modified original]
-  (spit "./log/last_test.txt" (log-content inp-code total modified (subs original 1 (- (.length original) 1))) :append true))
+  (spit "./log/last_test.txt" (log-content
+                                inp-code
+                                total
+                                modified
+                                (subs original 1 (- (.length original) 1)))
+                                :append true))
 
 ;;read the exsiting txt log content
 ;;this is disabled because it is removed from the middleware
@@ -237,8 +248,8 @@
              [:p {:style "width:50%;float:left"} "#" partial ":<br />"]
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (clojure.string/trim-newline modified) "<br />"]
-           [:p {:class "originalError" :style "color:#D10101"} "original error: " (clojure.string/trim-newline original) "<br />"]
+           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (show-newline modified) "<br />"]
+           [:p {:class "originalError" :style "color:#D10101"} "original error: " original "<br />"]
            [:p {:class "errorDetail" :style "display:none"} "error detail: " detail "<br /><br />"]])
     (html [:div {:class "nilResult"}
            [:hr]
@@ -250,8 +261,14 @@
            [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]
            [:p {:class "errorDetail" :style "color:#808080;display:none"} "error detail: nil<br /><br />"]])))
 
-
 ;;write html content
 (defn write-html
   [inp-code total partial modified original detail]
-  (spit (str "./log/history/" current-time ".html") (html-content inp-code total partial modified (subs original 1 (- (.length original) 1)) detail) :append true))
+  (spit (str "./log/history/" current-time ".html") (html-content
+                                                      inp-code
+                                                      total
+                                                      partial
+                                                      modified
+                                                      (subs original 1 (- (.length original) 1))
+                                                      detail)
+                                                      :append true))
