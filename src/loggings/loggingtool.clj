@@ -54,11 +54,11 @@
   (:value (first (filter :value (trap-response (str "(first (" key " @babel.processor/recorder))"))))))
 
 (defn- get-original-error
-  [inp-code]
+  []
   (get-original-error-by-key :msg))
 
 (defn- get-error-detail
-  [inp-code]
+  []
   (get-original-error-by-key :detail))
 
 ;;this function triggers the babel.processor/reset-recorder
@@ -78,15 +78,15 @@
           inp-code
           (:total @counter)
           (get-modified-error inp-code)
-          (get-original-error inp-code))
+          (get-original-error))
         (reset-recorder)
         (write-html
           inp-code
           (:total @counter)
           (:partial @counter)
           (get-modified-error inp-code)
-          (get-original-error inp-code)
-          (get-error-detail inp-code)))
+          (get-original-error)
+          (get-error-detail)))
         nil)
     (record-error inp-code)))
 
