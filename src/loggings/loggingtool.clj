@@ -42,16 +42,23 @@
   (swap! counter update-in [:partial] inc)
   (first (msgs-to-error (trap-response inp-code))))
 
-
 ;;theses 4 funtions get specific error msg from repl
 (defn- get-modified-error
   [inp-code]
-  (first (msgs-to-error (trap-response inp-code))))
+  (let [errors (msgs-to-error (trap-response inp-code))]
+    (if (nil? (first errors))
+        nil
+        (loop [errs errors
+               coll ["<br />&nbsp;"]]
+            (if (nil? (first errs))
+              (clojure.string/join "<br />&nbsp;" coll)
+              (recur (rest errs)
+                     (conj coll (first errs))))))))
 
 ;;get original error msg by key
 (defn- get-original-error-by-key
   [key]
-  (:value (first (filter :value (trap-response (str "(first (" key " @babel.processor/recorder))"))))))
+  (:value (first (filter :value (trap-response (str "(" key " @babel.processor/recorder))"))))))
 
 (defn- get-original-error
   []
@@ -74,19 +81,21 @@
     (if (= (:log? @counter) true)
       (do
         (reset-recorder)
-        (save-log
-          inp-code
-          (:total @counter)
-          (get-modified-error inp-code)
-          (get-original-error))
-        (reset-recorder)
-        (write-html
-          inp-code
-          (:total @counter)
-          (:partial @counter)
-          (get-modified-error inp-code)
-          (get-original-error)
-          (get-error-detail)))
+        (let [modified (get-modified-error inp-code)
+              original (get-original-error)]
+          (do
+            (save-log
+              inp-code
+              (:total @counter)
+              modified
+              original)
+            (write-html
+              inp-code
+              (:total @counter)
+              (:partial @counter)
+              modified
+              original
+              (get-error-detail)))))
         nil)
     (record-error inp-code)))
 
