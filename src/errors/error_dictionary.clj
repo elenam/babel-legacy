@@ -238,7 +238,7 @@
     :class "ExceptionInfo"
     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
-    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args :(\\S*)\\] predicate: (\\S*)\\n")
+    :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args :(\\S*)\\] predicate: (\\S*)(\\s+)")
     ;:match #"(.*)(\n(.*))*(\n)?"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                            ", the " (arg-str (nth matches 3)) :arg
@@ -250,7 +250,7 @@
 
     {:key :exception-info-or-after-in-0
       :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
       :make-msg-info-obj (fn [matches] (make-msg-info-hashes "In function " (nth matches 2) :arg
                                                               ", the " (arg-str (nth matches 3)) :arg
                                                               " is expected to be a "  (?-name (nth matches 7)) :type
@@ -260,7 +260,7 @@
 
     {:key :exception-info-functions
       :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)\\n(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)(\\n(.*)(\\n)?)*In: \\[(\\d*)\\]")
       :make-msg-info-obj
       (fn [matches]
         (let [[print-type print-val] (type-and-val (nth matches 5))]
@@ -273,7 +273,7 @@
 
     {:key :exception-info-or-one-line-functions
       :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)\\n  (.*)/(.*)")
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: \\#(\\S*)\\[(\\S*) (\\S*) (\\S*)\\] fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)  (.*)/(.*)")
       :make-msg-info-obj
       (fn [matches]
         (let [[print-type print-val] (type-and-val (nth matches 5))]
@@ -298,7 +298,7 @@
 
     {:key :exception-info-or-one-line
       :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)\\n  (.*)/(.*)")
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)  (.*)/(.*)")
       :make-msg-info-obj (fn [matches]
         (let [[print-type print-val] (type-and-val (nth matches 4))]
            (make-msg-info-hashes "In function " (nth matches 2) :arg
