@@ -37,7 +37,7 @@
 (expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
 
 ;(expect "\n" (get-error ""))
-(expect "A function keyword can only take one or two arguments, but 3 were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
+(expect "A function keyword can only take one or two arguments, but three arguments were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
 
 ;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
@@ -76,7 +76,7 @@
 
 (expect "The function hello cannot be called with three arguments.\n" (get-error "(defn hello [x y] (* x y)) (hello 1 2 3)"))
 
-(expect "The function hello cannot be called with zero arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
+(expect "The function hello cannot be called with no arguments.\n" (get-error "(defn hello [x & xs] (* x 1)) (hello)"))
 
 ;; Should not use "Function" here, but ok for now
 (expect "This anonymous function cannot be called with one argument.\n" (get-error "(map #(+ %1 %2) [1 2 3])"))
@@ -134,7 +134,7 @@
 (expect "You cannot use nonsense/1 in this position.\n"
         (get-error "(require 'nonsense/1)"))
 
-#_(expect "The system was looking for a class clojure/string/stuff.class or a file clojure/string/stuff.clj, but neither one was found."
+(expect "The system was looking for a class clojure/string/stuff.class or a file clojure/string/stuff.clj, but neither one was found.\n"
         (get-error "(require '[clojure.string.stuff :as stuff])"))
 
 (expect "No value found for key 3. Every key for a hash-map must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
@@ -183,6 +183,9 @@
 
 (expect "denominator cannot take as few arguments as are currently in it, needs more arguments.\n" (get-error "(denominator)"))
 (expect "denominator cannot take as many arguments as are currently in it, needs fewer arguments.\n" (get-error "(denominator 1/3 3)"))
+
+(expect "In function require, the list/vector may only be followed by a keyword.\n" (get-error "(require '(clojure.java [io :as a :refer [ends-with?]] \"a\"))"))
+(expect "In function require, args must come in key value pairs.\n" (get-error "(require '(clojure.java [io :as a :refer [ends-with?] :rename] :reload))"))
 
 ;#################################################################
 ;############################## Nested errors ####################
