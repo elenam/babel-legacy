@@ -214,7 +214,7 @@
     (not= modified nil)
     (str "#" total ":\n\n"
          "code input: " inp-code "\n\n"
-         "modified error: " (show-newline modified) "\n\n"
+         "modified error: " (subs (show-newline modified) 24) "\n\n"
          "original error: " original "\n\n\n")
     (str "#" total ":\n\n"
          "code input: " inp-code "\n\n"
@@ -249,7 +249,7 @@
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
            [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (show-newline modified) "<br />"]
-           [:p {:class "originalError" :style "color:#D10101"} "original error: " original "<br />"]
+           [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />&nbsp;" original "<br />"]
            [:p {:class "errorDetail" :style "display:none"} "error detail: " detail "<br /><br />"]])
     (html [:div {:class "nilResult"}
            [:hr]
