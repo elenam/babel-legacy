@@ -187,6 +187,12 @@
 (expect "In function require, the list/vector may only be followed by a keyword.\n" (get-error "(require '(clojure.java [io :as a :refer [ends-with?]] \"a\"))"))
 (expect "In function require, args must come in key value pairs.\n" (get-error "(require '(clojure.java [io :as a :refer [ends-with?] :rename] :reload))"))
 
+(expect "In function require, the first argument is expected to be a list, but is a number 3 instead.\n" (get-error "(require 3)"))
+(expect "In function require, the first argument is expected to be a list, but is nil instead.\n" (get-error "(require nil)"))
+(expect "In function require, the first argument is expected to be a list, but is a string \"a\" instead.\n" (get-error "(require \"a\")"))
+(expect "In function require, the first argument is expected to be a list, but is a vector [3] instead.\n" (get-error "(require [3])"))
+(expect "In function require, the first argument is expected to be a list, but is a vector [3 2] instead.\n" (get-error "(require [3 2])"))
+
 ;#################################################################
 ;############################## Nested errors ####################
 ;#################################################################

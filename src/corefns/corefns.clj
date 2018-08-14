@@ -210,10 +210,3 @@
   :args (s/and ::b-length-greater-zero
                (s/cat :a symbol? :b (s/* (s/cat :a keyword? :b (s/* (s/nilable coll?)))))))
 (stest/instrument `clojure.core/refer)
-
-(s/fdef clojure.core/import
-  :args (s/and ::b-length-zero-or-greater
-               (s/cat :a (s/* (s/or :a symbol?
-                                    :b ::importlists
-                                    :c class?)))))
-(stest/instrument `clojure.core/import)
