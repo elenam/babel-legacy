@@ -347,6 +347,65 @@
                                                            print-val :arg
                                                            " instead.\n")))}
 
+    {:key :exception-info-extra-input-spec
+     :class "ExceptionInfo"
+     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails spec: (\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: \\(cat (.*) (.*)\\),  Extra input")
+     ;:match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                            " cannot take as many arguments as are currently in it, needs fewer arguments.\n"))}
+
+    {:key :exception-info-insufficient-input-spec
+     :class "ExceptionInfo"
+     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: (\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*),  Insufficient input")
+     ;:match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                            " cannot take as few arguments as are currently in it, needs more arguments.\n"))}
+
+    {:key :exception-info-extra-input-spec-no-spec
+     :class "ExceptionInfo"
+     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: \\((.*)\\),  Extra input")
+     ;:match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                            " cannot take as many arguments as are currently in it, needs fewer arguments.\n"))}
+
+    {:key :exception-info-insufficient-input-spec-no-spec
+     :class "ExceptionInfo"
+     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (.*),  Insufficient input")
+     ;:match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                            " cannot take as few arguments as are currently in it, needs more arguments.\n"))}
+
+    {:key :exception-info-insufficient-input-spec-map
+     :class "ExceptionInfo"
+     ;; Need to extract the function name from "Call to #'spec-ex.spec-inte/+ did not conform to spec"
+     ;:match #"(.*)/(.*) did not conform to spec(.*)" ; the data is in the data object, not in the message
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: (.*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (.*),  Insufficient input")
+     ;:match #"(.*)(\n(.*))*(\n)?"
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :arg
+                                                            " cannot take as few arguments as are currently in it, needs more arguments. This is most likely do to a map missing arguments.\n"))}
+
+   {:key :exception-info-other-spec-functions
+     :class "ExceptionInfo"
+     :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(.*)\\] val: (.*) fails spec: (.*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (.*)(\\s+)  (.*)/(.*)")
+     :make-msg-info-obj (fn [matches]
+       (let [[print-type print-val] (type-and-val (nth matches 4))]
+          (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                          ", the " (arg-str (subs (nth matches 3) 0 1)) :arg
+                                                          " is expected to be a "  (?-name (nth matches 7)) :type
+                                                          ", but is " print-type :type
+                                                          print-val :arg
+                                                          " instead.\n")))}
+
+
+
    ;#############################
    ;### Class Cast Exceptions ###
    ;#############################
@@ -655,6 +714,13 @@
     :class "RuntimeException"
     :match (beginandend "EOF while reading")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "End of file " (nth matches 1) :arg ".\n"))}
+
+    {:key :compiler-exception-no-such-var
+    :class "RuntimeException"
+    :match (beginandend "No such var: (\\S*)/(\\S*),")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 2) :args
+                                                           " is not a function in the " (nth matches 1) :args
+                                                           " library.\n"))}
 
     {:key :compiler-exception-end-of-file
     ;This error message needs to be improved

@@ -150,6 +150,9 @@
 #_(expect "IllegalState: trying to lock a transaction that is not running.\n" (get-error "(ensure b)"))
 (expect "IllegalState: I/0 in transaction.\n" (get-error "(dosync (io! (println \"h\")))"))
 
+(expect "a is not a function in the clojure.string library.\n" (get-error "(clojure.string/a 3)"))
+(expect "f is not a function in the clojure.string library.\n" (get-error "(clojure.string/f 3)"))
+
 ;##### Spec Testing #####
 
 ;; Note: spec-ed functions come out as anonymous at this point because the name refers to spec, not to the function. This will be fixed.
