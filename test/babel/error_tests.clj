@@ -1,6 +1,7 @@
 (ns babel.error-tests
   (:require
-   [expectations :refer :all])
+   [expectations :refer :all]
+   [corefns.instrumentfunctionsfortesting])
   (:use
    [loggings.loggingtool :only [get-error start-log add-log]]))
 
@@ -195,6 +196,16 @@
 (expect "In function require, the first argument is expected to be a list, but is a string \"a\" instead.\n" (get-error "(require \"a\")"))
 (expect "In function require, the first argument is expected to be a list, but is a vector [3] instead.\n" (get-error "(require [3])"))
 (expect "In function require, the first argument is expected to be a list, but is a vector [3 2] instead.\n" (get-error "(require [3 2])"))
+
+;#################################################################
+;############################## Specs Not From Core ##############
+;#################################################################
+
+(expect "In function query, the first argument is expected to be a string, but is a map {} instead.\n" (get-error "(clojure.java.jdbc/query {})"))
+(expect "In function query, the first argument is expected to be a string, but is a map {:a 3} instead.\n" (get-error "(clojure.java.jdbc/query {:a 3})"))
+(expect "update! cannot take as few arguments as are currently in it, needs more arguments. This is most likely do to a map missing arguments.\n" (get-error "(clojure.java.jdbc/update! \"a\" :a {:s 3})"))
+(expect "In function db-query-with-resultset, the second argument is expected to be a string, but is a number 3 instead.\n" (get-error "(clojure.java.jdbc/db-query-with-resultset \"a\" 3)"))
+(expect "In function get-by-id, the second argument is expected to be a keyword, but is a number 3 instead.\n" (get-error "(clojure.java.jdbc/get-by-id \"a\" 3)"))
 
 ;#################################################################
 ;############################## Nested errors ####################

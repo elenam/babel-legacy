@@ -3,7 +3,8 @@
              [clojure.spec.test.alpha :as stest]
              [errors.messageobj :as m-obj]
              [errors.prettify-exception :as p-exc]
-             [corefns.corefns :as cf]))
+             [corefns.corefns :as cf]
+             [corefns.instrumentfunctionsfortesting]))
 
 ;;an atom that record original error response
 (def recorder (atom {:msg [] :detail []}))
