@@ -296,44 +296,6 @@
                                                             print-val :arg
                                                             " instead.\n")))}
 
-    #_{:key :exception-info-general-seq
-      ;this works but is having some issues with its placement in the vector
-      ;with require
-      :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*\\s*)*(\\d*)\\](.*)In: \\[(\\d*)\\] val: (.*) fails spec: :(\\S*)/(\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)In: \\[(\\d*)\\]")
-      :make-msg-info-obj (fn [matches]
-        (let [[print-type print-val] (type-and-val (nth matches 7))]
-           (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           ", the " (arg-str (subs (nth matches 6) 0 1)) :arg
-                                                           " is expected to be a "  (?-name (nth matches 12)) :type
-                                                           ", but is " print-type :type
-                                                           print-val :arg
-                                                           " instead.\n")))}
-
-    #_{:key :exception-info-pred-function
-      ;this works but interacts a bit weirdly with some of the other errors
-      :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (.*) fails spec: :(\\S*)/(\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: \\((\\S+\\s*)+\\)")
-      :make-msg-info-obj (fn [matches]
-        (let [[print-type print-val] (type-and-val (nth matches 4))]
-           (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           ", the " (arg-str (nth matches 3)) :arg
-                                                           " is expected to comply with the spec function " (nth matches 6) :type
-                                                           ", but is " print-type :type
-                                                           print-val :arg
-                                                           " instead.\n")))}
-
-    {:key :exception-info-require-single-arg
-      :class "ExceptionInfo"
-      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails spec: :(\\S*)/(\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(.*)")
-      :make-msg-info-obj (fn [matches]
-        (let [[print-type print-val] (type-and-val (nth matches 4))]
-           (make-msg-info-hashes "In function " (nth matches 2) :arg
-                                                           ", the " (arg-str (nth matches 3)) :arg
-                                                           " is expected to be a "  (?-name (nth matches 9)) :type
-                                                           ", but is " print-type :type
-                                                           print-val :arg
-                                                           " instead.\n")))}
     {:key :exception-require-innervector
       :class "ExceptionInfo"
       :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*\\s*)*\\] val: (.*) fails spec: (\\S*)/innervector (.*) Insufficient input")
@@ -350,6 +312,29 @@
            (make-msg-info-hashes "In function " (nth matches 2) :arg
                                  ", the list/vector may only be followed by a keyword.\n")))}
 
+    {:key :exception-info-require-single-arg
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*)\\] val: (\\S*) fails spec: :(\\S*)/(\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)(In: \\[(\\d*)\\](.*))+(.*)")
+      :make-msg-info-obj (fn [matches]
+        (let [[print-type print-val] (type-and-val (nth matches 4))]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (nth matches 3)) :arg
+                                                           " is expected to be a "  (?-name (nth matches 9)) :type
+                                                           ", but is " print-type :type
+                                                           print-val :arg
+                                                           " instead.\n")))}
+
+    {:key :exception-info-general-seq
+      :class "ExceptionInfo"
+      :match (beginandend "Call to \\#'(.*)/(.*) did not conform to spec:\\nIn: \\[(\\d*\\s*)*(\\d*)\\](.*)In: \\[(\\d*)\\] val: (.*) fails spec: :(\\S*)/(\\S*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (\\S*)(\\s+)In: \\[(\\d*)\\]")
+      :make-msg-info-obj (fn [matches]
+        (let [[print-type print-val] (type-and-val (nth matches 7))]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (subs (nth matches 6) 0 1)) :arg
+                                                           " is expected to be a "  (?-name (nth matches 12)) :type
+                                                           ", but is " print-type :type
+                                                           print-val :arg
+                                                           " instead.\n")))}
 
     {:key :exception-info-require-seq
       :class "ExceptionInfo"
