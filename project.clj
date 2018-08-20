@@ -16,5 +16,6 @@
   :repl-options {:nrepl-middleware
                  [babel.middleware/interceptor]
                  :port 7888};)
+   :injections [(require 'corefns.corefns)]
    :main utilities.spec_generator)
    ;:main specfiletesting.core)

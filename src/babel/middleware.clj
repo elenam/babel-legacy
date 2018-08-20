@@ -1,6 +1,7 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
-            [clojure.tools.nrepl.middleware])
+            [clojure.tools.nrepl.middleware]
+            [corefns.corefns :as corefns])
   (:import clojure.tools.nrepl.transport.Transport))
 
 (defn interceptor
