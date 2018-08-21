@@ -45,7 +45,8 @@
 #_(s/def ::b-not-greater-str-count b-not-greater-count)
 
 (s/def ::bindings-seq2 (s/and vector? ::binding-seq))
-(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/nilable coll?)))
+(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/or :a (s/nilable coll?)
+                                                                               :b symbol?)))
 
 ;##### Specs #####
 (s/fdef clojure.core/+ ;inline issue
@@ -198,7 +199,8 @@
 
 (s/fdef clojure.core/require
   :args (s/and ::b-length-greater-zero
-               (s/+ (s/cat :a (s/or :a ::requirelist :b ::requirevector :c symbol? :d class?) :b (s/* keyword?)))))
+               (s/+ (s/cat :a (s/or :a ::requirelist :b ::requirevector :c symbol? :d class? :e keyword?) :b (s/* (s/or :a keyword?
+                                                                                                                        :b (s/nilable coll?)))))))
 (stest/instrument `clojure.core/require)
 
 (s/fdef clojure.core/use
