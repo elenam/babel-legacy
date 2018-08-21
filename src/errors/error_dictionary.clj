@@ -19,22 +19,27 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
     " must come in pairs, but one of them does not have a match.\n"))}
 
-    {:key :vector-expected-for-bindings
-     :class "ExceptionInfo"
-     :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
-     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, but " (nth matches 5) :arg " was given instead.\n"))}
+   {:key :vector-expected-for-bindings
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/bindings (.*) predicate: vector\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg " require a vector, but " (nth matches 5) :arg " was given instead.\n"))}
 
     {:key :binding-requires-a-pair
      :class "ExceptionInfo"
-     :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input")
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding(.*)predicate: any\?,  Insufficient input(.*):args \((.*)\[(.*)\](.*)\)}")
      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
-     " must be a pair, but only one element is given.\n"))}
+     " must be a pair, but only " (nth matches 7) :arg " is given.\n"))}
 
-     {:key :extra-input-for-a-binding
-      :class "ExceptionInfo"
-      :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding (.*)Extra input")
-      :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
-      " must be only one name and one value, but more parameters were given.\n"))}
+   {:key :binding-insufficient-input
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*):clojure.core.specs.alpha/binding(.*)\"Insufficient input\"")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) " required a binding but no binding was provided.\n"))}
+
+    {:key :extra-input-for-a-binding
+     :class "ExceptionInfo"
+     :match (beginandend #"Call to (.*)/(.*) did not conform to spec(.*):clojure\.core\.specs\.alpha/binding (.*)Extra input(.*):args \((.*)\[(.*)\](.*)\)}")
+     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 2) :arg
+     " must be only one name and one value, but "(nth matches 7) :arg " were given.\n"))}
 
    {:key :wrong-binding-name
     :class "ExceptionInfo"
@@ -68,14 +73,20 @@
     :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/arg-list (.*) predicate: vector\?")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but no vector was passed.\n"))}\
 
-  ;  {:key :insufficient-input
-  ;   :class "ExceptionInfo"
-  ;   :match (beginandend #"Call to (.*)/(.*) did not conform to spec:\n(.*) :reason Insufficient Input")
-  ;   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There was insuffieint input for a function call\n"))}\
+  {:key :vector-expected
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails at: (.*) predicate: vector\?")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " required a vector, but was given " (nth matches 5) :arg " instead.\n"))}
 
+  {:key :argument-expected-none-given
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)predicate:(.*)Insufficient input(.*) :value nil, :args nil")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "An argument for " (nth matches 2) :arg " was required but wasn't given.\n"))}
 
-
-
+   {:key :another-argument-expected
+    :class "ExceptionInfo"
+    :match (beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)predicate:(.*):arity-1 :clojure\.core\.specs\.alpha/args\+body :arity-n(.*)Insufficient input(.*):args \((.*)\)}")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Another argument for " (nth matches 2) :arg " was expected after " (nth matches 7) :arg ".\n"))}
 
    {:key :length-not-greater-zero
     :class "ExceptionInfo"
