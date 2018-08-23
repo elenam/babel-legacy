@@ -428,6 +428,30 @@
                                                           print-val :arg
                                                           " instead.\n")))}
 
+    {:key :exception-info-other-spec-map-predicate
+      :class "ExceptionInfo"
+      :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nIn: \\[(.*)\\] val: (.*) fails spec: (.*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: \\((.*)\\)(\\s+)")
+      :make-msg-info-obj (fn [matches]
+        (let [[print-type print-val] (type-and-val (nth matches 4))]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (subs (nth matches 3) 0 1)) :arg
+                                                           " is expected to be a "  (?-name (nth matches 7)) :type
+                                                           ", but is " print-type :type
+                                                           print-val :arg
+                                                           " instead.\n")))}
+
+    {:key :exception-info-other-spec-no-pound
+      :class "ExceptionInfo"
+      :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nIn: \\[(.*)\\] val: (.*) fails spec: (.*) at: \\[:args (:\\S*\\s)*\\:(\\S*)\\] predicate: (.*)(\\s+)\\#")
+      :make-msg-info-obj (fn [matches]
+        (let [[print-type print-val] (type-and-val (nth matches 4))]
+           (make-msg-info-hashes "In function " (nth matches 2) :arg
+                                                           ", the " (arg-str (subs (nth matches 3) 0 1)) :arg
+                                                           " is expected to be a "  (?-name (nth matches 7)) :type
+                                                           ", but is " print-type :type
+                                                           print-val :arg
+                                                           " instead.\n")))}
+
 
 
    ;#############################

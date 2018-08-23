@@ -173,6 +173,7 @@
 (expect "In function map, the second argument is expected to be a collection, but is a number 3 instead.\n" (get-error "(map even? 3)"))
 (expect "In function map, the 6th argument is expected to be a collection, but is a number 3 instead.\n" (get-error "(map even? [3] [3] [3] [3] 3)"))
 (expect "In function map, the first argument is expected to be a function, but is a number 3 instead.\n" (get-error "(map 3 [3])"))
+(expect "In function map, the first argument is expected to be a function, but is a number 3 instead.\n" (get-error "(map 3 3)"))
 (expect "In function denominator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(denominator 3)"))
 (expect "In function numerator, the first argument is expected to be a ratio, but is a number 3 instead.\n" (get-error "(numerator 3)"))
 (expect "In function map, the second argument is expected to be a collection, but is a regular expression pattern #\"h\" instead.\n" (get-error "(map [3 2 3 4 5] #\"h\")"))

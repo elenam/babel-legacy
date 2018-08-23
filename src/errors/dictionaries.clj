@@ -204,36 +204,32 @@
    the correct response."
   [failedvals failedlength]
   (if (not= "nil" failedvals)
-    (let [x (count (read-string failedvals))]
-      (cond
-        (= failedlength "b-length-one") (if (> x 1)
-                                            (str (number-word (str x)) " arguments")
-                                            (str "no arguments"))
-        (= failedlength "b-length-two") (if (> x 2)
-                                            (str (number-word (str x)) " arguments")
-                                            (str "one argument"))
-        (= failedlength "b-length-three") (if (> x 3)
-                                              (str (number-word (str x)) " arguments")
-                                              (if (= x 1)
-                                                (str "one argument")
-                                                (str (number-word (str x)) " arguments")))
-        (= failedlength "b-length-greater-zero") (str "no arguments")
-        (= failedlength "b-length-greater-one") (if (= x 1)
-                                                  (str "one argument")
-                                                  (str "no arguments"))
-        (= failedlength "b-length-greater-two") (if (= x 2)
-                                                 (str "two arguments")
-                                                 (if (= x 1)
-                                                  (str "one argument")
-                                                  (str "no arguments")))
-        (= failedlength "b-length-zero-or-one") (str (number-word (str x)) " arguments")
-        (= failedlength "b-length-two-or-three") (if (> x 3)
-                                              (str (number-word (str x)) " arguments")
-                                              (if (= x 1)
-                                                (str "one argument")
-                                                (str "no arguments")))
-        (= failedlength "b-length-zero-to-three") (str (number-word (str x)) " arguments")
-        :else failedlength))
+    (let [x (count (read-string failedvals))
+          y (keyword failedlength)
+          z ({:b-length-one (if (> x 1)
+                          (str (number-word (str x)) " arguments")
+                          "no arguments")
+               :b-length-two (if (> x 2)
+                          (str (number-word (str x)) " arguments")
+                          "one argument")
+               :b-length-three (if (= x 1)
+                            "one argument"
+                            (str (number-word (str x)) " arguments"))
+               :b-length-greater-zero "no arguments"
+               :b-length-greater-one (if (= x 1)
+                                  "one argument"
+                                  "no arguments")
+               :b-length-greater-two (if (= x 1)
+                                  "one argument"
+                                  "two arguments")
+               :b-length-zero-or-one (str (number-word (str x)) " arguments")
+               :b-length-two-or-three (if (= x 1)
+                                   "one argument"
+                                   (str (number-word (str x)) " arguments"))
+               :b-length-zero-to-three (str (number-word (str x)) " arguments")} y)]
+             (if (nil? z)
+                failedlength
+                z))
       "no arguments"))
 
 (defn ?-name
