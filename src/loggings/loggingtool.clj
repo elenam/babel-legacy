@@ -53,7 +53,7 @@
             (if (nil? (first errs))
               (clojure.string/join "<br />&nbsp;" coll)
               (recur (rest errs)
-                     (conj coll (first errs))))))))
+                     (conj coll (str "\"" (first errs) "\""))))))))
 
 ;;get original error msg by key
 (defn- get-original-error-by-key
