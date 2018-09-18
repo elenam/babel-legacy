@@ -24,4 +24,4 @@
    :injections [(require 'corefns.corefns)]
    :main babel.middleware
    :aot [babel.middleware]
-   :repositories [["Babel origin" "https://github.com/Clojure-Intro-Course/babel/releases"]])
+   :repositories [["Babel origin" "https://github.com/Clojure-Intro-Course/babel"]])
