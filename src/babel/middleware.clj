@@ -1,7 +1,8 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
             [clojure.tools.nrepl.middleware])
-  (:import clojure.tools.nrepl.transport.Transport))
+  (:import clojure.tools.nrepl.transport.Transport)
+  (:gen-class))
 
 (defn interceptor
   "applies processor/modify-errors to every response that emerges from the server"
