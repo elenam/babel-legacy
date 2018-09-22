@@ -2,7 +2,7 @@
  "scp" #(let [c (resolve 'org.apache.maven.wagon.providers.ssh.external.ScpExternalWagon)]
           (clojure.lang.Reflector/invokeConstructor c (into-array []))))
 
-(defproject babel "0.1.0-alpha"
+(defproject babel :lein-v
   :description "A proof of concept library to rewrite error messages."
   :url "https://github.com/Clojure-Intro-Course/babel"
   :license {:name "Eclipse Public License"
@@ -17,11 +17,17 @@
                  ;[ring "1.7.0-RC1"]
                  ;[javax.servlet/servlet-api "2.5"]
   :plugins [[lein-expectations "0.0.8"]
-            [org.apache.maven.wagon/wagon-ssh-external "2.6"]]
+            [org.apache.maven.wagon/wagon-ssh-external "2.6"]
+            [com.roomkey/lein-v "6.4.0"]]
   :repl-options {:nrepl-middleware
                  [babel.middleware/interceptor]
                  :port 7888};)
    :injections [(require 'corefns.corefns)]
    :main babel.middleware
    :aot [babel.middleware]
+   :release-tasks
+               [["vcs" "assert-committed"]
+                ["v" "update"] ;; compute new version & tag it
+                ["vcs" "push"]
+                ["deploy"]]
    :repositories [["Babel origin" "https://github.com/Clojure-Intro-Course/babel"]])
