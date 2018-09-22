@@ -2,7 +2,7 @@
  "scp" #(let [c (resolve 'org.apache.maven.wagon.providers.ssh.external.ScpExternalWagon)]
           (clojure.lang.Reflector/invokeConstructor c (into-array []))))
 
-(defproject babel :lein-v
+(defproject babel-middleware :lein-v
   :description "A proof of concept library to rewrite error messages."
   :url "https://github.com/Clojure-Intro-Course/babel"
   :license {:name "Eclipse Public License"
