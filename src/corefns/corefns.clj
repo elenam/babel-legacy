@@ -179,7 +179,7 @@
 
 (s/def ::innervector (s/cat :a symbol? :b (s/* (s/cat :a keyword :b (s/or :a symbol?
                                                                           :b (s/nilable coll?))))))
-(s/def ::requiredlist (s/or :a (s/cat :a symbol?)
+(s/def ::requiredlist (s/or :a (s/cat :a (s/* symbol?))
                             :b (s/cat :a symbol? :b (s/and vector? ::innervector))))
 (s/def ::requirelist (s/and list? ::requiredlist))
 (s/def ::requiredvector (s/or :a (s/cat :a symbol?)
