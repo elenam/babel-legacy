@@ -15,12 +15,10 @@ If installing the new code works in a blank project, you are ready to proceed.
 ### Marking A Release
 Assuming your new code is in a branch, make a final commit on that branch, then check out ``master``. Pull from upstream, and then merge in your branch, and commit the result.
 
-If you make any changes to files after the merge, you will have to recommit them. Once you have the code ready, run ``lein v release :keyword`` where keyword is one of the following. ``:major`` ,``:minor`` or ``:patch``. Other keyword options exist, such as adding ``-alpha`` to the keyword. The options are documented [here](https://github.com/roomkey/lein-v/blob/master/README.md#support-for-lein-release), and semantic versioning is documented [here](https://semver.org/).
+If you make any changes to files after the merge, you will have to recommit them. Once you have the code ready, run ``lein v release keyword`` where keyword is one of the following. ``:major`` ,``:minor`` or ``:patch``. Other keyword options exist, such as adding ``-alpha`` to the keyword. The options are documented [here](https://github.com/roomkey/lein-v/blob/master/README.md#support-for-lein-release), and semantic versioning is documented [here](https://semver.org/).
 
 Push to ``master``. I do not know how well this works in a pull request scenario.
 
 ### Deploying to Clojars
 After you have run the above, the code is marked and versioned in git, and is on github.
 To publish it to clojars, run ``lein deploy clojars`` with a clean working directory, on the commit that the previous step produced. Provide identification, and wait for the upload to complete. Verify the new version is up on the site, and optionally try replacing the test dependency in your test project with it.
-
- 
