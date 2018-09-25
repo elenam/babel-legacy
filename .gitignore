@@ -1,9 +1,12 @@
 /target
 /classes
 /checkouts
+/log
 *.jar
 *.class
 /.lein-*
+pom.xml
+pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
