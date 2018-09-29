@@ -485,7 +485,7 @@
     {:key :assoc-parity-error
     :class "IllegalArgumentException"
     :match (beginandend "assoc expects even number of arguments after map/vector, found odd number")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The arguments following the hashmap or vector in assoc must come in pairs, but one argument does not have a match.\n"))}
 
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "IllegalArgumentException"
@@ -498,7 +498,7 @@
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "No value found for key "
                                                            ; is this too wordy?
                                                            ;(nth matches 1) :arg ". Every key must be paired with a value; the value should be immediately following the key."))
-                                                           (nth matches 1) :arg ". Every key for a hash-map must be followed by a value.\n"))}
+                                                           (nth matches 1) :arg ". Every key for a hashmap must be followed by a value.\n"))}
 
     {:key :illegal-argument-vector-arg-to-map-conj
     :class "IllegalArgumentException"
@@ -520,12 +520,12 @@
     {:key :cant-call-nil
     :class "IllegalArgumentException"
     :match (beginandend "Can't call nil")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot call nil as a function.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot call nil as a function.\n"))}
 
     {:key :duplicate-key-hashmap
     :class "IllegalArgumentException"
     :match (beginandend "Duplicate key: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hash-map twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hashmap twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
 
     {:key :loop-req-vector
     :class "IllegalArgumentException"
@@ -560,12 +560,12 @@
     ;need to test
     :class "AssertionError"
     :match (beginandend "Assert failed: \\((\\S*) argument(\\S*)\\)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot assert on " (nth matches 2) ".\n"))} ; process-asserts-obj from dictionaries.clj
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot assert on " (nth matches 2) ".\n"))} ; process-asserts-obj from dictionaries.clj
 
    {:key :assertion-error-without-argument
     :class "AssertionError"
     :match (beginandend "Assert failed: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Cannot assert on " (nth matches 1) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot assert on " (nth matches 1) :arg ".\n"))}
 
 
     ;########################
@@ -678,7 +678,7 @@
     {:key :number-format-exception
     :class "NumberFormatException"
     :match (beginandend "Invalid number: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Invalid number: " (nth matches 1) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The format of the number " (nth matches 1) :arg " is invalid.\n"))}
 
     ;#####################################################################
     ;### Runtime Exceptions or clojure.lang.LispReader$ReaderException ###
@@ -723,7 +723,7 @@
     {:key :compiler-exception-map-literal-even
     :class "RuntimeException"
     :match (beginandend "Map literal must contain an even number of forms")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A hash map must consist of key/value pairs; you have a key that's missing a value.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A hashmap must consist of key/value pairs; you have a key that's missing a value.\n"))}
 
     #_{:key :compiler-exception-first-argument-must-be-symbol
     ;spec

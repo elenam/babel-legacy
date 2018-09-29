@@ -35,24 +35,24 @@
 (expect "Expected a number, but a string was given instead.\n" (get-error "(+ \"hello\" 3)"))
 ;(expect "Attempted to use a number, but a function was expected.\n" (get-error "(map 5 [3])"))
 
-(expect "The arguments following the map or vector in assoc must come in pairs, but one of them does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
+(expect "The arguments following the hashmap or vector in assoc must come in pairs, but one argument does not have a match.\n" (get-error "(assoc {} 1 \"hello\" 2)"))
 
 ;(expect "\n" (get-error ""))
 (expect "A function keyword can only take one or two arguments, but three arguments were passed to it.\n" (get-error "(keyword \"hello\" \"goodbye\" \"hello\")"))
 
 ;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
-(expect "No value found for key :2. Every key for a hash-map must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
+(expect "No value found for key :2. Every key for a hashmap must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
 
 (expect "The function symbol cannot take three arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
 
-(expect "Cannot call nil as a function.\n" (get-error "(nil)"))
+(expect "You cannot call nil as a function.\n" (get-error "(nil)"))
 
-(expect "You cannot use the same key in a hash-map twice, but you have duplicated the key 1.\n" (get-error "{1 1 1 1}"))
+(expect "You cannot use the same key in a hashmap twice, but you have duplicated the key 1.\n" (get-error "{1 1 1 1}"))
 
 (expect "Unexpected end of file, starting at line 1. Probably a non-closing parenthesis or bracket.\n" (get-error "(def elements-that-can-contain-simple-types #_=> #{:xs:attribute"))
 
-(expect "Invalid number: 1.2.2.\n" (get-error "(+ 1.2.2 0)"))
+(expect "The format of the number 1.2.2 is invalid.\n" (get-error "(+ 1.2.2 0)"))
 
 (expect "You cannot use / in this position.\n" (get-error "(/string \"abcd\")"))
 
@@ -71,7 +71,7 @@
 
 (expect "Name clojure.hello is undefined.\n" (get-error "(clojure.hello/union #{1 2 3} #{3 4})"))
 
-(expect "A hash map must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
+(expect "A hashmap must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
 
 (expect "The function hello cannot be called with one argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
 
@@ -138,7 +138,7 @@
 (expect "The system was looking for a class clojure/string/stuff.class or a file clojure/string/stuff.clj, but neither one was found.\n"
         (get-error "(require '[clojure.string.stuff :as stuff])"))
 
-(expect "No value found for key 3. Every key for a hash-map must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
+(expect "No value found for key 3. Every key for a hashmap must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
 
 ;; TO-DO: clean up function names
 ;; Note: this test runs correctly, but it redefines fn every time it runs.
