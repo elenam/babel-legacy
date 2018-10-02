@@ -1,7 +1,3 @@
-(cemerick.pomegranate.aether/register-wagon-factory!
- "scp" #(let [c (resolve 'org.apache.maven.wagon.providers.ssh.external.ScpExternalWagon)]
-          (clojure.lang.Reflector/invokeConstructor c (into-array []))))
-
 (defproject babel-middleware :lein-v
   :description "A proof of concept library to rewrite error messages."
   :url "https://github.com/Clojure-Intro-Course/babel"
@@ -26,8 +22,8 @@
    :main babel.middleware
    :aot [babel.middleware]
    :release-tasks
-               [["vcs" "assert-committed"]
-                ["v" "update"] ;; compute new version & tag it
-                ["vcs" "push"]
-                ["deploy"]]
-   :repositories [["Babel origin" "https://github.com/Clojure-Intro-Course/babel"]])
+        [["vcs" "assert-committed"]
+         ["v" "update"] ;; compute new version & tag it
+         ["vcs" "push"]
+         ["deploy"]])
+   
