@@ -25,4 +25,6 @@
         [["vcs" "assert-committed"]
          ["v" "update"] ;; compute new version & tag it
          ["vcs" "push"]
-         ["deploy" "clojars"]])
+         ["deploy"]]
+   :repositories [["release" {:url "https://clojars.org/babel-middleware"
+                              :creds :gpg}]])
