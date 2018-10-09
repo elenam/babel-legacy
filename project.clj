@@ -26,5 +26,4 @@
          ["v" "update"] ;; compute new version & tag it
          ["vcs" "push"]
          ["deploy"]]
-  :deploy-repositories [["releases" :clojars]
-                        ["snapshots" :clojars]])
+  :deploy-repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
