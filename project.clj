@@ -25,4 +25,6 @@
         [["vcs" "assert-committed"]
          ["v" "update"] ;; compute new version & tag it
          ["vcs" "push"]
-         ["deploy" "clojars"]])
+         ["deploy"]]
+  :deploy-repositories [["releases" :clojars]
+                        ["snapshots" :clojars]])
