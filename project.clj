@@ -26,5 +26,5 @@
          ["v" "update"] ;; compute new version & tag it
          ["vcs" "push"]
          ["deploy"]]
-   :repositories [["release" {:url "https://clojars.org/babel-middleware"
-                              :creds :gpg}]])
+   :repositories [["releases" {:url "https://clojars.org/babel-middleware"}
+                              :creds :gpg]])
