@@ -495,10 +495,10 @@
     {:key :illegal-argument-no-val-supplied-for-key
     :class "IllegalArgumentException"
     :match (beginandend "No value supplied for key: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "No value found for key "
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Every key for a hashmap must be followed by a value, but the key "
                                                            ; is this too wordy?
                                                            ;(nth matches 1) :arg ". Every key must be paired with a value; the value should be immediately following the key."))
-                                                           (nth matches 1) :arg ". Every key for a hashmap must be followed by a value.\n"))}
+                                                           (nth matches 1) :arg " does not have a matching value.\n"))}
 
     {:key :illegal-argument-vector-arg-to-map-conj
     :class "IllegalArgumentException"
@@ -525,7 +525,7 @@
     {:key :duplicate-key-hashmap
     :class "IllegalArgumentException"
     :match (beginandend "Duplicate key: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use the same key in a hashmap twice, but you have duplicated the key " (nth matches 1) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You have duplicated the key " (nth matches 1) :arg ", you cannot use the same key in a hashmap twice.\n"))}
 
     {:key :loop-req-vector
     :class "IllegalArgumentException"
@@ -535,7 +535,7 @@
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
     :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Mismatch between the number of arguments of outside function and recur: recur must take " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur expected " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
 
     {:key :illegal-input-stream
     :class "IllegalArgumentException"
@@ -659,7 +659,7 @@
     {:key :compiler-exception-must-recur-from-tail-position
     :class "UnsupportedOperationException"
     :match (beginandend "Can only recur from tail position")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur can only occur as a tail call: no operations can be done after its return.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur can only occur as a tail call: no operations can be done on its result.\n"))}
 
    ;##############################
    ;### ClassNotFoundException ###
@@ -698,7 +698,7 @@
     {:key :invalid-tolken-error
     :class "RuntimeException"
     :match (beginandend "Invalid token: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use " (clojure.string/replace (nth matches 1) #"^/.*|.*/$" "/") :arg " in this position.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " is an invalid token.\n"))}
 
     {:key :syntax-error-cant-specifiy-over-20-args
     :class "RuntimeException"
@@ -723,7 +723,7 @@
     {:key :compiler-exception-map-literal-even
     :class "RuntimeException"
     :match (beginandend "Map literal must contain an even number of forms")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "A hashmap must consist of key/value pairs; you have a key that's missing a value.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You have a key that's missing a value; a hashmap must consist of key/value pairs.\n"))}
 
     #_{:key :compiler-exception-first-argument-must-be-symbol
     ;spec

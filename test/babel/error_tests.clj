@@ -42,19 +42,19 @@
 
 ;(expect "Vectors added to a map must consist of two elements: a key and a value.\n" (get-error "(conj {} [1 1 1])"))
 
-(expect "No value found for key :2. Every key for a hashmap must be followed by a value.\n" (get-error "(hash-map :1 1, :2)"))
+(expect "Every key for a hashmap must be followed by a value, but the key :2 does not have a matching value.\n" (get-error "(hash-map :1 1, :2)"))
 
 (expect "The function symbol cannot take three arguments.\n" (get-error "(symbol \"hello\" \"goodbye\" \"hello\")"))
 
 (expect "You cannot call nil as a function.\n" (get-error "(nil)"))
 
-(expect "You cannot use the same key in a hashmap twice, but you have duplicated the key 1.\n" (get-error "{1 1 1 1}"))
+(expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice.\n" (get-error "{1 1 1 1}"))
 
 (expect "Unexpected end of file, starting at line 1. Probably a non-closing parenthesis or bracket.\n" (get-error "(def elements-that-can-contain-simple-types #_=> #{:xs:attribute"))
 
 (expect "The format of the number 1.2.2 is invalid.\n" (get-error "(+ 1.2.2 0)"))
 
-(expect "You cannot use / in this position.\n" (get-error "(/string \"abcd\")"))
+(expect "/string is an invalid token.\n" (get-error "(/string \"abcd\")"))
 
 (expect "Parameters for cond must come in pairs, but one of them does not have a match.\n" (get-error "(cond (seq? [1 2]) 5 (seq? [1 3]))"))
 (expect "Parameters for loop must come in pairs, but one of them does not have a match.\n" (get-error "(defn s [s] (loop [s]))"))
@@ -71,7 +71,7 @@
 
 (expect "Name clojure.hello is undefined.\n" (get-error "(clojure.hello/union #{1 2 3} #{3 4})"))
 
-(expect "A hashmap must consist of key/value pairs; you have a key that's missing a value.\n" (get-error "{:body {(str \"hello\")}}"))
+(expect "You have a key that's missing a value; a hashmap must consist of key/value pairs.\n" (get-error "{:body {(str \"hello\")}}"))
 
 (expect "The function hello cannot be called with one argument.\n" (get-error "(defn hello [x y] (* x y)) (hello 1)"))
 
@@ -88,9 +88,9 @@
 
 (expect "Loop requires a vector for its binding.\n" (get-error "(loop x 5 (+ x 5))"))
 
-(expect "Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
+(expect "Recur expected one argument but was given two arguments.\n" (get-error "(defn reduce-to-zero [x] (if (= x 0) x (recur reduce-to-zero (- x 1))))"))
 
-(expect "Mismatch between the number of arguments of outside function and recur: recur must take one argument but was given two arguments.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
+(expect "Recur expected one argument but was given two arguments.\n" (get-error "(loop [x 5] (if (< x 1) \"hi\" (recur (dec x) (print x))))"))
 
 (expect "Expected a number, but a string was given instead.\n" (get-error "(map #(+ % \"a\") [3])"))
 
@@ -100,7 +100,7 @@
 
 (expect "You are not using if correctly.\n" (get-error "if"))
 
-(expect "Recur can only occur as a tail call: no operations can be done after its return.\n" (get-error "(loop [x 5] (recur x)(recur x))"))
+(expect "Recur can only occur as a tail call: no operations can be done on its result.\n" (get-error "(loop [x 5] (recur x)(recur x))"))
 
 ;(expect "Variable name was expected but 5 was used instead.\n" (get-error "(loop [5 y])"))
 
@@ -132,13 +132,13 @@
 (expect "The system was looking for a class nonsense/1/2.class or a file nonsense/1/2.clj, but neither one was found.\n"
         (get-error "(require 'nonsense.1.2)"))
 
-(expect "You cannot use nonsense/1 in this position.\n"
+(expect "nonsense/1 is an invalid token.\n"
         (get-error "(require 'nonsense/1)"))
 
 (expect "The system was looking for a class clojure/string/stuff.class or a file clojure/string/stuff.clj, but neither one was found.\n"
         (get-error "(require '[clojure.string.stuff :as stuff])"))
 
-(expect "No value found for key 3. Every key for a hashmap must be followed by a value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
+(expect "Every key for a hashmap must be followed by a value, but the key 3 does not have a matching value.\n" (get-error "(map #(slurp \"usethistext.txt\" %) [3])"))
 
 ;; TO-DO: clean up function names
 ;; Note: this test runs correctly, but it redefines fn every time it runs.
