@@ -9,7 +9,8 @@ Paper describing its use and development availible [here](https://github.com/Clo
 ## Usage
 Adjust your project.clj as follows, and ensure you are running clojure 1.9.0 or later.
 ```
-:dependencies [[babel-middleware "0.1.3-alpha"]]
+:dependencies [[clojure "1.9.0"]
+               [babel-middleware "0.1.3-alpha"]]
 :repl-options {:nrepl-middleware
               [babel.middleware/interceptor]}
 ```            
@@ -23,7 +24,6 @@ See details at [logging manual](/doc/logging.md).
 
 ## License
 
-Copyright © 2018 FIXME
+Copyright © 2018
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the MIT license
