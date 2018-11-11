@@ -76,7 +76,7 @@
         rest (apply str (drop 2 matches))]
     [e-class1 rest]))
 
-(defn process-spec-errors
+(defn process-errors
   "Takes a message from an exception as a string and returns a message object,
   to be displayed by the repl or IDE"
   [ex-str]
@@ -88,6 +88,34 @@
         msg-info-obj (msg-from-matched-entry entry message)]
     {:exception-class e-class
      :msg-info-obj  msg-info-obj}))
+
+(defn process-length
+  [ex-str]
+  (let [normal (re-matches #"b-length(\d+)\?" ex-str)
+        greater (re-matches #"b-length-greater(\d+)\?" ex-str)
+        greatereq (re-matches #"b-length-(\d+)greater\?" ex-str)
+        to (re-matches #"b-length(\d+)-to-(\d+)\?" ex-str)]
+        (if normal
+            (str (number-word (first (rest normal))) " argument")
+            (if greater
+                (str (number-word (str (+ 1 (read-string (first (rest greater)))))) " or more arguments")
+                (if greatereq
+                    (str (number-word (first (rest greatereq))) " or more arguments")
+                    (if to
+                      (str (number-word (first (rest to))) " to " (number-word (first (rest (rest to)))) " arguments")
+                      " no babel length data found"))))))
+
+(defn process-spec-errors
+  "Takes the message and data from a spec error and returns a modified message"
+  [ex-str data]
+  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*):" ex-str)))))
+        location (first (:in data))
+        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred data)))))
+        wrongval (:val data)
+        via (first (:via data))]
+  (if (nil? (re-matches #"b-length(.*)" shouldbe))
+      (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type (str wrongval)) wrongval " instead.\n")
+      (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
 
 ;#########################################
 ;############ Location format  ###########

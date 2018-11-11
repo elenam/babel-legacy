@@ -23,8 +23,10 @@
 
              (let [err (get-error (:session inp-message))]
                 (if (= "class clojure.lang.ExceptionInfo" (str (class err)))
-                   (first (:clojure.spec.alpha/problems (.getData err)))
-                   (m-obj/get-all-text (:msg-info-obj (p-exc/process-spec-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))))))
+                   ;;(:val (first (:clojure.spec.alpha/problems (.getData err))))
+                   ;;(second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*):" (str (.getMessage err)))))))
+                   (p-exc/process-spec-errors (str (.getMessage err)) (first (:clojure.spec.alpha/problems (.getData err))))
+                   (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))))))
       inp-message))
 
 (println "babel.processor loaded")
