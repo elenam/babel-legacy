@@ -36,8 +36,8 @@
   "takes a session number, and returns the adjusted message as a string."
   [err]
   (if (= "class clojure.lang.ExceptionInfo" (str (class err)))
-      (p-exc/process-spec-errors (str (.getMessage err)) (first (:clojure.spec.alpha/problems (.getData err))))
-      (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err)))))))
+      (str (p-exc/process-spec-errors (str (.getMessage err)) (first (:clojure.spec.alpha/problems (.getData err)))) (.getStackTrace err) ".\n")
+      (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))) (.getStackTrace err) ".\n")))
 
 (defn modify-errors [inp-message]
   (if (contains? inp-message :err)
