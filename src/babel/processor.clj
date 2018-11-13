@@ -32,8 +32,8 @@
         #(get % 'sessions))
    (ns-interns `clojure.tools.nrepl.middleware.session)))
 
-(defn proccess-message
-  "takes a session number, and returns the adjusted message as astring."
+(defn process-message
+  "takes a session number, and returns the adjusted message as a string."
   [err]
   (if (= "class clojure.lang.ExceptionInfo" (str (class err)))
       (p-exc/process-spec-errors (str (.getMessage err)) (first (:clojure.spec.alpha/problems (.getData err))))
@@ -42,15 +42,12 @@
 (defn modify-errors [inp-message]
   (if (contains? inp-message :err)
       (assoc inp-message :err
-             ;;Anything inside this s-expression that can be bencoded will be returned as the new error message
-             ;;You need  to call (get-error (:session inp-message)) in order to recieve the error object,
-             ;; but after that, the parser can do anything that produces a string to it.
              (let [err (get-error (:session inp-message))
-                   proccessed-error (proccess-message err)]
+                   processed-error (process-message err)]
                   (do
-                    (update-recorder-detail proccessed-error)
+                    (update-recorder-detail processed-error)
                     (update-recorder-msg (str err))
-                    proccessed-error)))
+                    processed-error)))
 
       inp-message))
 
