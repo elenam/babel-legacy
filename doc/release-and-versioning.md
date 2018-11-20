@@ -1,5 +1,7 @@
 # Release and Versioning
 
+**This document is now out of date, and needs to be updated.**
+ 
 Babel has been deployed to clojars, and has been set up to make use of lein-v to
 streamline releases. This file contains instructions on how to update, version and otherwise publish babel.
 This information is derived from [here](https://github.com/roomkey/lein-v#support-for-lein-release).
