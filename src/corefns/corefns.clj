@@ -197,18 +197,18 @@
                                         :b symbol?
                                         :c class?))))
 
-(s/fdef clojure.core/require
+#_(s/fdef clojure.core/require
   :args (s/and ::b-length-greater-zero
                (s/+ (s/cat :a (s/or :a ::requirelist :b ::requirevector :c symbol? :d class? :e keyword?) :b (s/* (s/or :a keyword?
                                                                                                                         :b (s/nilable coll?)))))))
-(stest/instrument `clojure.core/require)
+#_(stest/instrument `clojure.core/require)
 
-(s/fdef clojure.core/use
+#_(s/fdef clojure.core/use
   :args (s/and ::b-length-greater-zero
                (s/cat :a (s/+ (s/or :a ::requirelist :b ::requirevector :c symbol? :d class?)) :b (s/* keyword?))))
-(stest/instrument `clojure.core/use)
+#_(stest/instrument `clojure.core/use)
 
-(s/fdef clojure.core/refer
+#_(s/fdef clojure.core/refer
   :args (s/and ::b-length-greater-zero
                (s/cat :a symbol? :b (s/* (s/cat :a keyword? :b (s/* (s/nilable coll?)))))))
-(stest/instrument `clojure.core/refer)
+#_(stest/instrument `clojure.core/refer)
