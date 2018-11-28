@@ -1,4 +1,4 @@
-(defproject babel-middleware "0.1.4-alpha"
+(defproject babel-middleware "0.1.5-alpha"
   :description "A proof of concept library to rewrite error messages."
   :url "https://github.com/Clojure-Intro-Course/babel"
   :license {:name "Eclipse Public License"
