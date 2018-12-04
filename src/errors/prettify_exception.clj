@@ -108,7 +108,7 @@
 (defn process-spec-errors
   "Takes the message and data from a spec error and returns a modified message"
   [ex-str data]
-  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*):" ex-str)))))
+  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*)" ex-str)))))
         location (first (:in data))
         shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred data)))))
         wrongval (:val data)
