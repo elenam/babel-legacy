@@ -118,10 +118,11 @@
         location (first (:in data))
         shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred data)))))
         wrongval (:val data)
-        via (first (:via data))]
+        via (first (:via data))
+        wrongvaltype (str/replace (str (type wrongval)) #"class " "")]
   (if (nil? (re-matches #"b-length(.*)" shouldbe))
       (if (nil? (re-matches #"b-(.*)" shouldbe))
-          (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type (str wrongval)) wrongval " instead.\n")
+          (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.\n")
           (str (process-another functname (arg-str location) shouldbe)))
       (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
 
