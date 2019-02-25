@@ -126,6 +126,15 @@
           (str (process-another functname (arg-str location) shouldbe)))
       (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
 
+(defn process-macro-errors
+  "Takes the message and data from a macro error and returns a modified message"
+  [cause data]
+  (let [errmsginfo (first (re-seq #"(\S*):(\s)(.*)" cause))
+        errclass (first (rest errmsginfo))
+        errmsg (last errmsginfo)
+        processederr (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg))))]
+        (str processederr "Line: " (:clojure.error/line data) " Column: " (:clojure.error/column data) "\nIn: " (:clojure.error/source data) "\n")))
+
 ;#########################################
 ;############ Location format  ###########
 ;#########################################
