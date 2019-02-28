@@ -35,11 +35,13 @@
 (defn process-message
   "takes a session number, and returns the adjusted message as a string."
   [err]
-  (if (= "class clojure.lang.ExceptionInfo" (str (class err)))
+  (if (and (= "class clojure.lang.ExceptionInfo" (str (class err))) (= (count (:via (Throwable->map err))) 1))
       (str (p-exc/process-spec-errors (str (.getMessage err)) (.getData err) true))
       (if (= "class clojure.lang.Compiler$CompilerException" (str (class err)))
         (str (p-exc/process-macro-errors err (str (.getCause err)) (ex-data err)))
-        (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))) (p-exc/process-stacktrace err)))))
+        (if (and (= "class clojure.lang.ExceptionInfo" (str (class err))) (> (count (:via (Throwable->map err))) 1))
+          (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (:message (second (:via (Throwable->map err)))))))) (p-exc/process-stacktrace err))
+          (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))) (p-exc/process-stacktrace err))))))
 
 (defn modify-errors [inp-message]
   (if (contains? inp-message :err)
