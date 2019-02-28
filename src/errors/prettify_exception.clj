@@ -128,12 +128,18 @@
 
 (defn process-macro-errors
   "Takes the message and data from a macro error and returns a modified message"
-  [cause data]
-  (let [errmsginfo (first (re-seq #"(\S*):(\s)(.*)" cause))
-        errclass (first (rest errmsginfo))
-        errmsg (last errmsginfo)
-        processederr (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg))))]
-        (str processederr "Line: " (:clojure.error/line data) " Column: " (:clojure.error/column data) "\nIn: " (:clojure.error/source data) "\n")))
+  [err cause data]
+  (let [errmap (Throwable->map err)
+        specerrdata (:data errmap)
+        seconderr (second (:via errmap))
+        errmsg (:message seconderr)
+        errclass (:type seconderr)
+        linenumber (str "Line: " (:clojure.error/line data))
+        columnnumber (str " Column: " (:clojure.error/column data))
+        sourcefile (str "\nIn: " (:clojure.error/source data) "\n")]
+        (if (nil? specerrdata)
+          (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
+          (str (process-spec-errors errmsg (first (:clojure.spec.alpha/problems specerrdata))) linenumber columnnumber sourcefile))))
 
 ;#########################################
 ;############ Location format  ###########
