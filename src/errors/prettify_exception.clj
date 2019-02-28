@@ -156,7 +156,7 @@
   "Takes an error and returns the location of the error"
   [err]
   (let [errtrace (:trace (Throwable->map err))
-        invokestatic (first (filter #(= (str (first (rest %))) "invokeStatic") errtrace))
+        invokestatic (first (filter #(and (= (str (first (rest %))) "invokeStatic") (nil? (re-seq #"clojure.core(.*)" (str (first %))))) errtrace))
         linenumber (str "Line: " (last invokestatic))
         sourcefile (str "\nIn: " (first (rest (rest invokestatic))) "\n")]
         (str linenumber sourcefile)
