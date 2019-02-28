@@ -35,13 +35,33 @@
 (defn process-message
   "takes a session number, and returns the adjusted message as a string."
   [err]
-  (if (and (= "class clojure.lang.ExceptionInfo" (str (class err))) (= (count (:via (Throwable->map err))) 1))
-      (str (p-exc/process-spec-errors (str (.getMessage err)) (.getData err) true))
-      (if (= "class clojure.lang.Compiler$CompilerException" (str (class err)))
-        (str (p-exc/process-macro-errors err (str (.getCause err)) (ex-data err)))
-        (if (and (= "class clojure.lang.ExceptionInfo" (str (class err))) (> (count (:via (Throwable->map err))) 1))
-          (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (:message (second (:via (Throwable->map err)))))))) (p-exc/process-stacktrace err))
-          (str (m-obj/get-all-text (:msg-info-obj (p-exc/process-errors (str (clojure.string/replace (str (class err)) #"class " "") " " (.getMessage err))))) (p-exc/process-stacktrace err))))))
+  (let [errmap (Throwable->map err)
+        throwvia (:via errmap)
+        viacount (count throwvia)
+        errclass (str (:type (first throwvia)))
+        errdata (:data errmap)]
+    (if (and (= "clojure.lang.ExceptionInfo" errclass) (= viacount 1))
+        (p-exc/process-spec-errors (str (.getMessage err)) errdata true)
+        (if (= "clojure.lang.Compiler$CompilerException" errclass)
+          (p-exc/process-macro-errors err errclass (ex-data err))
+          (if (and (= "clojure.lang.ExceptionInfo" errclass) (> viacount 1))
+            (str 
+              (->> throwvia
+                   second
+                   :message
+                   (str errclass " ")
+                   p-exc/process-errors
+                   :msg-info-obj
+                   m-obj/get-all-text)
+              (p-exc/process-stacktrace err))
+            (str 
+              (->> err
+                   .getMessage
+                   (str errclass " ")
+                   p-exc/process-errors
+                   :msg-info-obj
+                   m-obj/get-all-text)
+              (p-exc/process-stacktrace err)))))))
 
 (defn modify-errors [inp-message]
   (if (contains? inp-message :err)
