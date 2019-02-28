@@ -152,6 +152,16 @@
           (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
           (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile))))
 
+(defn process-stacktrace
+  "Takes an error and returns the location of the error"
+  [err]
+  (let [errtrace (:trace (Throwable->map err))
+        invokestatic (first (filter #(= (str (first (rest %))) "invokeStatic") errtrace))
+        linenumber (str "Line: " (last invokestatic))
+        sourcefile (str "\nIn: " (first (rest (rest invokestatic))) "\n")]
+        (str linenumber sourcefile)
+    ))
+
 ;#########################################
 ;############ Location format  ###########
 ;#########################################
