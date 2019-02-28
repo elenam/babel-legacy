@@ -111,20 +111,31 @@
        (if not-zero
            (str "In function " functname ", the " location " cannot be the 0.\n"))))
 
-(defn process-spec-errors
+(defn create-spec-errors
   "Takes the message and data from a spec error and returns a modified message"
   [ex-str data]
   (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*)" ex-str)))))
-        location (first (:in data))
-        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred data)))))
-        wrongval (:val data)
-        via (first (:via data))
+        functdata (first (:clojure.spec.alpha/problems data))
+        location (first (:in functdata))
+        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred functdata)))))
+        wrongval (:val functdata)
+        via (first (:via functdata))
         wrongvaltype (str/replace (str (type wrongval)) #"class " "")]
   (if (nil? (re-matches #"b-length(.*)" shouldbe))
       (if (nil? (re-matches #"b-(.*)" shouldbe))
           (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.\n")
           (str (process-another functname (arg-str location) shouldbe)))
       (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
+
+(defn process-spec-errors
+  "Processes spec errors according to if they are a macro or not"
+  [ex-str data notmacro]
+  (let [locationdata (:clojure.spec.test.alpha/caller data)
+        linenumber (str "Line: " (:line locationdata))
+        sourcefile (str "\nIn: " (:file locationdata) "\n")]
+  (if notmacro
+    (str (create-spec-errors ex-str data) linenumber sourcefile)
+    (str (create-spec-errors ex-str data)))))
 
 (defn process-macro-errors
   "Takes the message and data from a macro error and returns a modified message"
@@ -139,7 +150,7 @@
         sourcefile (str "\nIn: " (:clojure.error/source data) "\n")]
         (if (nil? specerrdata)
           (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
-          (str (process-spec-errors errmsg (first (:clojure.spec.alpha/problems specerrdata))) linenumber columnnumber sourcefile))))
+          (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile))))
 
 ;#########################################
 ;############ Location format  ###########
