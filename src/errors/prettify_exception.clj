@@ -111,20 +111,56 @@
        (if not-zero
            (str "In function " functname ", the " location " cannot be the 0.\n"))))
 
-(defn process-spec-errors
+(defn create-spec-errors
   "Takes the message and data from a spec error and returns a modified message"
   [ex-str data]
-  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*):" ex-str)))))
-        location (first (:in data))
-        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred data)))))
-        wrongval (:val data)
-        via (first (:via data))
+  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*)" ex-str)))))
+        functdata (first (:clojure.spec.alpha/problems data))
+        location (first (:in functdata))
+        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred functdata)))))
+        wrongval (:val functdata)
+        via (first (:via functdata))
         wrongvaltype (str/replace (str (type wrongval)) #"class " "")]
   (if (nil? (re-matches #"b-length(.*)" shouldbe))
       (if (nil? (re-matches #"b-(.*)" shouldbe))
           (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.\n")
           (str (process-another functname (arg-str location) shouldbe)))
       (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
+
+(defn process-spec-errors
+  "Processes spec errors according to if they are a macro or not"
+  [ex-str data notmacro]
+  (let [locationdata (:clojure.spec.test.alpha/caller data)
+        linenumber (str "Line: " (:line locationdata))
+        sourcefile (str "\nIn: " (:file locationdata) "\n")]
+  (if notmacro
+    (str (create-spec-errors ex-str data) linenumber sourcefile)
+    (str (create-spec-errors ex-str data)))))
+
+(defn process-macro-errors
+  "Takes the message and data from a macro error and returns a modified message"
+  [err cause data]
+  (let [errmap (Throwable->map err)
+        specerrdata (:data errmap)
+        seconderr (second (:via errmap))
+        errmsg (:message seconderr)
+        errclass (:type seconderr)
+        linenumber (str "Line: " (:clojure.error/line data))
+        columnnumber (str " Column: " (:clojure.error/column data))
+        sourcefile (str "\nIn: " (:clojure.error/source data) "\n")]
+        (if (nil? specerrdata)
+          (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
+          (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile))))
+
+(defn process-stacktrace
+  "Takes an error and returns the location of the error"
+  [err]
+  (let [errtrace (:trace (Throwable->map err))
+        invokestatic (first (filter #(and (= (str (first (rest %))) "invokeStatic") (nil? (re-seq #"clojure.core(.*)" (str (first %))))) errtrace))
+        linenumber (str "Line: " (last invokestatic))
+        sourcefile (str "\nIn: " (first (rest (rest invokestatic))) "\n")]
+        (str linenumber sourcefile)
+    ))
 
 ;#########################################
 ;############ Location format  ###########
