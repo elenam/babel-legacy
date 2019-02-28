@@ -152,15 +152,17 @@
           (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
           (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile))))
 
+(def ignored-ns {:clojure.core "clojure.core"
+                 :clojure.string "clojure.string"})
+
 (defn process-stacktrace
   "Takes an error and returns the location of the error"
   [err]
   (let [errtrace (:trace (Throwable->map err))
-        invokestatic (first (filter #(and (= (str (first (rest %))) "invokeStatic") (nil? (re-seq #"clojure.core(.*)" (str (first %))))) errtrace))
+        invokestatic (first (filter #(and (= (str (first (rest %))) "invokeStatic") (and (not (nil? (re-seq #"(\S*)\$(\S*)" (str (first %))))) (nil? (ignored-ns (keyword (second (first (re-seq #"(\S*)\$(\S*)" (str (first %)))))))))) errtrace))
         linenumber (str "Line: " (last invokestatic))
         sourcefile (str "\nIn: " (first (rest (rest invokestatic))) "\n")]
-        (str linenumber sourcefile)
-    ))
+        (str linenumber sourcefile)))
 
 ;#########################################
 ;############ Location format  ###########
