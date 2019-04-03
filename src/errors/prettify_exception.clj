@@ -109,7 +109,7 @@
   [functname location ex-str]
   (let [not-zero (re-matches #"b-not-0\?" ex-str)]
        (if not-zero
-           (str "In function " functname ", the " location " cannot be the 0.\n"))))
+           (str "In function " functname ", the " location " cannot be 0.\n"))))
 
 (defn create-spec-errors
   "Takes the message and data from a spec error and returns a modified message"
@@ -125,7 +125,7 @@
       (if (nil? (re-matches #"b-(.*)" shouldbe))
           (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.\n")
           (str (process-another functname (arg-str location) shouldbe)))
-      (str functname " can only take " (process-length shouldbe) "; recieved " (number-arg (str (count wrongval))) ".\n"))))
+      (str functname " can only take " (process-length shouldbe) "; received " (number-arg (str (count wrongval))) ".\n"))))
 
 (defn process-spec-errors
   "Processes spec errors according to if they are a macro or not"
