@@ -47,9 +47,10 @@
           (if (and (= "clojure.lang.ExceptionInfo" errclass) (> viacount 1))
             (str 
               (->> throwvia
-                   second
+                   reverse
+                   first
                    :message
-                   (str errclass " ")
+                   (str (:type (first (reverse throwvia))) " ")
                    p-exc/process-errors
                    :msg-info-obj
                    m-obj/get-all-text)
