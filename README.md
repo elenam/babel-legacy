@@ -9,8 +9,8 @@ Paper describing its use and development availible [here](https://github.com/Clo
 ## Usage
 Adjust your project.clj as follows, and ensure you are running clojure 1.9.0 or later.
 ```
-:dependencies [[clojure "1.9.0"]
-               [babel-middleware "0.1.3-alpha"]]
+:dependencies [[clojure "1.10.0"]
+               [babel-middleware "0.2.0-alpha"]]
 :repl-options {:nrepl-middleware
               [babel.middleware/interceptor]}
 ```            
