@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>babel</groupId>
-  <artifactId>babel</artifactId>
+  <groupId>babel-middleware</groupId>
+  <artifactId>babel-middleware</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-alpha</version>
-  <name>babel</name>
+  <version>0.2.0-alpha</version>
+  <name>babel-middleware</name>
   <description>A proof of concept library to rewrite error messages.</description>
   <url>https://github.com/Clojure-Intro-Course/babel</url>
   <licenses>
@@ -17,7 +17,7 @@
     <url>https://github.com/Clojure-Intro-Course/babel</url>
     <connection>scm:git:git://github.com/Clojure-Intro-Course/babel.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/Clojure-Intro-Course/babel.git</developerConnection>
-    <tag>bc16a25e8949973c9e33b441ce2cef605a1792a4</tag>
+    <tag>9081563bb0c68ef3b5bb0248166e0fc49fcbdf85</tag>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -33,7 +33,7 @@
       </testResource>
     </testResources>
     <directory>target</directory>
-    <outputDirectory>target/classes</outputDirectory>
+    <outputDirectory>target\classes</outputDirectory>
     <plugins/>
   </build>
   <repositories>
@@ -57,16 +57,6 @@
         <enabled>true</enabled>
       </releases>
     </repository>
-    <repository>
-      <id>Babel origin</id>
-      <url>https://github.com/Clojure-Intro-Course/babel</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
   </repositories>
   <dependencyManagement>
     <dependencies/>
@@ -75,7 +65,7 @@
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
-      <version>1.9.0</version>
+      <version>1.10.0</version>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -91,21 +81,6 @@
       <groupId>hiccup</groupId>
       <artifactId>hiccup</artifactId>
       <version>1.0.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.onyxplatform</groupId>
-      <artifactId>onyx</artifactId>
-      <version>0.13.3-alpha4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.onyxplatform</groupId>
-      <artifactId>onyx-spec</artifactId>
-      <version>0.12.7.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>java.jdbc</artifactId>
-      <version>0.7.8</version>
     </dependency>
   </dependencies>
 </project>
