@@ -1,7 +1,7 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
-            [clojure.tools.nrepl.middleware])
-  (:import clojure.tools.nrepl.transport.Transport)
+            [nrepl.middleware])
+  (:import nrepl.transport.Transport)
   (:gen-class))
 
 (defn interceptor
@@ -17,5 +17,5 @@
                         ;(send [this msg]     (.send transport msg))))))))
 
 ;;sets the appropriate flags on the middleware so it is placed correctly
-(clojure.tools.nrepl.middleware/set-descriptor! #'interceptor
+(nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})

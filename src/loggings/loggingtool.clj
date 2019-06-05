@@ -1,7 +1,7 @@
 (ns loggings.loggingtool
   (:require
    [expectations :refer :all]
-   [clojure.tools.nrepl :as repl])
+   [nrepl :as repl])
   (:use
    [loggings.html-log]))
 

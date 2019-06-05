@@ -30,7 +30,7 @@
          deref
          deref
         #(get % 'sessions))
-   (ns-interns `clojure.tools.nrepl.middleware.session)))
+   (ns-interns `nrepl.middleware.session)))
 
 (defn process-message
   "takes a session number, and returns the adjusted message as a string."
@@ -45,7 +45,7 @@
         (if (= "clojure.lang.Compiler$CompilerException" errclass)
           (p-exc/process-macro-errors err errclass (ex-data err))
           (if (and (= "clojure.lang.ExceptionInfo" errclass) (> viacount 1))
-            (str 
+            (str
               (->> throwvia
                    reverse
                    first
@@ -55,7 +55,7 @@
                    :msg-info-obj
                    m-obj/get-all-text)
               (p-exc/process-stacktrace err))
-            (str 
+            (str
               (->> err
                    .getMessage
                    (str errclass " ")

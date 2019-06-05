@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.0"]
-                 [org.clojure/tools.nrepl "0.2.13"]
+                 [nrepl "0.6.0"]
                  [expectations "2.2.0-rc3"]
                  [hiccup "1.0.5"]]
   :plugins [[lein-expectations "0.0.8"]]
