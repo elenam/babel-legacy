@@ -1,10 +1,12 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
-            [nrepl.middleware])
+            [nrepl.middleware]
+            [nrepl.middleware.caught]
+            [clojure.repl])
   (:import nrepl.transport.Transport)
   (:gen-class))
 
-(def track (atom {})) ; for debugging purposes 
+(def track (atom {})) ; for debugging purposes
 
 (defn interceptor
   "applies processor/modify-errors to every response that emerges from the server"

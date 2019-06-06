@@ -85,7 +85,7 @@
         message (second parsing)
         entry (get-match e-class message)
         ;msg-info-obj (make-msg-info-hashes ex-str "\n" e-class " & " message "\n")]
-        msg-info-obj (msg-from-matched-entry entry message)]
+        msg-info-obj (or (msg-from-matched-entry entry message) (make-msg-info-hashes "No message detected"))]
     {:exception-class e-class
      :msg-info-obj  msg-info-obj}))
 

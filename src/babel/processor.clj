@@ -72,8 +72,8 @@
                   (do
                     (update-recorder-detail processed-error)
                     (update-recorder-msg (:session inp-message));(str err))
-                    (inp-message :err))))
-                    ;processed-error)))
+                    ;(inp-message :err))))
+                    processed-error)))
 
       inp-message))
 
