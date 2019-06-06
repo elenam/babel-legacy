@@ -68,11 +68,12 @@
   (if (contains? inp-message :err)
       (assoc inp-message :err
              (let [err (get-error (:session inp-message))
-                   processed-error (process-message err)]
+                   processed-error (if err (process-message err) "No detail can be found")]
                   (do
                     (update-recorder-detail processed-error)
-                    (update-recorder-msg (str err))
-                    processed-error)))
+                    (update-recorder-msg (:session inp-message));(str err))
+                    (inp-message :err))))
+                    ;processed-error)))
 
       inp-message))
 
