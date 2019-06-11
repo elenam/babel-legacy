@@ -26,15 +26,16 @@
 (nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 
-(defn- make-exception [exc-class msg]
-  (clojure.lang.Reflector/invokeConstructor
-    exc-class
-    (to-array [msg])))
+(defn- make-exception [exc msg]
+  (let [exc-class (class exc)]
+       (if (= exc-class clojure.lang.ExceptionInfo)
+           (ex-info msg (ex-data exc))
+           (clojure.lang.Reflector/invokeConstructor exc-class (to-array [msg])))))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
     (reset! track {:e %}) ; for debugging - and possibly for logging
-    (clojure.main/repl-caught (make-exception (class %) "hello")))))
+    (clojure.main/repl-caught (make-exception % (processor/process-message %))))))
     ;(clojure.repl/pst % 3))))
