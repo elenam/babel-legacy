@@ -21,19 +21,19 @@
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
-
-(defn get-error
-  [session-number]
-  ((comp #(% #'clojure.core/*e)
-         deref
-         #(get % session-number)
-         deref
-         deref
-        #(get % 'sessions))
-   (ns-interns `nrepl.middleware.session)))
+;
+; (defn get-error
+;   [session-number]
+;   ((comp #(% #'clojure.core/*e)
+;          deref
+;          #(get % session-number)
+;          deref
+;          deref
+;         #(get % 'sessions))
+;    (ns-interns `nrepl.middleware.session)))
 
 (defn process-message
-  "takes a session number, and returns the adjusted message as a string."
+  "takes a Java Throwable object, and returns the adjusted message as a string."
   [err]
   (let [errmap (Throwable->map err)
         throwvia (:via errmap)
@@ -64,17 +64,17 @@
                    m-obj/get-all-text)
               (p-exc/process-stacktrace err)))))))
 
-(defn modify-errors [inp-message]
-  (if (contains? inp-message :err)
-      (assoc inp-message :err
-             (let [err (get-error (:session inp-message))
-                   processed-error (if err (process-message err) "No detail can be found")]
-                  (do
-                    (update-recorder-detail processed-error)
-                    (update-recorder-msg (:session inp-message));(str err))
-                    ;(inp-message :err))))
-                    processed-error)))
-
-      inp-message))
+; (defn modify-errors [inp-message]
+;   (if (contains? inp-message :err)
+;       (assoc inp-message :err
+;              (let [err (get-error (:session inp-message))
+;                    processed-error (if err (process-message err) "No detail can be found")]
+;                   (do
+;                     (update-recorder-detail processed-error)
+;                     (update-recorder-msg (:session inp-message));(str err))
+;                     ;(inp-message :err))))
+;                     processed-error)))
+;
+;       inp-message))
 
 (println "babel.processor loaded")
