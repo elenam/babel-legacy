@@ -29,7 +29,8 @@
 (defn- make-exception [exc msg]
   (let [exc-class (class exc)]
        (if (= exc-class clojure.lang.ExceptionInfo)
-           (ex-info msg (ex-data exc))
+           ;(ex-info msg (ex-data exc))
+           (Exception. msg) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
            (if (= clojure.lang.Compiler$CompilerException exc-class)
                (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg)) ; a stub for now
                (clojure.lang.Reflector/invokeConstructor exc-class (to-array [msg]))))))
