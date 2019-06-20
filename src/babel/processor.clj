@@ -1,6 +1,7 @@
 (ns babel.processor
  (:require [errors.messageobj :as m-obj]
-           [errors.prettify-exception :as p-exc]))
+           [errors.prettify-exception :as p-exc]
+           [errors.dictionaries :as d]))
 
 ;;an atom that record original error response
 (def recorder (atom {:msg [] :detail []}))
@@ -68,9 +69,11 @@
   "Takes ex-info data of a spec error, returns a modified message as a string"
   [ex-data]
   (let [{[{:keys [path val via in]}] :clojure.spec.alpha/problems fn-name :clojure.spec.alpha/fn} ex-data
-        arg-number (first in)]
+        arg-number (first in)
+        [print-type print-val] (d/type-and-val (str val))] ; note that we convert the value back to a string
         ;; The message below is a stub for now
-    (str "In function " fn-name " the argument " val " at position " arg-number " expected to be a " path "\n")))
+    (str "In function " fn-name " the argument " print-val " at position " arg-number " was expected to be a " path
+          " but is " print-type "instead.\n")))
 
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)
