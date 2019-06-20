@@ -64,6 +64,14 @@
                    m-obj/get-all-text)
               (p-exc/process-stacktrace err)))))))
 
+(defn spec-message
+  "Takes ex-info data of a spec error, returns a modified message as a string"
+  [ex-data]
+  (let [{[{:keys [path val via in]}] :clojure.spec.alpha/problems fn-name :clojure.spec.alpha/fn} ex-data
+        arg-number (first in)]
+        ;; The message below is a stub for now
+    (str "In function " fn-name " the argument " val " at position " arg-number " expected to be a " path "\n")))
+
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)
 ;       (assoc inp-message :err
