@@ -44,5 +44,6 @@
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
     (reset! track {:e %}) ; for debugging - and possibly for logging
-    (clojure.main/repl-caught (make-exception % (processor/process-message %))))))
+    (clojure.main/repl-caught (make-exception % (if (= clojure.lang.ExceptionInfo (class %))
+                                                    "" (processor/process-message %)))))))
     ;(clojure.repl/pst % 3))))

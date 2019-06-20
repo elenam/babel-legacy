@@ -70,7 +70,7 @@
   [ex-data]
   (let [{[{:keys [path val via in]}] :clojure.spec.alpha/problems fn-name :clojure.spec.alpha/fn} ex-data
         arg-number (first in)
-        [print-type print-val] (d/type-and-val (str val))] ; note that we convert the value back to a string
+        [print-type print-val] (d/type-and-val val)] ; note that we convert the value back to a string
         ;; The message below is a stub for now
     (str "In function " fn-name " the argument " print-val " at position " arg-number " was expected to be a " path
           " but is " print-type "instead.\n")))
