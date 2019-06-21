@@ -307,11 +307,12 @@
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
-  when given an anonymous function"
+  when given an anonymous function."
   [s]
-  (let
-     [t (if (string? s) "a string " (get-dictionary-type (str s)))]
-     (cond (and (= t "a function ") (= (get-function-name (str s)) "anonymous function")) ["" "an anonymous function"]
-                                  (= t "a function ") [t (get-function-name (str s))]
-                                  (re-find #"unrecognized type" t) [t ""]
-                                  :else [t (if (string? s) (str "\"" s "\"") s)]))) ;; TO DO: put quotation marks around a string
+  (if (string? s) ["a string " (str "\"" s "\"")]
+      (let [t (get-dictionary-type (str s))]
+           (cond (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
+                 ["" "an anonymous function"]
+                 (= t "a function ") [t (get-function-name (str s))]
+                 (re-find #"unrecognized type" t) [t ""]
+                 :else [t s]))))
