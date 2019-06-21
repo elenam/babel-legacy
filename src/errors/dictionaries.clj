@@ -314,4 +314,4 @@
      (cond (and (= t "a function ") (= (get-function-name (str s)) "anonymous function")) ["" "an anonymous function"]
                                   (= t "a function ") [t (get-function-name (str s))]
                                   (re-find #"unrecognized type" t) [t ""]
-                                  :else [t s]))) ;; TO DO: put quotation marks around a string
+                                  :else [t (if (string? s) (str "\"" s "\"") s)]))) ;; TO DO: put quotation marks around a string
