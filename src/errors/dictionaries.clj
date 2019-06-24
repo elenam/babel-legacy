@@ -305,13 +305,15 @@
   (if (= n "") "/" n))
 
 (defn type-and-val
-  "Takes a value (as a string) from a spec error, returns a vector
+  "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
-  when given an anonymous function"
+  when given an anonymous function."
   [s]
-  (let
-     [t (get-dictionary-type s)]
-     (cond (and (= t "a function ") (= (get-function-name s) "anonymous function")) ["" "an anonymous function"]
-                                  (= t "a function ") [t (get-function-name s)]
-                                  (re-find #"unrecognized type" t) [t ""]
-                                  :else [t s])))
+  (cond (string? s) ["a string " (str "\"" s "\"")]
+        (nil? s) ["nil " "nil"]
+        :else (let [t (get-dictionary-type (str s))]
+                   (cond (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
+                              ["" "an anonymous function"]
+                         (= t "a function ") [t (get-function-name (str s))]
+                         (re-find #"unrecognized type" t) [t ""]
+                         :else [t s]))))

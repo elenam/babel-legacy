@@ -549,6 +549,12 @@
    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The argument must be an " (nth matches 1) :type
                                                            " but is " (nth matches 2) :arg
                                                            ".\n"))}
+   {:key :illegal-no-matching-constructor
+    :class "IllegalArgumentException"
+    :match (beginandend "No matching ctor found for class (.*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "No matching constructor found for a Java class "
+                                                           (nth matches 1) :type ".\n"))}
+
 
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
