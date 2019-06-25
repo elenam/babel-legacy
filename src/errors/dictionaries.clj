@@ -153,22 +153,21 @@
   "arg-str takes a non-negative integer as a string and matches it
    to the corresponding argument number as a string, number as adjective"
   [n]
-  (let [abs (fn [m] (if (> 0 m) (- m) m))
-        n0 (+ 1 (Integer. n))
-        n1 (mod (abs n0) 100)
-        n2 (mod (abs n0) 10)]
-    (case n0
+  (let [m (inc n)
+        n1 (mod (Math/abs m) 100)
+        n2 (mod (Math/abs m) 10)]
+    (case m
       1 "first argument"
       2 "second argument"
       3 "third argument"
       4 "fourth argument"
       5 "fifth argument"
       (cond
-        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str n0 "th argument")
-        (= 1 n2) (str n0 "st argument")
-        (= 2 n2) (str n0 "nd argument")
-        (= 3 n2) (str n0 "rd argument")
-        :else   (str n0 "th argument")))))
+        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str m "th argument")
+        (= 1 n2) (str m "st argument")
+        (= 2 n2) (str m "nd argument")
+        (= 3 n2) (str m "rd argument")
+        :else   (str m "th argument")))))
 
 (defn number-word
   "number word takes a positive integer as a string and changes it to a
