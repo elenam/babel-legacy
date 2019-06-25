@@ -136,20 +136,20 @@
 
 (s/fdef clojure.core/into
   :args (s/and ::b-length-zero-to-three
-               (s/or :arg-one (s/cat :to-coll (s/nilable coll?) :transducer ::function-or-lazy :from-coll any?)
-                     :arg-two (s/cat :to-coll (s/nilable coll?) :from-coll any?)
+               (s/or :arg-one (s/cat :coll (s/nilable coll?) :function ::function-or-lazy :coll any?)
+                     :arg-two (s/cat :coll (s/nilable coll?) :coll any?)
                      :arg-three (s/cat :any (s/? any?)))))
 (stest/instrument `clojure.core/into)
 
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
                (s/cat :function ::function-or-lazy
-                 :collections (s/* seqable?)))) ;change to a + to block transducers
+                 :collection (s/* seqable?)))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
 (s/fdef clojure.core/mod
   :args (s/and ::b-length-two
-               (s/cat :number ::number-or-lazy :number1 ::b-not-zero-or-lazy))) ;(fn [{:keys [a b]}] (not= b 0))))
+               (s/cat :number ::number-or-lazy :number ::b-not-zero-or-lazy))) ;(fn [{:keys [a b]}] (not= b 0))))
 (stest/instrument `clojure.core/mod)
 
 (s/fdef clojure.core/numerator
@@ -231,8 +231,8 @@
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :predicate ::function-or-lazy :collection (s/nilable seqable?))
-          :arg-two (s/cat :predicate ::function-or-lazy))))
+    (s/or :arg-one (s/cat :function ::function-or-lazy :collection (s/nilable seqable?))
+          :arg-two (s/cat :function ::function-or-lazy))))
 (stest/instrument `clojure.core/filter)
 
 (s/fdef clojure.core/take
@@ -254,8 +254,8 @@
 
 (s/fdef clojure.core/take-while
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :number ::function-or-lazy)
-          :arg-two (s/cat :number ::function-or-lazy :collection (s/nilable seqable?)))))
+    (s/or :arg-one (s/cat :function ::function-or-lazy)
+          :arg-two (s/cat :function ::function-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/take-while)
 
 (s/fdef clojure.core/drop
