@@ -72,9 +72,10 @@
 (defn spec-message
   "Takes ex-info data of a spec error, returns a modified message as a string"
   [ex-data]
-  (let [{[{:keys [path pred val via in]}] :clojure.spec.alpha/problems fn-name :clojure.spec.alpha/fn} ex-data
+  (let [{[{:keys [path pred val via in]}] :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn} ex-data
         arg-number (first in)
-        [print-type print-val] (d/type-and-val val)]
+        [print-type print-val] (d/type-and-val val)
+        fn-name (d/get-function-name (str fn-full-name))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
         (str "wrong length") ; a stub
         (str "The " (d/arg-str arg-number) " of " fn-name " was expected to be " (stringify path)
