@@ -1,6 +1,7 @@
 (ns errors.dictionaries
-  (:use [errors.messageobj]))
-(require '[clojure.string :as cs])
+  (:require [errors.messageobj :as m-obj]
+            [clojure.string :as cs]
+            [corefns.corefns :as cf]))
 
 ;;; A dictionary of known types and their user-friendly representations.
 ;;; Potentially, we can have multiple dictionaries depending on the level.
@@ -150,7 +151,7 @@
 
 ;;; arg-str: non-negative integer as a string -> string
 (defn arg-str
-  "arg-str takes a non-negative integer as a string and matches it
+  "arg-str takes a non-negative integer and matches it
    to the corresponding argument number as a string, number as adjective"
   [n]
   (let [m (inc n)
@@ -303,6 +304,19 @@
   [n]
   (if (= n "") "/" n))
 
+(defn- is-specced-fn?
+  "Takes a value and returns true if it is a specced functions
+   and false otherwise"
+   [val]
+   (and (ifn? val)  (re-matches #"clojure\.spec\.test(.*)" (str val))))
+
+(defn- specced-fn-name
+  "Takes a specced function and attempts to find its user-readable name.
+   If a name is found, it is returned. Otherwise the original name is returned
+   unchanged."
+   [s]
+   (or (cf/specced-lookup s) s))
+
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
@@ -311,7 +325,8 @@
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["nil " "nil"]
         :else (let [t (get-dictionary-type (str s))]
-                   (cond (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
+                   (cond (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
+                         (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
                               ["" "an anonymous function"]
                          (= t "a function ") [t (get-function-name (str s))]
                          (re-find #"unrecognized type" t) [t ""]

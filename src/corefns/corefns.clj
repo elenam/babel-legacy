@@ -2,7 +2,8 @@
  (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as stest]
             [clojure.spec.gen.alpha :as gen]
-            [clojure.core.specs.alpha :as sp]))
+            [clojure.core.specs.alpha :as sp]
+            [clojure.set]))
 
 ;##### Length Functions ##### Credit to Tony Song (frogrammer)
 (defn b-length1? [coll] (= (count coll) 1))
@@ -368,3 +369,5 @@
   :args (s/and ::b-length-greater-zero
                (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable coll?)))))))
 #_(stest/instrument `clojure.core/refer)
+
+(def specced-lookup (clojure.set/map-invert {'map map}))
