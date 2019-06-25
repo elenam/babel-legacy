@@ -72,8 +72,8 @@
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)] ; note that we convert the value back to a string
         ;; The message below is a stub for now
-    (str "In function " fn-name " the argument " print-val " at position " arg-number " was expected to be " path
-          " but is " print-type "instead.\n")))
+    (str "The " (d/arg-str arg-number) " of " fn-name " was expected to be " path
+          " but is" print-type print-val " instead.\n")))
 
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)

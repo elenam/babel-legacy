@@ -49,7 +49,6 @@
 (s/def ::length-one-anything (s/and ::b-length-one (s/cat :any any?)))
 (s/def ::length-one-number (s/and ::b-length-one (s/cat :number number?)))
 (s/def ::length-greater-zero-number (s/and ::b-length-greater-zero (s/cat :number (s/+ number?))))
-(s/def ::b-not-zero b-not-0?)
 #_(s/def ::b-not-greater-str-count b-not-greater-count)
 
 (s/def ::bindings-seq2 (s/and vector? ::binding-seq))
@@ -70,6 +69,7 @@
 (s/def ::string-or-lazy (s/alt :num string? :lazy ::lazy))
 (s/def ::map-vec-or-lazy (s/alt :or (s/alt :map map? :vector vector?) :lazy ::lazy))
 (s/def ::greater-than-zero greater-than-zero?)
+(s/def ::b-not-zero-or-lazy (s/alt :num-non-zero (s/and number? b-not-0?) :lazy ::lazy))
 
 (defn regex2? [regex] (instance? java.util.regex.Pattern regex))
 (s/def ::regex-or-lazy (s/alt :regex regex2? :lazy ::lazy))
@@ -149,7 +149,7 @@
 
 (s/fdef clojure.core/mod
   :args (s/and ::b-length-two
-               (s/cat :number ::number-or-lazy :number (s/and ::number-or-lazy ::b-not-zero)))) ;(fn [{:keys [a b]}] (not= b 0))))
+               (s/cat :number ::number-or-lazy :number1 ::b-not-zero-or-lazy))) ;(fn [{:keys [a b]}] (not= b 0))))
 (stest/instrument `clojure.core/mod)
 
 (s/fdef clojure.core/numerator
