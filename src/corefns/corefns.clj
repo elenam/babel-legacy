@@ -138,7 +138,7 @@
 (s/fdef clojure.core/into
   :args (s/and ::b-length-zero-to-three
                (s/or :arg-one (s/cat :coll (s/nilable coll?) :function ::function-or-lazy :coll any?)
-                     :arg-two (s/cat :coll (s/nilable coll?) :coll any?)
+                     :arg-two (s/cat :coll (s/nilable coll?) :any any?)
                      :arg-three (s/cat :any (s/? any?)))))
 (stest/instrument `clojure.core/into)
 
