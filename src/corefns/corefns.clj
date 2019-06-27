@@ -370,4 +370,4 @@
                (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable coll?)))))))
 #_(stest/instrument `clojure.core/refer)
 
-(def specced-lookup (clojure.set/map-invert {'map map}))
+(def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +}))
