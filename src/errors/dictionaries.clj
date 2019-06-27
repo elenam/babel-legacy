@@ -121,7 +121,8 @@
   [fname]
   (let [;check-spec ((merge corefns-map specs-map) fname)
         ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
-        matched (or (nth (re-matches #"(.*)\$(.*)" fname) 2)
+        matched (or (nth (re-matches #"(.*)\$(.*)@(.*)" fname) 2)
+                    (nth (re-matches #"(.*)\$(.*)" fname) 2)
                     (nth (re-matches #"(.*)/(.*)" fname) 2)
                     ;; the last match is the function name we need:
                     (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
@@ -271,23 +272,16 @@
   (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
 
 (defn get-dictionary-type
-  "get-dictionary-type takes a string and returns the corresponding type
-   if the string is \"nil\" we return an empty string so the result in the
-   error dictionary does not return nil nil"
   [x]
-  (if (nil? (read-string x))
-    ""
-    (if (and (symbol? (read-string x)) (resolve (symbol x)))
+  "get-dictionary-type takes an object and returns its general type.
+  If nil is passed returns an empty string."
+  (if (nil? x) ""
       (-> x
-        get-type
-        (str " "))
-      (-> x
-        read-string
-        type
-        str
-        (clojure.string/replace #"class " "")
-        get-type
-        (str " ")))))
+          type
+          str
+          (clojure.string/replace #"class " "")
+          get-type
+          (str " "))))
 
 (defn change-if
   "change-if takes a string and will output a string based on if
@@ -324,8 +318,8 @@
   [s]
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["nil " "nil"]
-        :else (let [t (get-dictionary-type (str s))]
-                   (cond ;(symbol? s) (type-and-val (resolve s)) ;; can this lead to infinite recursion? Can the result be nil? 
+        :else (let [t (get-dictionary-type s)]
+                   (cond  ;(type-and-val (resolve s)) ;; can this lead to infinite recursion? Can the result be nil?
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
                          (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
                               ["" "an anonymous function"]
