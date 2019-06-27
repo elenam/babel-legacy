@@ -76,7 +76,7 @@
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)
         fn-name (d/get-function-name (str fn-full-name))
-        function-args-val (apply str (interpose " " args-val))
+        function-args-val (apply str (interpose " " (map #(second (d/type-and-val %)) args-val)))
         ]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
         (str "wrong length") ; a stub
