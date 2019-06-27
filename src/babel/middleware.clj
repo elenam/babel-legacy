@@ -30,9 +30,11 @@
   (let [exc-class (class exc)]
        (if (= clojure.lang.ExceptionInfo exc-class)
            ;(ex-info msg (ex-data exc))
-           (Exception. (processor/spec-message (:data (Throwable->map exc)))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
+               (Exception. (processor/spec-message (:data (Throwable->map exc)))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
            (if (= clojure.lang.Compiler$CompilerException exc-class)
-               (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg)) ; a stub for now
+               (if (processor/macro-spec? exc)
+                   (Exception. "This is a macro")
+                   (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
                ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
                (if (= clojure.lang.ArityException exc-class)
                   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" (.getMessage exc))]
