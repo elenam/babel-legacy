@@ -67,7 +67,7 @@
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a collection",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
-                :regex "a regular expression", :num-non-zero "a number that's not zero"})
+                :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong"})
 
 
 (defn stringify
@@ -81,7 +81,7 @@
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)
         fn-name (d/get-function-name (str fn-full-name))
-        function-args-val (apply str (interpose " " (map #(second (d/type-and-val %)) args-val)))
+        function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
         ]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
         (str "wrong length") ; a stub

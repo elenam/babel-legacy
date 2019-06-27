@@ -326,3 +326,8 @@
                          (= t "a function ") [t (get-function-name (str s))]
                          (re-find #"unrecognized type" t) [t ""]
                          :else [t s]))))
+
+(defn anonymous?
+  "changes the string of an anonymous"
+  [a]
+  (if (= (str a) "an anonymous function") "#(...)" a))
