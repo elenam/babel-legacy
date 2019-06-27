@@ -22,17 +22,6 @@
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
-;
-; (defn get-error
-;   [session-number]
-;   ((comp #(% #'clojure.core/*e)
-;          deref
-;          #(get % session-number)
-;          deref
-;          deref
-;         #(get % 'sessions))
-;    (ns-interns `nrepl.middleware.session)))
-
 (defn process-message
   "takes a Java Throwable object, and returns the adjusted message as a string."
   [err]
@@ -65,6 +54,13 @@
                    m-obj/get-all-text)
               (p-exc/process-stacktrace err)))))))
 
+(defn macro-spec?
+  "Takes an exception object. Returns a true value if it's a spec error for a macro,
+   a false value otherwise."
+  [exc]
+  (and (> (count (:via (Throwable->map exc))) 1)
+       (= :macro-syntax-check (:clojure.error/phase (:data (first (:via (Throwable->map exc))))))))
+
 (defn stringify
   [vector-of-keywords]
   (if (= (count vector-of-keywords) 1) (name (first vector-of-keywords)) (name (second vector-of-keywords))))
@@ -79,7 +75,7 @@
         function-args-val (apply str (interpose " " (map #(second (d/type-and-val %)) args-val)))
         ]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (str "wrong length") ; a stub
+        (str "wrong length") ; a for our (babel) length predicates
         (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
              " but is " print-type print-val " instead.\n"))))
 
