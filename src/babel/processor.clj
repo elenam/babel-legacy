@@ -54,6 +54,7 @@
                    m-obj/get-all-text)
               (p-exc/process-stacktrace err)))))))
 
+
 (defn macro-spec?
   "Takes an exception object. Returns a true value if it's a spec error for a macro,
    a false value otherwise."
@@ -61,9 +62,13 @@
   (and (> (count (:via (Throwable->map exc))) 1)
        (= :macro-syntax-check (:clojure.error/phase (:data (first (:via (Throwable->map exc))))))))
 
+(def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a collection",
+                :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
+                :regex "a regular expression", :num-non-zero "a number that's not zero"})
+
 (defn stringify
   [vector-of-keywords]
-  (if (= (count vector-of-keywords) 1) (name (first vector-of-keywords)) (name (second vector-of-keywords))))
+  (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
 
 (defn spec-message
   "Takes ex-info data of a spec error, returns a modified message as a string"
