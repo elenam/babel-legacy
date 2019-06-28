@@ -85,7 +85,7 @@
         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
         ]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (str "Wrong number of arguments, expected " (length-ref (keyword (d/get-function-name (str (first via))))) " but instead has "(d/number-vals (str val) (d/get-function-name (str (first via))))) ; a for our (babel) length predicates
+        (str "Wrong number of arguments, expected in " "("fn-name" "function-args-val")"  ": the function " fn-name " expects " (length-ref (keyword (d/get-function-name (str (first via))))) " but was given "(d/number-vals val (d/get-function-name (str (first via))))) ; a for our (babel) length predicates
         (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
              " but is " print-type print-val " instead.\n"))))
 

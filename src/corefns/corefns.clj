@@ -137,15 +137,15 @@
 
 (s/fdef clojure.core/into
   :args (s/and ::b-length-zero-to-three
-               (s/or :arg-one (s/cat :coll (s/nilable coll?) :function ::function-or-lazy :coll any?)
+               (s/or :arg-one (s/cat :any (s/? any?))
                      :arg-two (s/cat :coll (s/nilable coll?) :any any?)
-                     :arg-three (s/cat :any (s/? any?)))))
+                     :arg-three (s/cat :coll (s/nilable coll?) :function ::function-or-lazy :coll any?)
+                     )))
 (stest/instrument `clojure.core/into)
 
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
-               (s/cat :function any?
-                 :collection (s/* seqable?)))) ;change to a + to block transducers
+               (s/cat :function any? :collection (s/* seqable?)))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
 (s/fdef clojure.core/mod
@@ -207,7 +207,7 @@
 
 (s/fdef clojure.core/gen-class
   :args (s/and ::b-length-zero-or-greater
-    (s/cat :value (s/* any?))))
+    (s/cat :arg-one (s/* any?))))
 (stest/instrument `clojure.core/gen-class)
 
 (s/fdef clojure.core/while
@@ -232,8 +232,8 @@
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :function ::function-or-lazy :collection (s/nilable seqable?))
-          :arg-two (s/cat :function ::function-or-lazy))))
+    (s/or :arg-one (s/cat :function ::function-or-lazy)
+          :arg-two (s/cat :function ::function-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/filter)
 
 (s/fdef clojure.core/take
@@ -244,8 +244,8 @@
 
 (s/fdef clojure.core/take-nth
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :number ::greater-than-zero :collection (s/nilable seqable?))
-          :arg-two (s/cat :number ::number-or-lazy))))
+    (s/or :arg-one (s/cat :number ::number-or-lazy)
+          :arg-two (s/cat :number ::greater-than-zero :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/take-nth)
 
 (s/fdef clojure.core/take-last
@@ -306,7 +306,6 @@
       :arg-one (s/cat :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-two (s/cat :number ::number-or-lazy :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-three (s/cat :number ::number-or-lazy :number ::number-or-lazy :value any? :collection (s/nilable seqable?)))))
-
 (stest/instrument `clojure.core/partition)
 
 (s/fdef clojure.core/partition-by

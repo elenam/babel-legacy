@@ -176,16 +176,16 @@
    string with the numbers corresponding spelling"
   [n]
   (case n
-    "0" "zero"
-    "1" "one"
-    "2" "two"
-    "3" "three"
-    "4" "four"
-    "5" "five"
-    "6" "six"
-    "7" "seven"
-    "8" "eight"
-    "9" "nine"
+     "0" "zero"
+     "1" "one"
+     "2" "two"
+     "3" "three"
+     "4" "four"
+     "5" "five"
+     "6" "six"
+     "7" "seven"
+     "8" "eight"
+     "9" "nine"
     n))
 
 (defn number-arg
@@ -204,30 +204,17 @@
    number of arguments in failedvals and uses failedlength to determine
    the correct response."
   [failedvals failedlength]
-  (if (not= "" failedvals)
-    (let [x (count (read-string failedvals))
+  (if (not= 0 (count failedvals))
+    (let [x (count failedvals)
           y (keyword failedlength)
-          z ({:b-length-one (if (> x 1)
-                          (str (number-word (str x)) " arguments")
-                          "no arguments")
-               :b-length-two (if (> x 2)
-                          (str (number-word (str x)) " arguments")
-                          "one argument")
-               :b-length-three (if (= x 1)
-                            "one argument"
-                            (str (number-word (str x)) " arguments"))
-               :b-length-greater-zero "no arguments"
-               :b-length-greater-one (if (= x 1)
-                                  "one argument"
-                                  "no arguments")
-               :b-length-greater-two (if (= x 1)
-                                  "one argument"
-                                  "two arguments")
-               :b-length-zero-or-one (str (number-word (str x)) " arguments")
-               :b-length-two-or-three (if (= x 1)
-                                   "one argument"
-                                   (str (number-word (str x)) " arguments"))
-               :b-length-zero-to-three (str (number-word (str x)) " arguments")} y)]
+          z ({:b-length-one (str x " arguments")
+               :b-length-two (str x " arguments")
+               :b-length-three (str x " arguments")
+               :b-length-greater-one (str x " arguments")
+               :b-length-greater-two (str x " arguments")
+               :b-length-zero-to-one (str x " arguments")
+               :b-length-two-to-three (str x " arguments")
+               :b-length-zero-to-three (str x " arguments")} y)]
              (if (nil? z)
                 failedlength
                 z))
