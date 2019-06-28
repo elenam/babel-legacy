@@ -144,7 +144,7 @@
 
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
-               (s/cat :function ::function-or-lazy
+               (s/cat :function any?
                  :collection (s/* seqable?)))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
@@ -370,4 +370,4 @@
                (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable coll?)))))))
 #_(stest/instrument `clojure.core/refer)
 
-(def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +,}))
+(def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +}))

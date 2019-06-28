@@ -66,6 +66,11 @@
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong"})
 
+(def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
+                 :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",
+                 :b-length-zero-to-one "zero or one arguments", :b-length-one-to-two "one or two arguments", :b-length-two-to-three "two or three arguments",
+                 :b-length-two-to-four "two or up to four arguments", :b-length-one-to-three "one or up to three arguments", :b-length-zero-to-three "zero or up to three arguments"})
+
 (defn stringify
   [vector-of-keywords]
   (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
@@ -80,7 +85,7 @@
         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
         ]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (str "wrong length") ; a for our (babel) length predicates
+        (str "Wrong number of arguments, expected " (length-ref (keyword (d/get-function-name (str (first via))))) " but instead has "(d/number-vals (str val) (d/get-function-name (str (first via))))) ; a for our (babel) length predicates
         (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
              " but is " print-type print-val " instead.\n"))))
 

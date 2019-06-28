@@ -204,7 +204,7 @@
    number of arguments in failedvals and uses failedlength to determine
    the correct response."
   [failedvals failedlength]
-  (if (not= "nil" failedvals)
+  (if (not= "" failedvals)
     (let [x (count (read-string failedvals))
           y (keyword failedlength)
           z ({:b-length-one (if (> x 1)
