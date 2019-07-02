@@ -198,27 +198,27 @@
     (= n "1") (str (number-word n) " argument")
     :else (str (number-word n) " arguments")))
 
-(defn number-vals
-  "number-vals takes two strings, one which are the arguments that caused
-   an error and the length required of the thing it errored on. It returns the
-   number of arguments in failedvals and uses failedlength to determine
-   the correct response."
-  [failedvals failedlength]
-  (if (not= 0 (count failedvals))
-    (let [x (count failedvals)
-          y (keyword failedlength)
-          z ({:b-length-one (str x " arguments")
-               :b-length-two (str x " arguments")
-               :b-length-three (str x " arguments")
-               :b-length-greater-one (str x " arguments")
-               :b-length-greater-two (str x " arguments")
-               :b-length-zero-to-one (str x " arguments")
-               :b-length-two-to-three (str x " arguments")
-               :b-length-zero-to-three (str x " arguments")} y)]
-             (if (nil? z)
-                failedlength
-                z))
-      "no arguments"))
+; (defn number-vals
+;   "number-vals takes two strings, one which are the arguments that caused
+;    an error and the length required of the thing it errored on. It returns the
+;    number of arguments in failedvals and uses failedlength to determine
+;    the correct response."
+;   [failedvals failedlength]
+;   (if (not= 0 (count failedvals))
+;     (let [x (count failedvals)
+;           y (keyword failedlength)
+;           z ({:b-length-one (str x " arguments")
+;                :b-length-two (str x " arguments")
+;                :b-length-three (str x " arguments")
+;                :b-length-greater-one (str x " arguments")
+;                :b-length-greater-two (str x " arguments")
+;                :b-length-zero-to-one (str x " arguments")
+;                :b-length-two-to-three (str x " arguments")
+;                :b-length-zero-to-three (str x " arguments")} y)]
+;              (if (nil? z)
+;                 failedlength
+;                 z))
+;       "no arguments"))
 
 (defn ?-name
   "?-name takes a string and converts it into a new string

@@ -75,6 +75,8 @@
 (defn regex2? [regex] (instance? java.util.regex.Pattern regex))
 (s/def ::regex-or-lazy (s/alt :regex regex2? :lazy ::lazy))
 
+(s/def ::number-or-collection (s/alt :arg-one ::number-or-lazy :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?))))
+
 ;##### Specs #####
 (s/fdef clojure.core/+ ;inline issue
   :args (s/cat :number (s/* number?)))
@@ -129,7 +131,7 @@
 
 (s/fdef clojure.core/conj
   :args (s/and ::b-length-zero-or-greater
-               (s/or :map-arg (s/cat :collection-map map?) :sequence (s/nilable (s/* (s/alt :map map? :vec (s/coll-of any? :kind vector? :count 2))))
+               (s/or :map-arg (s/cat :collection-map map? :sequence (s/alt :map map? :vec (s/* (s/coll-of any? :kind vector? :count 2))))
                      :any (s/cat :any (s/nilable any?)) ;conj can take anything but the intent of conj is that a single argument will be a collection
                      :collection (s/cat :collection (s/nilable ::not-map) :any (s/+ any?))
                     )))
@@ -238,8 +240,9 @@
 
 (s/fdef clojure.core/take
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :number ::number-or-lazy)
-          :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
+          (s/or :arg-one (s/nilable ::number-or-lazy)
+                :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))
+          ))
 (stest/instrument `clojure.core/take)
 
 (s/fdef clojure.core/take-nth
@@ -261,14 +264,13 @@
 
 (s/fdef clojure.core/drop
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :number ::number-or-lazy)
-          :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
+    ::number-or-collection))
 (stest/instrument `clojure.core/drop)
 
 (s/fdef clojure.core/drop-last
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :collection (s/nilable seqable?))
-          :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
+               (s/alt :arg-one (s/cat :collection (s/nilable seqable?))
+                      :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/drop-last)
 
 (s/fdef clojure.core/drop-while
@@ -302,7 +304,7 @@
 
 (s/fdef clojure.core/partition
   :args (s/and ::b-length-two-to-four
-    (s/or
+    (s/alt
       :arg-one (s/cat :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-two (s/cat :number ::number-or-lazy :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-three (s/cat :number ::number-or-lazy :number ::number-or-lazy :value any? :collection (s/nilable seqable?)))))
