@@ -315,6 +315,16 @@
                          :else [t s]))))
 
 (defn anonymous?
-  "changes the string of an anonymous"
+  "Returns a string representation of an anonymous function."
   [a]
   (if (= (str a) "an anonymous function") "#(...)" a))
+
+(defn macro-args->str
+  "Takes a sequence of arguments for a macro, returns a string
+   representation of these arguments for printing."
+  [args]
+  ; TO-DO: add printing of anonymous functions
+  (if (empty? args) " "
+      (let [n (- (count args) 1)
+            args-with-spaces (conj (concat (take n args) [" " (last args)]) " ")]
+           (apply str args-with-spaces))))

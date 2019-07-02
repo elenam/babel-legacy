@@ -89,6 +89,17 @@
         (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
              " but is " print-type print-val " instead.\n"))))
 
+(defn spec-macro-message
+  [ex]
+  (let [exc-map (Throwable->map ex)
+        {:keys [cause data]} exc-map
+        fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
+        {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value} data
+        val-str (d/macro-args->str value)]
+        (str "(" fn-name val-str ")" "\n" (first problems))))
+  ;; cases: extra/insufficient input vs other spec errors
+
+
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)
 ;       (assoc inp-message :err

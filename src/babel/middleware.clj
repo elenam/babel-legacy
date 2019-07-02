@@ -35,7 +35,7 @@
                    (clojure.lang.Reflector/invokeConstructor (resolve (:type (second (:via (Throwable->map exc)))))  (to-array [msg])));(str "the type is: " (:type (second (:via (Throwable->map exc)))))))
            (if (= clojure.lang.Compiler$CompilerException exc-class)
                (if (processor/macro-spec? exc)
-                   (Exception. "This is a macro")
+                   (Exception. (processor/spec-macro-message exc))
                    (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
                ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
                (if (= clojure.lang.ArityException exc-class)
