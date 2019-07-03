@@ -304,7 +304,7 @@
 
 (s/fdef clojure.core/partition
   :args (s/and ::b-length-two-to-four
-    (s/alt
+    (s/or
       :arg-one (s/cat :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-two (s/cat :number ::number-or-lazy :number ::number-or-lazy :collection (s/nilable seqable?))
       :arg-three (s/cat :number ::number-or-lazy :number ::number-or-lazy :value any? :collection (s/nilable seqable?)))))
