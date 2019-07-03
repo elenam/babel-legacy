@@ -26,7 +26,7 @@
 (nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 
-(defn- make-exception [exc msg]
+(defn make-exception [exc msg]
   (let [exc-class (class exc)]
        (if (= clojure.lang.ExceptionInfo exc-class)
            ;(ex-info msg (ex-data exc))

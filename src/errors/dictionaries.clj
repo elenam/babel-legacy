@@ -325,6 +325,5 @@
   [args]
   ; TO-DO: add printing of anonymous functions
   (if (empty? args) " "
-      (let [n (- (count args) 1)
-            args-with-spaces (conj (concat (take n args) [" " (last args)]) " ")]
+      (let [args-with-spaces (conj (interpose " " args) " ")]
            (apply str args-with-spaces))))

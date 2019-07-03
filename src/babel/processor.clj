@@ -33,7 +33,8 @@
     (if (and (= "clojure.lang.ExceptionInfo" errclass) (= viacount 1))
         (p-exc/process-spec-errors (str (.getMessage err)) errdata true)
         (if (= "clojure.lang.Compiler$CompilerException" errclass)
-          (p-exc/process-macro-errors err errclass (ex-data err))
+        ;; TO-DO: refactor this function and get rid of its uses on ExceptionInfo
+          "";(p-exc/process-macro-errors err errclass (ex-data err))
           (if (and (= "clojure.lang.ExceptionInfo" errclass) (> viacount 1))
             (str
               (->> throwvia
@@ -109,8 +110,12 @@
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value} data
-        val-str (d/macro-args->str value)]
-        (str "(" fn-name val-str ")" "\n" (first problems))))
+        val-str (d/macro-args->str value)
+        n (count problems)]
+        ;; Wording needs to be fine-tuned
+        (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
+              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")\n")
+              :else (str "(" fn-name val-str ")" " has " n " paths\n"))))
   ;; cases: extra/insufficient input vs other spec errors
 
 
