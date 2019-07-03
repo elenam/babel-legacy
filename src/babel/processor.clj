@@ -112,9 +112,9 @@
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value} data
         val-str (d/macro-args->str value)
         n (count problems)]
-        ;; Wording needs to be fine-tuned
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
-              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")\n")
+              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n") ;; should we report the extra parts?
+
               :else (str "(" fn-name val-str ")" " has " n " paths\n"))))
   ;; cases: extra/insufficient input vs other spec errors
 

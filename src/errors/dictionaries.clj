@@ -327,3 +327,12 @@
   (if (empty? args) " "
       (let [args-with-spaces (conj (interpose " " args) " ")]
            (apply str args-with-spaces))))
+
+  (defn extra-macro-args-info
+    "Takes a spec problem map. Returns information about extra input for a macro
+     if it exists (as a string), otherwise an empty string"
+    [spec-problem]
+    (let [{:keys [val]} spec-problem]
+         (if-not (empty? val)
+                 (str " The extra parts are:" (macro-args->str val))
+                 "")))
