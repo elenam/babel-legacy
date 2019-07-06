@@ -325,7 +325,7 @@
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["nil " "nil"]
         :else (let [t (get-dictionary-type (str s))]
-                   (cond ;(symbol? s) (type-and-val (resolve s)) ;; can this lead to infinite recursion? Can the result be nil? 
+                   (cond ;(symbol? s) (type-and-val (resolve s)) ;; can this lead to infinite recursion? Can the result be nil?
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
                          (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
                               ["" "an anonymous function"]
