@@ -121,7 +121,8 @@
   [fname]
   (let [;check-spec ((merge corefns-map specs-map) fname)
         ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
-        matched (or (nth (re-matches #"(.*)\$(.*)" fname) 2)
+        matched (or (nth (re-matches #"(.*)\$(.*)@(.*)" fname) 2)
+                    (nth (re-matches #"(.*)\$(.*)" fname) 2)
                     (nth (re-matches #"(.*)/(.*)" fname) 2)
                     ;; the last match is the function name we need:
                     (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
@@ -175,16 +176,16 @@
    string with the numbers corresponding spelling"
   [n]
   (case n
-    "0" "zero"
-    "1" "one"
-    "2" "two"
-    "3" "three"
-    "4" "four"
-    "5" "five"
-    "6" "six"
-    "7" "seven"
-    "8" "eight"
-    "9" "nine"
+     "0" "zero"
+     "1" "one"
+     "2" "two"
+     "3" "three"
+     "4" "four"
+     "5" "five"
+     "6" "six"
+     "7" "seven"
+     "8" "eight"
+     "9" "nine"
     n))
 
 (defn number-arg
@@ -197,40 +198,27 @@
     (= n "1") (str (number-word n) " argument")
     :else (str (number-word n) " arguments")))
 
-(defn number-vals
-  "number-vals takes two strings, one which are the arguments that caused
-   an error and the length required of the thing it errored on. It returns the
-   number of arguments in failedvals and uses failedlength to determine
-   the correct response."
-  [failedvals failedlength]
-  (if (not= "nil" failedvals)
-    (let [x (count (read-string failedvals))
-          y (keyword failedlength)
-          z ({:b-length-one (if (> x 1)
-                          (str (number-word (str x)) " arguments")
-                          "no arguments")
-               :b-length-two (if (> x 2)
-                          (str (number-word (str x)) " arguments")
-                          "one argument")
-               :b-length-three (if (= x 1)
-                            "one argument"
-                            (str (number-word (str x)) " arguments"))
-               :b-length-greater-zero "no arguments"
-               :b-length-greater-one (if (= x 1)
-                                  "one argument"
-                                  "no arguments")
-               :b-length-greater-two (if (= x 1)
-                                  "one argument"
-                                  "two arguments")
-               :b-length-zero-or-one (str (number-word (str x)) " arguments")
-               :b-length-two-or-three (if (= x 1)
-                                   "one argument"
-                                   (str (number-word (str x)) " arguments"))
-               :b-length-zero-to-three (str (number-word (str x)) " arguments")} y)]
-             (if (nil? z)
-                failedlength
-                z))
-      "no arguments"))
+; (defn number-vals
+;   "number-vals takes two strings, one which are the arguments that caused
+;    an error and the length required of the thing it errored on. It returns the
+;    number of arguments in failedvals and uses failedlength to determine
+;    the correct response."
+;   [failedvals failedlength]
+;   (if (not= 0 (count failedvals))
+;     (let [x (count failedvals)
+;           y (keyword failedlength)
+;           z ({:b-length-one (str x " arguments")
+;                :b-length-two (str x " arguments")
+;                :b-length-three (str x " arguments")
+;                :b-length-greater-one (str x " arguments")
+;                :b-length-greater-two (str x " arguments")
+;                :b-length-zero-to-one (str x " arguments")
+;                :b-length-two-to-three (str x " arguments")
+;                :b-length-zero-to-three (str x " arguments")} y)]
+;              (if (nil? z)
+;                 failedlength
+;                 z))
+;       "no arguments"))
 
 (defn ?-name
   "?-name takes a string and converts it into a new string
@@ -271,23 +259,16 @@
   (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
 
 (defn get-dictionary-type
-  "get-dictionary-type takes a string and returns the corresponding type
-   if the string is \"nil\" we return an empty string so the result in the
-   error dictionary does not return nil nil"
   [x]
-  (if (nil? (read-string x))
-    ""
-    (if (and (symbol? (read-string x)) (resolve (symbol x)))
+  "get-dictionary-type takes an object and returns its general type.
+  If nil is passed returns an empty string."
+  (if (nil? x) ""
       (-> x
-        get-type
-        (str " "))
-      (-> x
-        read-string
-        type
-        str
-        (clojure.string/replace #"class " "")
-        get-type
-        (str " ")))))
+          type
+          str
+          (clojure.string/replace #"class " "")
+          get-type
+          (str " "))))
 
 (defn change-if
   "change-if takes a string and will output a string based on if
@@ -324,11 +305,16 @@
   [s]
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["nil " "nil"]
-        :else (let [t (get-dictionary-type (str s))]
-                   (cond ;(symbol? s) (type-and-val (resolve s)) ;; can this lead to infinite recursion? Can the result be nil?
+        :else (let [t (get-dictionary-type s)]
+                   (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
                          (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
                               ["" "an anonymous function"]
                          (= t "a function ") [t (get-function-name (str s))]
                          (re-find #"unrecognized type" t) [t ""]
                          :else [t s]))))
+
+(defn anonymous?
+  "changes the string of an anonymous"
+  [a]
+  (if (= (str a) "an anonymous function") "#(...)" a))

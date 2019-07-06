@@ -30,9 +30,13 @@
   (let [exc-class (class exc)]
        (if (= clojure.lang.ExceptionInfo exc-class)
            ;(ex-info msg (ex-data exc))
-           (Exception. (processor/spec-message (:data (Throwable->map exc)))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
+               (if (= 1 (count (:via (Throwable->map exc))))
+                   (Exception. (processor/spec-message (:data (Throwable->map exc)))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
+                   (clojure.lang.Reflector/invokeConstructor (resolve (:type (second (:via (Throwable->map exc)))))  (to-array [msg])));(str "the type is: " (:type (second (:via (Throwable->map exc)))))))
            (if (= clojure.lang.Compiler$CompilerException exc-class)
-               (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg)) ; a stub for now
+               (if (processor/macro-spec? exc)
+                   (Exception. "This is a macro")
+                   (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
                ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
                (if (= clojure.lang.ArityException exc-class)
                   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" (.getMessage exc))]
@@ -44,6 +48,6 @@
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
     (reset! track {:e %}) ; for debugging - and possibly for logging
-    (clojure.main/repl-caught (make-exception % (if (= clojure.lang.ExceptionInfo (class %))
+    (clojure.main/repl-caught (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
                                                     "" (processor/process-message %)))))))
     ;(clojure.repl/pst % 3))))
