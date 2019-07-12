@@ -83,14 +83,14 @@
   (.contains path :clojure.spec.alpha/nil))
 
 (defn filter-extra-spec-errors
-   "error-maps looks like [{:path [:a :b ...] ~~} {:path [] ~~} ...]
-   Filters through error-maps removing any map that contains :clojure.spec.apha/nil in :path or :reason"
-   [error-maps]
-   (if (> (count error-maps) 1)
-       (->> error-maps
+   "problem-maps looks like [{:path [:a :b ...] ~~} {:path [] ~~} ...]
+   Filters through problem-maps removing any map that contains :clojure.spec.apha/nil in :path or :reason"
+   [problem-maps]
+   (if (> (count problem-maps) 1)
+       (->> problem-maps
             (filter #(not (has-alpha-nil? %)))
             (filter #(not (contains? % :reason))))
-       error-maps))
+       problem-maps))
 
 ; (defn choose-path
 ;   "Returns correct path based on conditions when given a list which should be of a :clojure.spec.alpha.problems that contains a list of paths.
@@ -107,8 +107,10 @@
 (defn spec-message
   "Takes ex-info data of a spec error, returns a modified message as a string"
   [ex-data]
-  (let [{my-paths :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
-        {:keys [path pred val via in]} (-> my-paths
+  (let [{problem-list :clojure.spec.alpha/problems
+         fn-full-name :clojure.spec.alpha/fn
+         args-val :clojure.spec.alpha/args} ex-data
+        {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
         arg-number (first in)
