@@ -92,18 +92,6 @@
             (filter #(not (contains? % :reason))))
        problem-maps))
 
-; (defn choose-path
-;   "Returns correct path based on conditions when given a list which should be of a :clojure.spec.alpha.problems that contains a list of paths.
-;    Its default case should be when the :path contains nil because of the nilable path which we never want to return because it gives null pointer.
-;    Its purpose is to check for :reason which is the wrong path because of how spec is structured,
-;    it removes this path through recursion until you get the correct path for the spec error."
-  ; (cond
-  ;   (= (count list-of-paths) 1) list-of-paths
-  ;   (= (first list-of-paths) nil) {:path [:wrong-path] :pred :val :via "function" :in [0]} ;Should never happen
-  ;   (.contains ((first list-of-paths) :path) :clojure.spec.alpha/nil) (choose-path (rest list-of-paths)) ;checks if path contains nil through .contains
-  ;   (contains? (first list-of-paths) :reason) (choose-path (rest list-of-paths)) ;checks if path contains reason
-  ;   :else (first list-of-paths))) ;return the first
-
 (defn spec-message
   "Takes ex-info data of a spec error, returns a modified message as a string"
   [{problem-list :clojure.spec.alpha/problems
