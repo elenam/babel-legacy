@@ -79,15 +79,16 @@
   (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
 
 (defn has-alpha-nil?
-  [error-map]
-  (not (.contains (:path error-map) :clojure.spec.alpha/nil)))
+  [{:keys [path]}]
+  (.contains path :clojure.spec.alpha/nil))
 
 (defn filter-path
    "Filters through a list of paths removing any hashmap that contains :reason or :clojure.spec.apha/nil"
    [error-maps]
    (if (> (count error-maps) 1)
-       (filter #(not (contains? % :reason))
-               (filter has-alpha-nil? error-maps))
+       (->> error-maps
+            (filter #(not (has-alpha-nil? %)))
+            (filter #(not (contains? % :reason))))
        error-maps))
 
 ; (defn choose-path
