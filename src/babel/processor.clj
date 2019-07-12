@@ -82,8 +82,9 @@
   [{:keys [path]}]
   (.contains path :clojure.spec.alpha/nil))
 
-(defn filter-path
-   "Filters through a list of paths removing any hashmap that contains :reason or :clojure.spec.apha/nil"
+(defn filter-extra-spec-errors
+   "error-maps looks like [{:path [:a :b ...] ~~} {:path [] ~~} ...]
+   Filters through error-maps removing any map that contains :clojure.spec.apha/nil in :path or :reason"
    [error-maps]
    (if (> (count error-maps) 1)
        (->> error-maps
@@ -108,8 +109,8 @@
   [ex-data]
   (let [{my-paths :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
         {:keys [path pred val via in]} (-> my-paths
-                                           filter-path
-                                           first) ;(first (filter-path my-paths))
+                                           filter-extra-spec-errors
+                                           first)
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)
         fn-name (d/get-function-name (str fn-full-name))
