@@ -106,22 +106,30 @@
 
 (defn spec-message
   "Takes ex-info data of a spec error, returns a modified message as a string"
-  [ex-data]
-  (let [{problem-list :clojure.spec.alpha/problems
-         fn-full-name :clojure.spec.alpha/fn
-         args-val :clojure.spec.alpha/args} ex-data
-        {:keys [path pred val via in]} (-> problem-list
+  [{problem-list :clojure.spec.alpha/problems
+    fn-full-name :clojure.spec.alpha/fn
+    args-val :clojure.spec.alpha/args}]
+  (let [{:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
-        arg-number (first in)
-        [print-type print-val] (d/type-and-val val)
+        wrong-num-args-msg "Wrong number of arguments, expected in (%s %s): the function %s expects %s but was given %s arguments"
+        general-err-msg "The %s of (%s %s) was expected to be %s but is %s%s instead.\n"
         fn-name (d/get-function-name (str fn-full-name))
         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
-        ]
+        arg-number (first in)
+        [print-type print-val] (d/type-and-val val)]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (str "Wrong number of arguments, expected in " "("fn-name" "function-args-val")"  ": the function " fn-name " expects " (length-ref (keyword (d/get-function-name (str (first via))))) " but was given " (if (nil? val) 0 (count val)) " arguments") ; a for our (babel) length predicates
-        (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
-             " but is " print-type print-val " instead.\n"))))
+        (format wrong-num-args-msg fn-name
+                                   function-args-val
+                                   fn-name
+                                   (length-ref (keyword (d/get-function-name (str (first via))))) ;num-expected-args
+                                   (if (nil? val) 0 (count val))) ;num-given-args
+        (format general-err-msg (d/arg-str arg-number) ;index of incorrect argument
+                                fn-name
+                                function-args-val
+                                (stringify path) ;correct type
+                                print-type
+                                print-val))))
 
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)
