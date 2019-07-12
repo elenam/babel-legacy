@@ -78,17 +78,17 @@
   [vector-of-keywords]
   (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
 
-(defn has-val?
-  "Higher ordered function designed to that returns a predicate true or false depending if the path contains a vector with the value :clojure.spec.alpha/nil"
-  [key value]
-  (fn
-    [sequence]
-      (not (.contains (sequence key) value))))
+(defn has-alpha-nil?
+  [error-map]
+  (not (.contains (:path error-map) :clojure.spec.alpha/nil)))
 
 (defn filter-path
    "Filters through a list of paths removing any hashmap that contains :reason or :clojure.spec.apha/nil"
-   [list-of-paths]
-   (if (> (count list-of-paths) 1) (filter #(not (contains? % :reason)) (filter (has-val? :path :clojure.spec.alpha/nil) list-of-paths)) list-of-paths))
+   [error-maps]
+   (if (> (count error-maps) 1)
+       (filter #(not (contains? % :reason))
+               (filter has-alpha-nil? error-maps))
+       error-maps))
 
 ; (defn choose-path
 ;   "Returns correct path based on conditions when given a list which should be of a :clojure.spec.alpha.problems that contains a list of paths.
@@ -106,9 +106,9 @@
   "Takes ex-info data of a spec error, returns a modified message as a string"
   [ex-data]
   (let [{my-paths :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
-        paths (filter-path my-paths)
-        our-path (first paths)
-        {:keys [path pred val via in]} our-path
+        {:keys [path pred val via in]} (-> my-paths
+                                           filter-path
+                                           first) ;(first (filter-path my-paths))
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)
         fn-name (d/get-function-name (str fn-full-name))
