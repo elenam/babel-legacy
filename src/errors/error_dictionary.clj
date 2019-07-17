@@ -94,7 +94,7 @@
    ;  :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-divide (nth matches 2)) :arg
    ;                                                         " can only take one or more arguments; recieved " (number-vals (nth matches 3) "b-length-greater-zero") :arg
    ;                                                         ".\n"))}
-   ; 
+   ;
    ; {:key :length-not-greater-zero-macro
    ;  :class "ExceptionInfo"
    ;  :match (beginandend "Call to (.*)/(.*) did not conform to spec:\\nval: (.*) fails spec: :(.*)/b-length-greater-zero")
@@ -654,7 +654,7 @@
     :class "UnsupportedOperationException"
     :match (beginandend "(\\S*) not supported on this type: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Function " (nth matches 1) :arg
-                                                           " does not allow " (get-type (nth matches 2)) :type " as an argument.\n"))}
+                                                           " does not allow " (get-type (nth matches 2)) :type " as an argument in this position.\n"))}
 
     {:key :compiler-exception-must-recur-from-tail-position
     :class "UnsupportedOperationException"

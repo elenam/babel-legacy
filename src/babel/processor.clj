@@ -126,11 +126,14 @@
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value} data
-        val-str (d/macro-args->str value)
+        val-str (d/macro-args->str value) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n") ;; should we report the extra parts?
-              (and (= n 1) (= (:pred (first problems) clojure.core.specs.alpha/even-number-of-forms?))) "fails even number of forms"
+              (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
+                   (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
+              (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
+                   (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
               :else (str "(" fn-name val-str ")" " has " n " paths\n"))))
   ;; cases: extra/insufficient input vs other spec errors
 
