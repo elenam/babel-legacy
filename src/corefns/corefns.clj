@@ -31,7 +31,7 @@
                                                (if num2
                                                   (and (>= strc num1) (>= strc num2) (>= num2 num1))
                                                   (>= strc num1))))
-(defn greater-than-zero? [number] (< 0 number))
+(defn greater-than-zero? [number] (and (number? number)(< 0 number)))
 
 (s/def ::b-length-one b-length1?)
 (s/def ::b-length-two b-length2?)
@@ -229,7 +229,7 @@
 
 (s/fdef clojure.core/contains?
   :args (s/and ::b-length-two
-    (s/cat :collection (s/nilable coll?) :key (s/nilable keyword?))))
+    (s/or :arg-one (s/cat :collection (s/nilable coll?) :key (s/nilable keyword?)))))
 (stest/instrument `clojure.core/contains?)
 
 (s/fdef clojure.core/filter
@@ -248,7 +248,7 @@
 (s/fdef clojure.core/take-nth
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :number ::number-or-lazy)
-          :arg-two (s/cat :number ::greater-than-zero :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :number-greater-than-zero ::greater-than-zero :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/take-nth)
 
 (s/fdef clojure.core/take-last

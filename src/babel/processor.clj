@@ -65,7 +65,7 @@
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong" :num "a number" :lazy "a lazy sequence"
-                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs"})
+                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs" :number-greater-than-zero "a number that's greater than zero"})
 
 (def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
                  :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",
@@ -92,12 +92,11 @@
             (filter #(not (contains? % :reason))))
        problem-maps))
 
-(defn spec-message
-  "Takes ex-info data of a spec error, returns a modified message as a string"
-  [{problem-list :clojure.spec.alpha/problems
-    fn-full-name :clojure.spec.alpha/fn
-    args-val :clojure.spec.alpha/args}]
-  (let [{:keys [path pred val via in]} (-> problem-list
+(defn babel-spec-message
+  "Takes ex-info data of our babel spec error, returns a modified message as a string"
+  [ex-data]
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
+        {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
         wrong-num-args-msg "Wrong number of arguments, expected in (%s %s): the function %s expects %s but was given %s arguments"
@@ -118,6 +117,41 @@
                                 (stringify path) ;correct type
                                 print-type
                                 print-val))))
+
+(defn unknown-spec
+  "determines if the spec function is ours or someone's else"
+  [unknown-ex-data]
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
+        {:keys [path pred val via in]} (-> problem-list
+                                           filter-extra-spec-errors
+                                           first)
+         fail "Fails a predicate: 'The %s argument of (%s %s) fails a requirement: must be a %s'"
+         extra "Extra input: 'In the %s call (%s %s) there were extra arguments'"
+         insufficient "Insufficient input: 'In the %s call (%s %s) there were insufficient arguments'"
+         fn-name (d/get-function-name (str fn-full-name))
+         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
+         arg-number (first in)
+         [print-type print-val] (d/type-and-val val)]
+     (cond
+       (= (:reason (first problem-list)) "Extra input") (format extra fn-name
+                                                                      fn-name
+                                                                      function-args-val)
+      (= (:reason (first problem-list)) "Insufficient input") (format insufficient fn-name
+                                                                                   fn-name
+                                                                                   function-args-val)
+      :else (format fail arg-number
+                         fn-name
+                         function-args-val
+                         pred))))
+
+(defn spec-message
+ "uses babel-spec-message"
+ [exception]
+ (let [{problem-list :clojure.spec.alpha/problems} exception
+       {:keys [pred]} (-> problem-list
+                                          filter-extra-spec-errors
+                                          first)]
+ (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
 ; (defn modify-errors [inp-message]
 ;   (if (contains? inp-message :err)
