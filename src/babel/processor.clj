@@ -66,7 +66,7 @@
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong" :num "a number" :lazy "a lazy sequence"
-                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs"})
+                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs" :number-greater-than-zero "a number that's greater than zero"})
 
 (def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
                  :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",
@@ -79,46 +79,80 @@
   [vector-of-keywords]
   (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
 
-(defn has-val?
-  "Higher ordered function designed to that returns a predicate true or false depending if the path contains a vector with the value :clojure.spec.alpha/nil"
-  [key value]
-  (fn
-    [sequence]
-      (not (.contains (sequence key) value))))
+(defn has-alpha-nil?
+  [{:keys [path]}]
+  (.contains path :clojure.spec.alpha/nil))
 
-(defn filter-path
-   "Filters through a list of paths removing any hashmap that contains :reason or :clojure.spec.apha/nil"
-   [list-of-paths]
-   (if (> (count list-of-paths) 1) (filter #(not (contains? % :reason)) (filter (has-val? :path :clojure.spec.alpha/nil) list-of-paths)) list-of-paths))
+(defn filter-extra-spec-errors
+   "problem-maps looks like [{:path [:a :b ...] ~~} {:path [] ~~} ...]
+   Filters through problem-maps removing any map that contains :clojure.spec.apha/nil in :path or :reason"
+   [problem-maps]
+   (if (> (count problem-maps) 1)
+       (->> problem-maps
+            (filter #(not (has-alpha-nil? %)))
+            (filter #(not (contains? % :reason))))
+       problem-maps))
 
-; (defn choose-path
-;   "Returns correct path based on conditions when given a list which should be of a :clojure.spec.alpha.problems that contains a list of paths.
-;    Its default case should be when the :path contains nil because of the nilable path which we never want to return because it gives null pointer.
-;    Its purpose is to check for :reason which is the wrong path because of how spec is structured,
-;    it removes this path through recursion until you get the correct path for the spec error."
-  ; (cond
-  ;   (= (count list-of-paths) 1) list-of-paths
-  ;   (= (first list-of-paths) nil) {:path [:wrong-path] :pred :val :via "function" :in [0]} ;Should never happen
-  ;   (.contains ((first list-of-paths) :path) :clojure.spec.alpha/nil) (choose-path (rest list-of-paths)) ;checks if path contains nil through .contains
-  ;   (contains? (first list-of-paths) :reason) (choose-path (rest list-of-paths)) ;checks if path contains reason
-  ;   :else (first list-of-paths))) ;return the first
-
-(defn spec-message
-  "Takes ex-info data of a spec error, returns a modified message as a string"
+(defn babel-spec-message
+  "Takes ex-info data of our babel spec error, returns a modified message as a string"
   [ex-data]
-  (let [{my-paths :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
-        paths (filter-path my-paths)
-        our-path (first paths)
-        {:keys [path pred val via in]} our-path
-        arg-number (first in)
-        [print-type print-val] (d/type-and-val val)
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
+        {:keys [path pred val via in]} (-> problem-list
+                                           filter-extra-spec-errors
+                                           first)
+        wrong-num-args-msg "Wrong number of arguments, expected in (%s %s): the function %s expects %s but was given %s arguments"
+        general-err-msg "The %s of (%s %s) was expected to be %s but is %s%s instead.\n"
         fn-name (d/get-function-name (str fn-full-name))
         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
-        ]
+        arg-number (first in)
+        [print-type print-val] (d/type-and-val val)]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (str "Wrong number of arguments, expected in " "("fn-name" "function-args-val")"  ": the function " fn-name " expects " (length-ref (keyword (d/get-function-name (str (first via))))) " but was given " (if (nil? val) 0 (count val)) " arguments") ; a for our (babel) length predicates
-        (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
-             " but is " print-type print-val " instead.\n"))))
+        (format wrong-num-args-msg fn-name
+                                   function-args-val
+                                   fn-name
+                                   (length-ref (keyword (d/get-function-name (str (first via))))) ;num-expected-args
+                                   (if (nil? val) 0 (count val))) ;num-given-args
+        (format general-err-msg (d/arg-str arg-number) ;index of incorrect argument
+                                fn-name
+                                function-args-val
+                                (stringify path) ;correct type
+                                print-type
+                                print-val))))
+
+(defn unknown-spec
+  "determines if the spec function is ours or someone's else"
+  [unknown-ex-data]
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
+        {:keys [path pred val via in]} (-> problem-list
+                                           filter-extra-spec-errors
+                                           first)
+         fail "Fails a predicate: 'The %s argument of (%s %s) fails a requirement: must be a %s'"
+         extra "Extra input: 'In the %s call (%s %s) there were extra arguments'"
+         insufficient "Insufficient input: 'In the %s call (%s %s) there were insufficient arguments'"
+         fn-name (d/get-function-name (str fn-full-name))
+         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
+         arg-number (first in)
+         [print-type print-val] (d/type-and-val val)]
+     (cond
+       (= (:reason (first problem-list)) "Extra input") (format extra fn-name
+                                                                      fn-name
+                                                                      function-args-val)
+      (= (:reason (first problem-list)) "Insufficient input") (format insufficient fn-name
+                                                                                   fn-name
+                                                                                   function-args-val)
+      :else (format fail arg-number
+                         fn-name
+                         function-args-val
+                         pred))))
+
+(defn spec-message
+ "uses babel-spec-message"
+ [exception]
+ (let [{problem-list :clojure.spec.alpha/problems} exception
+       {:keys [pred]} (-> problem-list
+                                          filter-extra-spec-errors
+                                          first)]
+ (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
 (defn- process-paths-macro
   [problems]
