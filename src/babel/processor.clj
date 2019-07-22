@@ -154,11 +154,29 @@
                                           first)]
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
+(defn- print-macro-arg
+  "Takes an argument that fails a spec condition for a macro and returns
+   a user-readable representation of this argument as a string"
+  [val]
+  (str val))
+
+(defn- process-group
+  "Takes a vector of a value and hashmaps of predicates it failed and returns
+   a string describing the problems"
+  [[val probs]]
+  (str "The value " (print-macro-arg val) " fails " probs "\n"))
+
 (defn- process-paths-macro
+  "Takes the 'problems' part of a spec for a macro and returns a description
+   of the problems as a string"
   [problems]
-  (group-by :val (map #(select-keys % [:pred :val]) problems)))
+  (let [grouped (group-by :val (map #(select-keys % [:pred :val]) problems))
+        num-groups (count grouped)]
+       (apply str (map process-group grouped))))
 
 (defn spec-macro-message
+  "Takes an exception of a macro spec failure and returns the description of
+   the problem as a string"
   [ex]
   (let [exc-map (Throwable->map ex)
         {:keys [cause data]} exc-map
@@ -177,19 +195,5 @@
               ;; symbol? (note - might be multiple paths; also may be not in the first position)
 
               :else (str "(" fn-name val-str ")" " has " n " paths\n" (process-paths-macro problems) "\n"))))
-
-
-; (defn modify-errors [inp-message]
-;   (if (contains? inp-message :err)
-;       (assoc inp-message :err
-;              (let [err (get-error (:session inp-message))
-;                    processed-error (if err (process-message err) "No detail can be found")]
-;                   (do
-;                     (update-recorder-detail processed-error)
-;                     (update-recorder-msg (:session inp-message));(str err))
-;                     ;(inp-message :err))))
-;                     processed-error)))
-;
-;       inp-message))
 
 (println "babel.processor loaded")
