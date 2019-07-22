@@ -120,6 +120,10 @@
         (str "The " (d/arg-str arg-number) " of " "("fn-name" "function-args-val")" " was expected to be " (stringify path)
              " but is " print-type print-val " instead.\n"))))
 
+(defn- process-paths-macro
+  [problems]
+  (group-by :val (map #(select-keys % [:pred :val]) problems)))
+
 (defn spec-macro-message
   [ex]
   (let [exc-map (Throwable->map ex)
@@ -129,13 +133,16 @@
         val-str (d/macro-args->str value) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
-              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n") ;; should we report the extra parts?
+              ;; should we report the extra parts?
+              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
+              ;; should report the argument
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
-              :else (str "(" fn-name val-str ")" " has " n " paths\n"))))
-  ;; cases: extra/insufficient input vs other spec errors
+              ;; symbol? (note - might be multiple paths; also may be not in the first position)
+
+              :else (str "(" fn-name val-str ")" " has " n " paths\n" (process-paths-macro problems) "\n"))))
 
 
 ; (defn modify-errors [inp-message]
