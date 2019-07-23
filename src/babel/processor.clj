@@ -162,9 +162,18 @@
   (str val))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
-;; name
+;; name. Negativr positions are later discarded
 (def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
-  #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"]})
+  #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"],
+  #'clojure.core/qualified-keyword? [-1 " a keyword"]})
+
+(defn- predicate-name
+  "Takes a failed predicate from a macro spec, returns a vector
+   of its name and position"
+  [p]
+  (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type type"]) ; for debugging purposes
+        (set? p) [5 " one of specific keywords"]
+        :else  [10 " unknown type type"]))
 
 (defn- print-failed-predicates
   "Takes a vector of hashmaps of failed predicates and returns a string
@@ -173,8 +182,9 @@
   (->> probs
        (map :pred) ; get the failed predicates
        (distinct) ; eliminate duplicates
-       (map #(macro-predicates (resolve %))) ; get position/name pairs
+       (map #(predicate-name %)) ; get position/name pairs
        (sort #(< (first %1) (first %2))) ; sort by the position
+       (filter #(>= (first %) 0)); remove negative positions
        (map second) ; take names only
        (s/join " or"))) ; join into a string with " or" as a separator
 
