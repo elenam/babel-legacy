@@ -172,7 +172,7 @@
    of its name and position"
   [p]
   (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type type"]) ; for debugging purposes
-        (set? p) [5 " one of specific keywords"]
+        (set? p) [-1 " one of specific keywords"]
         :else  [10 " unknown type type"]))
 
 (defn- print-failed-predicates
@@ -180,6 +180,7 @@
    that describes them for beginners"
   [probs]
   (->> probs
+       (filter #(nil? (:reason %))) ; eliminate "Extra input" and "Insufficient input"
        (map :pred) ; get the failed predicates
        (distinct) ; eliminate duplicates
        (map #(predicate-name %)) ; get position/name pairs
@@ -192,13 +193,16 @@
   "Takes a vector of a value and hashmaps of predicates it failed and returns
    a string describing the problems"
   [[val probs]]
-  (str "The value " (print-macro-arg val) " must be" (print-failed-predicates probs) "\n"))
+  (let [printed-group (print-failed-predicates probs)]
+       (if (not= printed-group "")
+           (str "In place of " (print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           "")))
 
 (defn- process-paths-macro
   "Takes the 'problems' part of a spec for a macro and returns a description
    of the problems as a string"
   [problems]
-  (let [grouped (group-by :val (map #(select-keys % [:pred :val]) problems))
+  (let [grouped (group-by :val (map #(select-keys % [:pred :val :reason]) problems))
         num-groups (count grouped)]
        (apply str (map process-group grouped))))
 
@@ -222,6 +226,6 @@
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
               ;; symbol? (note - might be multiple paths; also may be not in the first position)
 
-              :else (str "(" fn-name val-str ")" " has " n " paths\n" (process-paths-macro problems) "\n"))))
+              :else (str "Syntax problems with (" fn-name val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
