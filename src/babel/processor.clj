@@ -222,6 +222,6 @@
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
               ;; symbol? (note - might be multiple paths; also may be not in the first position)
 
-              :else (str "(" fn-name (val-str) ")" " has " n " paths\n" (process-paths-macro problems) "\n"))))
+              :else (str "(" fn-name val-str ")" " has " n " paths\n" (process-paths-macro problems) "\n"))))
 
 (println "babel.processor loaded")
