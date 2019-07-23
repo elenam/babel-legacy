@@ -1,5 +1,6 @@
 (ns babel.processor
- (:require [errors.messageobj :as m-obj]
+ (:require [clojure.string :as s]
+           [errors.messageobj :as m-obj]
            [errors.prettify-exception :as p-exc]
            [errors.dictionaries :as d]))
 
@@ -160,11 +161,28 @@
   [val]
   (str val))
 
+;; Predicates are mapped to a pair of a position and a beginner-friendly
+;; name
+(def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
+  #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"]})
+
+(defn- print-failed-predicates
+  "Takes a vector of hashmaps of failed predicates and returns a string
+   that describes them for beginners"
+  [probs]
+  (->> probs
+       (map :pred) ; get the failed predicates
+       (distinct) ; eliminate duplicates
+       (map #(macro-predicates (resolve %))) ; get position/name pairs
+       (sort #(< (first %1) (first %2))) ; sort by the position
+       (map second) ; take names only
+       (s/join " or"))) ; join into a string with " or" as a separator
+
 (defn- process-group
   "Takes a vector of a value and hashmaps of predicates it failed and returns
    a string describing the problems"
   [[val probs]]
-  (str "The value " (print-macro-arg val) " fails " probs "\n"))
+  (str "The value " (print-macro-arg val) " must be" (print-failed-predicates probs) "\n"))
 
 (defn- process-paths-macro
   "Takes the 'problems' part of a spec for a macro and returns a description
