@@ -165,15 +165,18 @@
 ;; name. Negativr positions are later discarded
 (def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
   #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"],
-  #'clojure.core/qualified-keyword? [-1 " a keyword"]})
+  #'clojure.core/qualified-keyword? [-1 " a keyword"],
+  #'clojure.core/sequential? [1 " a vector"]}) ; while other sequential constructs are possible, for beginners "a vector" is sufficient
 
 (defn- predicate-name
   "Takes a failed predicate from a macro spec, returns a vector
    of its name and position"
   [p]
-  (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type type"]) ; for debugging purposes
+  (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type"]) ; for debugging purposes
         (set? p) [-1 " one of specific keywords"]
-        :else  [10 " unknown type type"]))
+        (and (seq? p) (re-find #"clojure.core/sequential\?" (apply str (flatten p))))
+             (macro-predicates #'clojure.core/sequential?)
+        :else  [10 (str " unknown type " p)]))
 
 (defn- print-failed-predicates
   "Takes a vector of hashmaps of failed predicates and returns a string
@@ -187,6 +190,7 @@
        (sort #(< (first %1) (first %2))) ; sort by the position
        (filter #(>= (first %) 0)); remove negative positions
        (map second) ; take names only
+       (distinct) ; eliminate duplicates
        (s/join " or"))) ; join into a string with " or" as a separator
 
 (defn- process-group
