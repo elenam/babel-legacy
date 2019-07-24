@@ -159,7 +159,7 @@
   "Takes an argument that fails a spec condition for a macro and returns
    a user-readable representation of this argument as a string"
   [val]
-  (str val))
+  (str (if (string? val) (str "\"" val "\"") val)))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
@@ -210,6 +210,13 @@
         num-groups (count grouped)]
        (apply str (map process-group grouped))))
 
+(defn- invalid-macro-params?
+  "Takes the 'problems' part of a spect for a macro and returns true
+   if all problems refer to the parameters and false otherwise"
+   [problems]
+   (let [via-lasts (distinct (map str (map last (map :via problems))))]
+        (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
+
 (defn spec-macro-message
   "Takes an exception of a macro spec failure and returns the description of
    the problem as a string"
@@ -228,8 +235,7 @@
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
-              ;; symbol? (note - might be multiple paths; also may be not in the first position)
-
+              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name val-str ")\n")
               :else (str "Syntax problems with (" fn-name val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
