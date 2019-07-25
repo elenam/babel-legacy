@@ -159,23 +159,27 @@
    "switches the anonymous symbols with readable strings"
    [anon-func]
    (cond
-     (not (seqable? anon-func)) (str anon-func)
-     (empty? anon-func) ")"
-     (.equals "fn*" (str anon-func)) "#"
-     (vector? anon-func) ""
+     (string? val) (str "\"" val "\"")
+     (= "fn*" (str anon-func)) "#"
+     ;(vector? anon-func) ""
      (re-matches #"p(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
-     :else (str "("(build-the-anonymous (first anon-func)) (build-the-anonymous (rest anon-func)))))
+     :else (str anon-func)))
 
 
- (defn- print-macro-arg
+ (defn- print-macro-arg-rec
    "Takes an argument that fails a spec condition for a macro and returns
     a user-readable representation of this argument as a string"
    [val]
    (cond
-     (not (seqable? val)) (build-the-anonymous (str val))
-     (empty? val) ""
-     ;(re-matches #"fn(.*)" (subs (str val) 1 3)) (build-the-anonymous val)
-     :else (str (print-macro-arg (first val)) (print-macro-arg (rest val)))))
+     (not (seqable? val)) (build-the-anonymous val)
+     (empty? val) ")"
+     (seqable? (first val)) (str "(" (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest val)))
+     :else (str (build-the-anonymous (first val)) " " (print-macro-arg-rec (rest val)))))
+
+(defn- print-macro-arg
+  [val]
+  (not (seqable? val)) (build-the-anonymous val)
+  :else (str "(" (print-macro-arg-rec (first val)) (print-macro-arg-rec (rest val))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
