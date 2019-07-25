@@ -155,11 +155,27 @@
                                           first)]
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
-(defn- print-macro-arg
-  "Takes an argument that fails a spec condition for a macro and returns
-   a user-readable representation of this argument as a string"
-  [val]
-  (str (if (string? val) (str "\"" val "\"") val)))
+ (defn build-the-anonymous
+   "switches the anonymous symbols with readable strings"
+   [anon-func]
+   (cond
+     (not (seqable? anon-func)) (str anon-func)
+     (empty? anon-func) ")"
+     (.equals "fn*" (str anon-func)) "#"
+     (vector? anon-func) ""
+     (re-matches #"p(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
+     :else (str "("(build-the-anonymous (first anon-func)) (build-the-anonymous (rest anon-func)))))
+
+
+ (defn- print-macro-arg
+   "Takes an argument that fails a spec condition for a macro and returns
+    a user-readable representation of this argument as a string"
+   [val]
+   (cond
+     (not (seqable? val)) (build-the-anonymous (str val))
+     (empty? val) ""
+     ;(re-matches #"fn(.*)" (subs (str val) 1 3)) (build-the-anonymous val)
+     :else (str (print-macro-arg (first val)) (print-macro-arg (rest val)))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
