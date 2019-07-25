@@ -160,11 +160,11 @@
    [anon-func]
    (cond
      (not (seqable? anon-func)) (str anon-func)
-     (empty? anon-func) ")"
-     (.equals "fn*" (str anon-func)) "#"
-     (vector? anon-func) ""
-     (re-matches #"p(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
-     :else (str "("(build-the-anonymous (first anon-func)) (build-the-anonymous (rest anon-func)))))
+     (empty? anon-func) ""
+     (.equals "fn*" (str anon-func)) "(#"
+     (and (vector? anon-func) (re-matches #"p(\d)__(\d)(\d)(\d)(\d)(.*)" (str (first anon-func)))) ""
+     (re-matches #"p(\d)__(\d)(\d)(\d)(\d)(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
+     :else (str (build-the-anonymous (first anon-func)) (build-the-anonymous (rest anon-func)))))
 
 
  (defn- print-macro-arg
@@ -215,7 +215,7 @@
   [[val probs]]
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
-           (str "In place of " (print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           (str "In place of " "(" (print-macro-arg val) ")" " the following are allowed:" (print-failed-predicates probs) "\n")
            "")))
 
 (defn- process-paths-macro
