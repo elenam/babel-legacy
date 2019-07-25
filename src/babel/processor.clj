@@ -181,15 +181,18 @@
 ;; name. Negativr positions are later discarded
 (def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
   #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"],
-  #'clojure.core/qualified-keyword? [-1 " a keyword"]})
+  #'clojure.core/qualified-keyword? [-1 " a keyword"],
+  #'clojure.core/sequential? [1 " a vector"]}) ; while other sequential constructs are possible, for beginners "a vector" is sufficient
 
 (defn- predicate-name
   "Takes a failed predicate from a macro spec, returns a vector
    of its name and position"
   [p]
-  (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type type"]) ; for debugging purposes
+  (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type"]) ; for debugging purposes
         (set? p) [-1 " one of specific keywords"]
-        :else  [10 " unknown type type"]))
+        (and (seq? p) (re-find #"clojure.core/sequential\?" (apply str (flatten p))))
+             (macro-predicates #'clojure.core/sequential?)
+        :else  [10 (str " unknown type " p)]))
 
 (defn- print-failed-predicates
   "Takes a vector of hashmaps of failed predicates and returns a string
@@ -203,6 +206,7 @@
        (sort #(< (first %1) (first %2))) ; sort by the position
        (filter #(>= (first %) 0)); remove negative positions
        (map second) ; take names only
+       (distinct) ; eliminate duplicates
        (s/join " or"))) ; join into a string with " or" as a separator
 
 (defn- process-group
@@ -222,6 +226,13 @@
         num-groups (count grouped)]
        (apply str (map process-group grouped))))
 
+(defn- invalid-macro-params?
+  "Takes the 'problems' part of a spect for a macro and returns true
+   if all problems refer to the parameters and false otherwise"
+   [problems]
+   (let [via-lasts (distinct (map str (map last (map :via problems))))]
+        (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
+
 (defn spec-macro-message
   "Takes an exception of a macro spec failure and returns the description of
    the problem as a string"
@@ -229,19 +240,19 @@
   (let [exc-map (Throwable->map ex)
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
-        {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value} data
+        {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/macro-args->str value) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n")
+              ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9)
+              (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (d/macro-args->str args)  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
-              ;; should report the argument
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
-              ;; symbol? (note - might be multiple paths; also may be not in the first position)
-
+              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name val-str ")\n")
               :else (str "Syntax problems with (" fn-name val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
