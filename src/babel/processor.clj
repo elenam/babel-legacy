@@ -155,14 +155,15 @@
                                           first)]
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
+
  (defn build-the-anonymous
    "switches the anonymous symbols with readable strings"
    [anon-func]
    (cond
-     (string? val) (str "\"" val "\"")
+     (and (re-matches #"p(\d)__(.*)" (str anon-func)) (vector? anon-func)) ""
+     (string? anon-func) (str "\"" anon-func "\"")
      (= "fn*" (str anon-func)) "#"
-     ;(vector? anon-func) ""
-     (re-matches #"p(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
+     (re-matches #"p(\d)__(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
      :else (str anon-func)))
 
 
@@ -174,6 +175,7 @@
      (not (seqable? val)) (build-the-anonymous val)
      (empty? val) ")"
      (seqable? (first val)) (str "(" (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest val)))
+     (and (not (empty? (rest val))) (= "fn*" (str (first val))) (seqable? val)) (str (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest (rest val))));;condition to remove a vector after fn*
      :else (str (build-the-anonymous (first val)) " " (print-macro-arg-rec (rest val)))))
 
 (defn- print-macro-arg
