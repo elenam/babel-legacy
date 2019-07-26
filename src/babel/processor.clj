@@ -175,7 +175,7 @@
      (not (seqable? val)) (build-the-anonymous val)
      (empty? val) ")"
      (seqable? (first val)) (str "(" (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest val)))
-     (and (not (empty? (rest val))) (= "fn*" (str (first val))) (seqable? val)) (str (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest (rest val))))
+     (and (not (empty? (rest val))) (= "fn*" (str (first val))) (seqable? val)) (str (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest (rest val))));;condition to remove a vector after fn*
      :else (str (build-the-anonymous (first val)) " " (print-macro-arg-rec (rest val)))))
 
 (defn- print-macro-arg
