@@ -25,6 +25,14 @@
         (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" inp-code)})
         doall)))
 
+(defn get-error-parts
+  "Takes the object returned by trap-response and separates it into different
+  parts, returned as a map"
+  [response]
+  (let [err-str (:err (second response))
+        matches (re-matches #"(?s)(\S+) error \((\S+)\)(.*)" err-str)
+        type (get matches 2)] {:type type}))
+
 ;;takes the response and returns only the error message
 (defn msgs-to-error
   "takes a list of messages and returns nil if no :err is present, or the first present :err value"
@@ -76,7 +84,7 @@
   []
   (trap-response (str "(babel.processor/reset-recorder)")))
 
-;;the execution funtion for the tests
+;;the execution function for the tests
 (defn get-error
   "takes a testing expr and return its modified error message"
   [inp-code]
