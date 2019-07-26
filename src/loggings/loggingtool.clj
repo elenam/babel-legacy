@@ -1,7 +1,9 @@
 (ns loggings.loggingtool
   (:require
+   [babel.middleware]
    [expectations :refer :all]
-   [nrepl :as repl])
+   [nrepl.core :as repl]
+   [nrepl.middleware.caught])
   (:use
    [loggings.html-log]))
 
@@ -17,9 +19,10 @@
 (defn trap-response
   "evals the code given as a string, and returns the list of associated nREPL messages"
   [inp-code]
+  (babel.middleware/setup-exc)
   (with-open [conn (repl/connect :port server-port)]
     (-> (repl/client conn 1000)
-        (repl/message {:op :eval :code inp-code})
+        (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" inp-code)})
         doall)))
 
 ;;takes the response and returns only the error message
