@@ -19,7 +19,7 @@
 (defn trap-response
   "evals the code given as a string, and returns the list of associated nREPL messages"
   [code]
-  (babel.middleware/setup-exc)
+  ;(babel.middleware/setup-exc)
   (with-open [conn (repl/connect :port server-port)]
     (-> (repl/client conn 1000)
         (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" code)})
@@ -35,12 +35,12 @@
         n (if match1 2 1)
         type (get matches n)
         at (get matches (+ n 1))
-        message (get matches (+ n 2))
+        message (clojure.string/trim (get matches (+ n 2)))
         line (get matches (+ n 3))
         in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
 
-(defn babel-test
+(defn babel-test-message
   [code]
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"

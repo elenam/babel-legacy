@@ -1,6 +1,7 @@
 (ns babel.error-tests
   (:require
-   [expectations :refer :all]))
+   [expectations :refer :all]
+   [loggings.loggingtool :as t]))
    ;[corefns.instrumentfunctionsfortesting])
 ;  (:use
 ;   [loggings.loggingtool :only [get-error start-log add-log]]))
@@ -22,9 +23,10 @@
 ; (expect  nil (get-error "(take 5 (filter #(> 8 %) (repeatedly #(rand-int 10))))"))
 ;
 ; ;;arithmetic-exception-divide-by-zero
-; (expect "Tried to divide by zero\n" (get-error "(/ 70 0)"))
+
+(expect "Tried to divide by zero" (t/babel-test-message "(/ 70 0)"))
 ;
-; (expect "Tried to divide by zero\n" (get-error "(/ 70 8 0)"))
+(expect "Tried to divide by zero" (t/babel-test-message "(/ 70 8 0)"))
 ;
 ; ;;compiler-exception-cannot-resolve-symbol
 ; (expect "Name smoked-cod is undefined.\n" (get-error "(smoked-cod)"))
