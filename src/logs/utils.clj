@@ -37,7 +37,6 @@
         type (get matches n)
         at (get matches (+ n 1))
         message (s/trim (get matches (+ n 2)))
-        ;message (get matches (+ n 2))
         line (get matches (+ n 3))
         in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
