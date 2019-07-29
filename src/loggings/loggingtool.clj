@@ -18,11 +18,11 @@
 ;;gets the returning message from open repl
 (defn trap-response
   "evals the code given as a string, and returns the list of associated nREPL messages"
-  [inp-code]
+  [code]
   (babel.middleware/setup-exc)
   (with-open [conn (repl/connect :port server-port)]
     (-> (repl/client conn 1000)
-        (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" inp-code)})
+        (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" code)})
         doall)))
 
 (defn get-error-parts
@@ -30,8 +30,19 @@
   parts, returned as a map"
   [response]
   (let [err-str (:err (second response))
-        matches (re-matches #"(?s)(\S+) error \((\S+)\)(.*)" err-str)
-        type (get matches 2)] {:type type}))
+        matches (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\r\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
+        type (get matches 2)
+        at (get matches 3)
+        message (get matches 4)
+        line (get matches 5)
+        in (get matches 6)]
+      {:type type :at at :message message :line line :in in}))
+
+(defn babel-test
+  [code]
+  "Takes code as a string and returns the error message corresponding to the code
+   or nil if there was no error"
+  (:message (get-error-parts (trap-response code))))
 
 ;;takes the response and returns only the error message
 (defn msgs-to-error
