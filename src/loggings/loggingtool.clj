@@ -30,12 +30,14 @@
   parts, returned as a map"
   [response]
   (let [err-str (:err (second response))
-        matches (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\r\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
-        type (get matches 2)
-        at (get matches 3)
-        message (get matches 4)
-        line (get matches 5)
-        in (get matches 6)]
+        match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\r\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
+        matches (or match1 (re-matches #"(?s)(\S+) error at (.*)\r\n(.+)\n(.*)" err-str))
+        n (if match1 2 1)
+        type (get matches n)
+        at (get matches (+ n 1))
+        message (get matches (+ n 2))
+        line (get matches (+ n 3))
+        in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
 
 (defn babel-test
