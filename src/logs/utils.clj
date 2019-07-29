@@ -1,11 +1,11 @@
-(ns loggings.loggingtool
+(ns logs.utils
   (:require
    [babel.middleware]
    [expectations :refer :all]
    [nrepl.core :as repl]
    [nrepl.middleware.caught])
   (:use
-   [loggings.html-log]))
+   [logs.html-log]))
 
 ;;you need to have launched a nREPL server in babel for these to work.
 ;;this must be the same port specified in project.clj

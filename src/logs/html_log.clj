@@ -1,4 +1,4 @@
-(ns loggings.html-log
+(ns logs.html-log
   (:use hiccup.core))
 
 ;;counter atom that count the amount of testing units.
