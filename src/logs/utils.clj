@@ -3,7 +3,8 @@
    [babel.middleware]
    [expectations :refer :all]
    [nrepl.core :as repl]
-   [nrepl.middleware.caught])
+   [nrepl.middleware.caught]
+   [clojure.string :as s])
   (:use
    [logs.html-log]))
 
@@ -30,12 +31,13 @@
   parts, returned as a map"
   [response]
   (let [err-str (:err (second response))
-        match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\r\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
-        matches (or match1 (re-matches #"(?s)(\S+) error at (.*)\r\n(.+)\n(.*)" err-str))
+        match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
+        matches (or match1 (re-matches #"(?s)(\S+) error at (.*)\n(.+)\n(.*)" err-str))
         n (if match1 2 1)
         type (get matches n)
         at (get matches (+ n 1))
-        message (clojure.string/trim (get matches (+ n 2)))
+        message (s/trim (get matches (+ n 2)))
+        ;message (get matches (+ n 2))
         line (get matches (+ n 3))
         in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
