@@ -3,8 +3,8 @@
    [babel.middleware]
    [expectations :refer :all]
    [nrepl.core :as repl]
-   [nrepl.middleware.caught]
-   [clojure.string :as s])
+   [clojure.string :as s :refer [trim]]
+   [nrepl.middleware.caught])
   (:use
    [logs.html-log]))
 
@@ -23,7 +23,7 @@
   (with-open [conn (repl/connect :port server-port)]
     (-> (repl/client conn 1000)
     ;; Note: adding deref may be an issue if the code has a syntax error
-        (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" code "(deref babel.middleware/track)")})
+        (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" code)})
         doall)))
 
 (defn get-error-parts
@@ -41,11 +41,22 @@
         in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
 
+(defn get-original-error
+  ""
+  []
+    (with-open [conn (repl/connect :port server-port)]
+         (-> (repl/client conn 1000)
+         ;; Note: adding deref may be an issue if the code has a syntax error
+            (repl/message {:op :eval :code "(:message (deref babel.middleware/track))"})
+            doall
+            first
+            :value)))
+
 (defn babel-test-message
   [code]
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
-  (:message (get-error-parts (trap-response code))))
+  (str (:message (get-error-parts (trap-response code))) "\n" (apply str (get-original-error))))
 
 ;;takes a string and return its error message if applied, also adds counter atom
 ; (defn record-error
