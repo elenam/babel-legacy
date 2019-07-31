@@ -13,3 +13,7 @@
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 0)"))
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
+
+(expect "Tried to divide by zero" (log/babel-test-message "(map map map)"))
+
+(expect "true" (log/babel-test-message "(greater-than-zero 9)"))
