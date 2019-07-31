@@ -10,4 +10,3 @@
 ;#########################################
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
-(expect "true" (log/babel-test-message "(greater-than-zero 9)"))

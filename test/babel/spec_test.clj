@@ -8,5 +8,5 @@
 ;############################################
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
-(expect "The second argument of (take 9 8) was expected to be a sequence but is a number 9 instead."
-(log/babel-test-message "(take 9 9)"))
+; (expect "The second argument of (take 9 8) was expected to be a sequence but is a number 9 instead."
+; (log/babel-test-message "(take 9 9)"))

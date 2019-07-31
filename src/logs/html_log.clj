@@ -231,12 +231,6 @@
                                 (subs original 1 (- (.length original) 1)))
                                 :append true))
 
-;;read the exsiting txt log content
-;;this is disabled because it is removed from the middleware
-#_(defn read-log
-   []
-   (println (slurp "./log/last_test.txt")))
-
 ;;define html content
 (defn- html-content
   [inp-code total partial modified original detail]

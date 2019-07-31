@@ -2,7 +2,8 @@
   (:require [babel.processor :as processor]
             [nrepl.middleware]
             [nrepl.middleware.caught]
-            [clojure.repl])
+            [clojure.repl]
+            [clojure.main :as cm :refer [ex-str ex-triage]])
   (:import nrepl.transport.Transport)
   (:gen-class))
 
@@ -43,11 +44,15 @@
                        (clojure.lang.ArityException. (Integer/parseInt howmany) fname))
                    (clojure.lang.Reflector/invokeConstructor exc-class (to-array [msg])))))))
 
+(defn- record-message
+  [e]
+  (cm/ex-str (cm/ex-triage (Throwable->map e))))
+
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
-    (reset! track {:e %}) ; for debugging - and possibly for logging
+    (reset! track {:e % :message (record-message %)}) ; for debugging - and possibly for logging
     (clojure.main/repl-caught (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
                                                     "" (processor/process-message %)))))))
     ;(clojure.repl/pst % 3))))
