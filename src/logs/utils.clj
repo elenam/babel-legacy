@@ -32,7 +32,7 @@
   [response]
   (let [err-str (:err (second response))
         match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
-        matches (or match1 (re-matches #"(?s)(\S+) error at (.*)\n(.+)\n(.*)" err-str))
+        matches (or match1 (re-matches #"(?s)(\S+) error at (.*?)\n(.+)\n(.*)" err-str))
         n (if match1 2 1)
         type (get matches n)
         at (get matches (+ n 1))
@@ -45,18 +45,25 @@
   ""
   []
     (with-open [conn (repl/connect :port server-port)]
-         (-> (repl/client conn 1000)
-         ;; Note: adding deref may be an issue if the code has a syntax error
+        (-> (repl/client conn 1000)
             (repl/message {:op :eval :code "(:message (deref babel.middleware/track))"})
             doall
             first
             :value)))
 
+;; TODO: Add logging
+(defn get-all-info
+  ""
+  [code]
+  (let [modified-msg (get-error-parts (trap-response code))
+        original-msg (get-original-error)]
+    (assoc modified-msg :original original-msg)))
+
 (defn babel-test-message
   [code]
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
-  (str (:message (get-error-parts (trap-response code))) "\n" (apply str (get-original-error))))
+  (:message (get-all-info code)))
 
 ;;takes a string and return its error message if applied, also adds counter atom
 ; (defn record-error
