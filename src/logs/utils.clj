@@ -53,17 +53,26 @@
 
 ;; TODO: Add logging
 (defn get-all-info
-  ""
+  "Executes code and returns a map with the error part of the response
+  (separated into :type, :at, :message, :line, and :in fields - some may
+  be nil) and the original repl error as :original. Also adds the code
+  itself as :code"
   [code]
   (let [modified-msg (get-error-parts (trap-response code))
         original-msg (get-original-error)]
-    (assoc modified-msg :original original-msg)))
+    (assoc modified-msg :original original-msg :code code)))
 
 (defn babel-test-message
-  [code]
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
+  [code]
   (:message (get-all-info code)))
+
+(defn set-log
+  "Sets the log? field in the atom counter to b. This allows turning logging
+  on and off"
+  [b]
+  (swap! counter assoc :log? b))
 
 ;;takes a string and return its error message if applied, also adds counter atom
 ; (defn record-error
@@ -130,13 +139,7 @@
 ;         nil)
 ;     (record-error inp-code)))
 ;
-; ;;---- a switch that turns the logging system on/off ----
-; (defn- do-log
-;   "takes a boolean and turn on/off the log system"
-;   [boo]
-;   (cond (= boo true) (swap! counter assoc :log? true)
-;         (= boo false) (swap! counter assoc :log? false)
-;         :else nil))
+;
 ;
 ; ;;calls start-l from html-log
 ; (defn start-log
