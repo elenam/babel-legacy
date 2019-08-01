@@ -53,7 +53,9 @@
 
 (defn write-log
   [info]
-  (let [{:keys [message original code]} info]
+  (let [{:keys [message original code]} info
+        _ (swap! counter update-in [:total] inc)
+        _ (swap! counter update-in [:partial] inc)]
     (write-html code (:total @counter) (:partial @counter) message original)))
 
 (defn get-all-info

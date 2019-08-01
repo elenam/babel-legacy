@@ -2,12 +2,12 @@
   (:use hiccup.core))
 
 ;;counter atom that count the amount of testing units.
-(def counter (atom {:total 1 :partial 1 :log? true}))
+(def counter (atom {:total 0 :partial 0 :log? true}))
 
 ;;reset the counter
 (defn- reset-counter
   []
-  (reset! counter (atom {:total 1 :partial 1 :log? true})))
+  (reset! counter (atom {:total 0 :partial 0 :log? true})))
 
 (defn set-log
   "Sets the :log? value in the atom counter to b. This allows turning logging
@@ -177,7 +177,7 @@
 (defn add-l
     [file-name]
     (do
-      (swap! counter assoc :partial 1)
+      (swap! counter assoc :partial 0)
       (spit (str "./log/history/" current-time ".html") (log-division file-name) :append true)))
 
 ;;show '\n' at the end of message
