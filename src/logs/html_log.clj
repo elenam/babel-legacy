@@ -7,7 +7,13 @@
 ;;reset the counter
 (defn- reset-counter
   []
-  (def counter (atom {:total 1 :partial 1 :log? true})))
+  (reset! counter (atom {:total 1 :partial 1 :log? true})))
+
+(defn set-log
+  "Sets the :log? value in the atom counter to b. This allows turning logging
+  on and off"
+  [b]
+  (swap! counter assoc :log? b))
 
 ;;sets time with the file name format
 (declare current-time)
@@ -64,21 +70,6 @@
                }
                }
              }
-             function hideDetail() {
-               var x = document.getElementsByClassName(\"errorDetail\");
-               if (document.getElementById(\"detail\").checked != true) {
-                 var i;
-                 for (i = 0; i < x.length; i++) {
-                   x[i].style.display='none';
-                 }
-                 } else {
-                 var i;
-                 for (i = 0; i < x.length; i++) {
-                   x[i].style.display='block';
-                 }
-                 }
-
-               }
                function hidenils() {
                  var x = document.getElementsByClassName(\"nilResult\");
                  if (document.getElementById(\"nil\").checked != true) {
@@ -133,7 +124,6 @@
            [:input#nil {:type "checkbox" :checked true :onclick "hidenils()"} [:a {:style "color:#808080;padding-right:20px"} "nil error"]]
            [:input#modified {:type "checkbox" :checked true :onclick "hideModified()"} [:a#modifiedA {:style "color:#00AE0C;padding-right:20px"}"modified error"]]
            [:input#original {:type "checkbox" :checked true :onclick "hideOriginal()"} [:a#originalA {:style "color:#D10101;padding-right:20px"} "original error"]]
-           [:input#detail {:type "checkbox" :checked false :onclick "hideDetail()"} "error detail"]
            [:input#colorBlind {:type "checkbox" :checked false :onclick "colorBlindMode()":style "text-align:right;float:right"} [:a {:style "text-align:right;float:right"}  "Color blind mode"]]]]
         [:div#loadingError {:style "display:block"}
          [:hr]
@@ -233,7 +223,7 @@
 
 ;;define html content
 (defn- html-content
-  [inp-code total partial modified original detail]
+  [inp-code total partial modified original]
   (if
     (not= modified nil)
     (html [:div {:class "nonNilResult"}
@@ -243,8 +233,7 @@
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
            [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (show-newline modified) "<br />"]
-           [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />&nbsp;" original "<br />"]
-           [:p {:class "errorDetail" :style "display:none"} "error detail: " detail "<br /><br />"]])
+           [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />&nbsp;" original "<br />"]])
     (html [:div {:class "nilResult"}
            [:hr]
            [:div
@@ -252,17 +241,19 @@
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
            [:p {:class "nilmodifiedError" :style "color:#808080"} "modified error: nil<br />"]
-           [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]
-           [:p {:class "errorDetail" :style "color:#808080;display:none"} "error detail: nil<br /><br />"]])))
+           [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]])))
 
 ;;write html content
 (defn write-html
-  [inp-code total partial modified original detail]
+  [inp-code total partial modified original]
   (spit (str "./log/history/" current-time ".html") (html-content
                                                       inp-code
                                                       total
                                                       partial
                                                       modified
-                                                      (subs original 1 (- (.length original) 1))
-                                                      detail)
+                                                      (subs original 1 (- (.length original) 1)))
                                                       :append true))
+
+
+(defn write-log
+  [x])

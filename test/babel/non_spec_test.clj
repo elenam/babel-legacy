@@ -14,4 +14,5 @@
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
 
-(expect "Tried to divide by zero" (log/babel-test-message "(map map map)"))
+(expect "The second argument of (map map map) was expected to be a sequence but is a function map instead."
+        (log/babel-test-message "(map map map)"))

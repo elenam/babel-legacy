@@ -59,8 +59,10 @@
   itself as :code"
   [code]
   (let [modified-msg (get-error-parts (trap-response code))
-        original-msg (get-original-error)]
-    (assoc modified-msg :original original-msg :code code)))
+        original-msg (get-original-error)
+        all-info (assoc modified-msg :original original-msg :code code)
+        _ (when (:log? @counter) (write-log all-info))]
+    all-info))
 
 (defn babel-test-message
   "Takes code as a string and returns the error message corresponding to the code
@@ -68,11 +70,6 @@
   [code]
   (:message (get-all-info code)))
 
-(defn set-log
-  "Sets the log? field in the atom counter to b. This allows turning logging
-  on and off"
-  [b]
-  (swap! counter assoc :log? b))
 
 ;;takes a string and return its error message if applied, also adds counter atom
 ; (defn record-error
