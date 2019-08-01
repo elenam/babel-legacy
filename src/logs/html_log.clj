@@ -219,7 +219,7 @@
              [:p {:style "width:50%;float:left"} "#" partial ":<br />"]
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " (show-newline modified) "<br />"]
+           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " modified "<br />"]
            [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />&nbsp;" original "<br />"]])
     (html [:div {:class "nilResult"}
            [:hr]
