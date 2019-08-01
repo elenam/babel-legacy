@@ -10,6 +10,13 @@
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
 
+;start logging
+(log/start-log)
+(expect nil (log/add-log
+              (do
+                (def file-name "this file")
+                (:file (meta #'file-name)))))
+
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 0)"))
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))

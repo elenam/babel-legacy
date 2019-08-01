@@ -17,12 +17,12 @@
 
 ;;sets time with the file name format
 (declare current-time)
-(defn- update-time
+(defn update-time
   []
   (def current-time (.format (java.text.SimpleDateFormat. "MM'_'dd'_'yyyy'_T'HH'_'mm'_'ss") (new java.util.Date))))
 
 ;;preset html log contents
-(defn- html-log-preset
+(defn html-log-preset
   []
   (html [:title "Babel testing log"]
         [:h3 {:style "padding-top:100px"} "Testing log : "]
@@ -130,7 +130,7 @@
          [:h4 "Error loading test data!!!"]]))
 
 ;;adds a new log to the category
-(defn- add-category
+(defn add-category
   [file-name]
   (html
     [:p
@@ -159,22 +159,11 @@
     (check-existing-log)))
 
 ;;makes the category html
-(defn- make-category
+(defn make-category
   []
   (do
     (clojure.java.io/make-parents "./log/log_category.html")
     (spit "./log/log_category.html" (category-preset) :append false)))
-
-;;start of txt and html test log, including preset up
-(defn start-l
-  []
-  (do
-    (update-time)
-    (make-category)
-    (spit "./log/log_category.html" (add-category current-time) :append true)
-    (clojure.java.io/make-parents "./log/history/test_logs.html")
-    (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
-    (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
 
 ;;sets html division for different test files
 (defn- log-division
@@ -200,8 +189,7 @@
 ;;content that is going to be put into the log
 (defn- log-content
   [inp-code total modified original]
-  (if
-    (not= modified nil)
+  (if modified
     (str "#" total ":\n\n"
          "code input: " inp-code "\n\n"
          "modified error: " (subs (show-newline modified) 24) "\n\n"
@@ -224,8 +212,7 @@
 ;;define html content
 (defn- html-content
   [inp-code total partial modified original]
-  (if
-    (not= modified nil)
+  (if modified
     (html [:div {:class "nonNilResult"}
            [:hr]
            [:div
@@ -253,7 +240,3 @@
                                                       modified
                                                       (subs original 1 (- (.length original) 1)))
                                                       :append true))
-
-
-(defn write-log
-  [x])

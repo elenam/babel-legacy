@@ -51,7 +51,11 @@
             first
             :value)))
 
-;; TODO: Add logging
+(defn write-log
+  [info]
+  (let [{:keys [message original code]} info]
+    (write-html code (:total @counter) (:partial @counter) message original)))
+
 (defn get-all-info
   "Executes code and returns a map with the error part of the response
   (separated into :type, :at, :message, :line, and :in fields - some may
@@ -69,6 +73,24 @@
    or nil if there was no error"
   [code]
   (:message (get-all-info code)))
+
+;;calls add-l from html-log
+(defn add-log
+  "takes a file name and inserts it to the log"
+  [file-name]
+  (when (:log? @counter)
+      (add-l file-name)))
+
+      ;;start of txt and html test log, including preset up
+(defn start-log
+  []
+  (do
+    (update-time)
+    (make-category)
+    (spit "./log/log_category.html" (add-category current-time) :append true)
+    (clojure.java.io/make-parents "./log/history/test_logs.html")
+    (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
+    (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
 
 
 ;;takes a string and return its error message if applied, also adds counter atom
@@ -138,19 +160,4 @@
 ;
 ;
 ;
-; ;;calls start-l from html-log
-; (defn start-log
-;   "used to create log file"
-;   [boo]
-;   (cond (= boo false) (do-log false)
-;         (= boo true) (do
-;                     (do-log true)
-;                     (start-l))
-;         :else (start-l)))
 ;
-; ;;calls add-l from html-log
-; (defn add-log
-;   "takes a file name and inserts it to the log"
-;   [file-name]
-;   (if (= (:log? @counter) true)
-;       (add-l file-name)))
