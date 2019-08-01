@@ -51,19 +51,49 @@
             first
             :value)))
 
-;; TODO: Add logging
+(defn write-log
+  [info]
+  (let [{:keys [message original code]} info
+        _ (swap! counter update-in [:total] inc)
+        _ (swap! counter update-in [:partial] inc)]
+    (write-html code (:total @counter) (:partial @counter) message original)))
+
 (defn get-all-info
-  ""
+  "Executes code and returns a map with the error part of the response
+  (separated into :type, :at, :message, :line, and :in fields - some may
+  be nil) and the original repl error as :original. Also adds the code
+  itself as :code"
   [code]
   (let [modified-msg (get-error-parts (trap-response code))
-        original-msg (get-original-error)]
-    (assoc modified-msg :original original-msg)))
+        original-msg (get-original-error)
+        all-info (assoc modified-msg :original original-msg :code code)
+        _ (when (:log? @counter) (write-log all-info))]
+    all-info))
 
 (defn babel-test-message
-  [code]
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
+  [code]
   (:message (get-all-info code)))
+
+;;calls add-l from html-log
+(defn add-log
+  "takes a file name and inserts it to the log"
+  [file-name]
+  (when (:log? @counter)
+      (add-l file-name)))
+
+      ;;start of txt and html test log, including preset up
+(defn start-log
+  []
+  (do
+    (update-time)
+    (make-category)
+    (spit "./log/log_category.html" (add-category current-time) :append true)
+    (clojure.java.io/make-parents "./log/history/test_logs.html")
+    (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
+    (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
+
 
 ;;takes a string and return its error message if applied, also adds counter atom
 ; (defn record-error
@@ -130,27 +160,6 @@
 ;         nil)
 ;     (record-error inp-code)))
 ;
-; ;;---- a switch that turns the logging system on/off ----
-; (defn- do-log
-;   "takes a boolean and turn on/off the log system"
-;   [boo]
-;   (cond (= boo true) (swap! counter assoc :log? true)
-;         (= boo false) (swap! counter assoc :log? false)
-;         :else nil))
 ;
-; ;;calls start-l from html-log
-; (defn start-log
-;   "used to create log file"
-;   [boo]
-;   (cond (= boo false) (do-log false)
-;         (= boo true) (do
-;                     (do-log true)
-;                     (start-l))
-;         :else (start-l)))
 ;
-; ;;calls add-l from html-log
-; (defn add-log
-;   "takes a file name and inserts it to the log"
-;   [file-name]
-;   (if (= (:log? @counter) true)
-;       (add-l file-name)))
+;
