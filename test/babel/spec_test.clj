@@ -10,6 +10,12 @@
 ;; TO RUN tests, make sure you have repl started in a separate terminal
 ; (expect "The second argument of (take 9 8) was expected to be a sequence but is a number 9 instead."
 ; (log/babel-test-message "(take 9 9)"))
+
+(expect nil (log/add-log
+              (do
+                (def file-name "this file")
+                (:file (meta #'file-name)))))
+
 (expect "The second argument of (map map map) was expected to be a sequence but is a function map instead."
 (log/babel-test-message "(map map map)"))
 
