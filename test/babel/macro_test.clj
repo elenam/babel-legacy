@@ -14,9 +14,9 @@
                 (def file-name "this file")
                 (:file (meta #'file-name)))))
 
-(expect "Syntax problems with (let [(+ (fn* [p1__1196#] (* p1__1196# 3)) 2) g] 7):
-In place of (+(# (* %1 3 ) ) 2 ) the following are allowed: a name or a vector or a hashmap
-" (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
+(expect "Syntax problems with (let((+ (# (* %1 3 ) ) 2 ) g )7 )):
+In place of (+(# (* %1 3 ) ) 2 ) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
 
 (expect "Syntax problems with (let((+ (# (* %1 3 ) ) 2 ) g )7 )):
 In place of (+(# (* %1 3 ) ) 2 ) the following are allowed: a name or a vector or a hashmap"
@@ -32,3 +32,5 @@ In place of (+x 1 ) the following are allowed: a name or a vector or a hashmap"
 
 (expect "Syntax problems with (let((+ 1 2 ) (+ 1 2 ) )(+ 1 2 ) )):
 In place of (+1 2 ) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] (+ 1 2))"))
+
+(expect "Don't know how to create a sequence from a keyword." (log/babel-test-message "(let [{:a 1} g] 7)"))
