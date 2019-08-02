@@ -149,7 +149,7 @@
         (recur (rest dir)
                (conj coll (str "<p><a href=\"." (subs (str target) 5) "\" class=\"logFiles\"> "(subs (str target) 14)" </a></p>")))))))
 
-;;category html page presetting
+;category html page presetting
 (defn- category-preset
   []
   (html

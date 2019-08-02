@@ -72,12 +72,14 @@
   be nil) and the original repl error as :original. Also adds the code
   itself as :code"
   [code]
-  (let [modified-msg (get-error-parts (trap-response code))
-        original-msg (get-original-error)
-        all-info (assoc modified-msg :original original-msg :code code)
-        _ (reset-error-tracking)
-        _ (when (:log? @counter) (write-log all-info))]
-    all-info))
+  (let [modified-msg (get-error-parts (trap-response code))]
+    (if (:log? @counter)
+      (let [original-msg (get-original-error)
+            all-info (assoc modified-msg :original original-msg :code code)
+            _ (reset-error-tracking)
+            _ (when (:log? @counter) (write-log all-info))]
+            all-info)
+      modified-msg)))
 
 (defn babel-test-message
   "Takes code as a string and returns the error message corresponding to the code
@@ -95,10 +97,12 @@
       ;;start of txt and html test log, including preset up
 (defn start-log
   []
-  (do
-    (update-time)
-    (make-category)
-    (spit "./log/log_category.html" (add-category current-time) :append true)
-    (clojure.java.io/make-parents "./log/history/test_logs.html")
-    (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
-    (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false)))
+  (when (:log? @counter)
+    (do
+      (update-time)
+      (reset-error-tracking)
+      (make-category)
+      (spit "./log/log_category.html" (add-category current-time) :append true)
+      (clojure.java.io/make-parents "./log/history/test_logs.html")
+      (spit (str "./log/history/" current-time ".html") (html-log-preset) :append false)
+      (spit "./log/last_test.txt" (str (new java.util.Date) "\n") :append false))))
