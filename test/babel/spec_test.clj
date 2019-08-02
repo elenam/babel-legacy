@@ -67,7 +67,7 @@
 
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
-(expect nil (log/babel-test-message "(map char? \"abc\")"))
+(expect "" (log/babel-test-message "(map char? \"abc\")")) ;; there should be no error for this
 
 ; (expect "" (log/babel-test-message ""))
 ;
