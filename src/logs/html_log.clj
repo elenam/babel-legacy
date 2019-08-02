@@ -1,4 +1,6 @@
 (ns logs.html-log
+  (:require
+    [clojure.string :as s :refer [replace]])
   (:use hiccup.core))
 
 ;;counter atom that count the amount of testing units.
@@ -219,8 +221,8 @@
              [:p {:style "width:50%;float:left"} "#" partial ":<br />"]
              [:p {:style "width:50%;text-align:right;float:right"} total]]
            [:p {:style "color:#020793"} "code input: " inp-code "<br />"]
-           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: " modified "<br />"]
-           [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />&nbsp;" original "<br />"]])
+           [:p {:class "modifiedError" :style "color:#00AE0C"} "modified error: <br /><br />" modified "<br />"]
+           [:p {:class "originalError" :style "color:#D10101"} "original error: <br /><br />" original "<br />"]])
     (html [:div {:class "nilResult"}
            [:hr]
            [:div
@@ -230,13 +232,19 @@
            [:p {:class "nilmodifiedError" :style "color:#808080"} "modified error: nil<br />"]
            [:p {:class "niloriginalError" :style "color:#808080"} "original error: nil<br />"]])))
 
+(defn- replace-newlines
+  [str]
+  (s/replace (s/replace str "\\r\\n" "<br />") "\\n" "<br />"))
+
 ;;write html content
 (defn write-html
   [inp-code total partial modified original]
+  (let [orig-html (replace-newlines original)
+        orig-no-quot-marks (subs orig-html 1 (dec (count orig-html)))]
   (spit (str "./log/history/" current-time ".html") (html-content
                                                       inp-code
                                                       total
                                                       partial
                                                       modified
-                                                      (subs original 1 (- (.length original) 1)))
-                                                      :append true))
+                                                      orig-no-quot-marks)
+                                                      :append true)))
