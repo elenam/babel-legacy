@@ -246,5 +246,6 @@
                                                       total
                                                       partial
                                                       modified
-                                                      orig-no-quot-marks)
+                                                      ;; TODO: handle better!!!!
+                                                      (if (= original "nil") "nil" orig-no-quot-marks))
                                                       :append true)))

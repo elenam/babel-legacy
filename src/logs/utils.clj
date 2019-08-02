@@ -30,13 +30,14 @@
   "Takes the object returned by trap-response and separates it into different
   parts, returned as a map"
   [response]
-  (let [err-str (:err (second response))
+  (let [err-response (:err (second response))
+        err-str (or err-response "")
         match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
         matches (or match1 (re-matches #"(?s)(\S+) error at (.*?)\n(.+)\n(.*)" err-str))
         n (if match1 2 1)
         type (get matches n)
         at (get matches (+ n 1))
-        message (s/trim (get matches (+ n 2)))
+        message (s/trim (or (get matches (+ n 2)) ""))
         line (get matches (+ n 3))
         in (get matches (+ n 4))]
       {:type type :at at :message message :line line :in in}))
@@ -50,6 +51,13 @@
             doall
             first
             :value)))
+
+(defn reset-error-tracking
+  ""
+  []
+    (with-open [conn (repl/connect :port server-port)]
+        (-> (repl/client conn 1000)
+            (repl/message {:op :eval :code "(babel.middleware/reset-track)"}))))
 
 (defn write-log
   [info]
@@ -67,6 +75,7 @@
   (let [modified-msg (get-error-parts (trap-response code))
         original-msg (get-original-error)
         all-info (assoc modified-msg :original original-msg :code code)
+        _ (reset-error-tracking)
         _ (when (:log? @counter) (write-log all-info))]
     all-info))
 
