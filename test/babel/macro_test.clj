@@ -1,6 +1,7 @@
 (ns babel.macro-test
   (:require
    [logs.utils :as log]
+   [babel.non-spec-test :refer [to-log?]]
    [expectations :refer :all]))
 
 ;#########################################
@@ -8,6 +9,8 @@
 ;#########################################
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
+
+(expect #(not= % nil) (log/set-log babel.non-spec-test/to-log?))
 
 (expect nil (log/add-log
               (do

@@ -11,12 +11,6 @@
   []
   (reset! counter (atom {:total 0 :partial 0 :log? true})))
 
-(defn set-log
-  "Sets the :log? value in the atom counter to b. This allows turning logging
-  on and off"
-  [b]
-  (swap! counter assoc :log? b))
-
 ;;sets time with the file name format
 (declare current-time)
 (defn update-time

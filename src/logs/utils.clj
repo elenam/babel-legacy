@@ -59,6 +59,12 @@
         (-> (repl/client conn 1000)
             (repl/message {:op :eval :code "(babel.middleware/reset-track)"}))))
 
+(defn set-log
+  "Sets the :log? value in the atom counter to b. This allows turning logging
+  on and off"
+  [b]
+  (swap! counter assoc :log? b))
+
 (defn write-log
   [info]
   (let [{:keys [message original code]} info

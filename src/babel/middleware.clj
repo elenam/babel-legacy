@@ -56,4 +56,4 @@
     (clojure.main/repl-caught (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
                                                     "" (processor/process-message %)))))))
     ;(clojure.repl/pst % 3))))
-(defn reset-track [] (reset! track {}))
+(defn reset-track [](reset! track {}))

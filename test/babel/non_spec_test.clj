@@ -12,6 +12,11 @@
 
 ;start logging
 (log/start-log)
+
+(def to-log? true)
+
+(expect #(not= % nil) (log/set-log to-log?))
+
 (expect nil (log/add-log
               (do
                 (def file-name "this file")
