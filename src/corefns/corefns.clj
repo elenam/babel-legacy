@@ -131,8 +131,8 @@
 
 (s/fdef clojure.core/conj
   :args (s/and ::b-length-zero-or-greater
-               (s/or :map-arg (s/cat :collection-map map? :sequence (s/alt :map map? :vec (s/* (s/coll-of any? :kind vector? :count 2))))
-                     :any (s/cat :any (s/nilable any?)) ;conj can take anything but the intent of conj is that a single argument will be a collection
+               (s/or :any (s/cat :any (s/? (s/nilable any?))) ;conj can take anything but the intent of conj is that a single argument will be a collection
+                     :map-arg (s/cat :collection-map map? :sequence (s/alt :map map? :vec (s/* (s/coll-of any? :kind vector? :count 2))))
                      :collection (s/cat :collection (s/nilable ::not-map) :any (s/+ any?))
                     )))
 (stest/instrument `clojure.core/conj)

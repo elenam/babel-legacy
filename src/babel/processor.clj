@@ -68,7 +68,7 @@
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong" :num "a number" :lazy "a lazy sequence"
                 :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs" :number-greater-than-zero "a number that's greater than zero"
-                :collection-map "a map"})
+                :collection-map "a sequence"})
 
 (def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
                  :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",
@@ -113,7 +113,7 @@
                                    function-args-val
                                    fn-name
                                    (length-ref (keyword (d/get-function-name (str (first via))))) ;num-expected-args
-                                   (if (nil? val) 0 (count val))) ;num-given-args
+                                   (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))) ;num-given-args
         (format general-err-msg (d/arg-str arg-number) ;index of incorrect argument
                                 fn-name
                                 function-args-val
