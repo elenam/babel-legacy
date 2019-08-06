@@ -36,7 +36,6 @@
 ;errors that give null pointers
 ;(conj "lijk" "jlksdfj")
 ;(conj 1 "a")
-;(into [] {} "a")
 ;(take "apple" "banana")
 
 (expect "The first argument of (conj 1 \"a\") was expected to be a map but is a number 1 instead." (log/babel-test-message "(conj 1 \"a\")" ))

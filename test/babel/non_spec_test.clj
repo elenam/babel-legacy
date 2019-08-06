@@ -26,6 +26,10 @@
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
 
+;; 3-argument usage of 'into' has a transducer as its second argument. {} is a function
+;; so it passes the type check, but throws a null pointer exception when applied.
+(expect "An attempt to access a non-existing object (NullPointerException)." (log/babel-test-message "(into [] {} \"a\")"))
+
 ;(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(defn greater-than-zero [x] (> x 0)) (take (range) (range))"))
 
 ;(expect "The second argument of (map f f) was expected to be a sequence but is a function f instead." (log/babel-test-message "(defn f [x] (+ x 2)) (map f f)"))

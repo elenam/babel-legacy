@@ -167,22 +167,31 @@
      (re-matches #"p(\d)__(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
      :else (str anon-func)))
 
+(defn- args->str
+  "Takes a vector of (as strings) arguments and returns a string of these symbols
+  with separated by empty spaces, enclosed into open-sym at the start and close-sym
+  at the end, if provided"
+  ([args]
+  (apply str (interpose " " args)))
+  ([args open-sym close-sym]
+  (str open-sym (apply str (interpose " " args)) close-sym)))
 
- (defn- print-macro-arg-rec
-   "Takes an argument that fails a spec condition for a macro and returns
-    a user-readable representation of this argument as a string"
-   [val]
-   (cond
-     (not (seqable? val)) (build-the-anonymous val)
-     (empty? val) ")"
-     (seqable? (first val)) (str "(" (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest val)))
-     (and (not (empty? (rest val))) (= "fn*" (str (first val))) (seqable? val)) (str (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest (rest val))));;condition to remove a vector after fn*
-     :else (str (build-the-anonymous (first val)) " " (print-macro-arg-rec (rest val)))))
+(defn- macro-args-rec
+  [args]
+  (cond
+    (not (seqable? args)) [(build-the-anonymous args)]
+    (empty? args) []
+    (seqable? (first args)) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
+    (and (not (empty? (rest args))) (= "fn*" (str (first args))) (seqable? args))
+         (into (macro-args-rec (first args)) (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
+    :else (into [(build-the-anonymous (first args))] (macro-args-rec (rest args)))))
+
+
 
 (defn- print-macro-arg
   [val]
   (not (seqable? val)) (build-the-anonymous val)
-  :else (str "(" (print-macro-arg-rec (first val)) (print-macro-arg-rec (rest val))))
+  :else (args->str (into (macro-args-rec (first val)) (macro-args-rec (rest val)))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
@@ -259,7 +268,13 @@
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
-              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name val-str ")\n")
-              :else (str "Syntax problems with (" fn-name  val-str "):\n" (process-paths-macro problems)))))
+              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
+              (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
+                                                                      fn-name
+                                                                      " "
+                                                                      (str (args->str (first value) "[" "]") (args->str (rest value)))
+                                                                      "):\n"
+                                                                      (process-paths-macro problems))
+              :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
