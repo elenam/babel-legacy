@@ -105,9 +105,9 @@
         wrong-num-args-msg "Wrong number of arguments, expected in (%s %s): the function %s expects %s but was given %s arguments"
         general-err-msg "The %s of (%s %s) was expected to be %s but is %s%s instead.\n"
         fn-name (d/get-function-name (str fn-full-name))
-        function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
+        function-args-val (apply str (interpose " " (map d/range-collapse (map d/anonymous? (map #(second (d/type-and-val %)) args-val)))))
         arg-number (first in)
-        [print-type print-val] (d/type-and-val val)]
+        [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
         (format wrong-num-args-msg fn-name
                                    function-args-val

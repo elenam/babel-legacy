@@ -68,8 +68,12 @@
 
 (expect "" (log/babel-test-message "(map char? \"abc\")")) ;; there should be no error for this
 
-; (expect "" (log/babel-test-message ""))
-;
-; (expect "" (log/babel-test-message ""))
-;
-; (expect "" (log/babel-test-message ""))
+(expect "The first argument of (even? (0 1 2 3 4)) was expected to be a number but is a sequence (0 1 2 3 4) instead." (log/babel-test-message "(even? (range 5))"))
+
+(expect "The first argument of (even? (0 1 2 3 4 5 6 7 8 9)) was expected to be a number but is a sequence (0 1 2 3 4 5 6 7 8 9) instead." (log/babel-test-message "(even? (range 10))"))
+
+(expect "The first argument of (even? ((0 1 2 3 4 5 6 7 8 9) ...)) was expected to be a number but is a sequence ((0 1 2 3 4 5 6 7 8 9) ...) instead." (log/babel-test-message "(even? (range 11))"))
+
+(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(drop (range 20) (range 20))"))
+
+;(expect "" (log/babel-test-message "(odd? (drop 20 (range 20)))"))

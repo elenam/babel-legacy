@@ -319,6 +319,11 @@
   [a]
   (if (= (str a) "an anonymous function") "#(...)" a))
 
+(defn range-collapse
+  "takes a range and if the collection is over 10 elements, returns the first 10 elements"
+  [n]
+  (if (and (cf/lazy? n) (< 10 (count n))) (cons (take 10 n) '(...)) n))
+
 (defn macro-args->str
   "Takes a sequence of arguments for a macro, returns a string
    representation of these arguments for printing."
