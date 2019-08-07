@@ -181,17 +181,17 @@
   (cond
     (not (seqable? args)) [(build-the-anonymous args)]
     (empty? args) []
-    (seqable? (first args)) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
-    (and (not (empty? (rest args))) (= "fn*" (str (first args))) (seqable? args))
-         (into (macro-args-rec (first args)) (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
+    (seqable? (first args)) (into [(args->str (macro-args-rec (first args)) "{" "}")]  (macro-args-rec (rest args)))
+    (and (not (empty? (rest args))) (= "fn*" (str (first args))))
+         (into [(args->str (macro-args-rec (first args)) "(" ")")] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
     :else (into [(build-the-anonymous (first args))] (macro-args-rec (rest args)))))
 
 
-
-(defn- print-macro-arg
+(defn print-macro-arg
   [val]
   (not (seqable? val)) (build-the-anonymous val)
-  :else (args->str (into (macro-args-rec (first val)) (macro-args-rec (rest val)))))
+  (seqable? (first val)) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))) "!" "!")
+  :else (args->str (into (macro-args-rec (first val)) (macro-args-rec (rest val))) "(" ")"))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
@@ -232,6 +232,7 @@
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
            (str "In place of " (print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           ;(str "In place of " (str val) " the following are allowed:" (print-failed-predicates probs) "\n")
            "")))
 
 (defn- process-paths-macro
@@ -272,7 +273,7 @@
               (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
                                                                       fn-name
                                                                       " "
-                                                                      (str (args->str (first value) "[" "]") (args->str (rest value)))
+                                                                      (str "[" (print-macro-arg (first value)) "] " (print-macro-arg (rest value)))
                                                                       "):\n"
                                                                       (process-paths-macro problems))
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
