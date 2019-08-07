@@ -11,12 +11,6 @@
   []
   (reset! counter (atom {:total 0 :partial 0 :log? true})))
 
-(defn set-log
-  "Sets the :log? value in the atom counter to b. This allows turning logging
-  on and off"
-  [b]
-  (swap! counter assoc :log? b))
-
 ;;sets time with the file name format
 (declare current-time)
 (defn update-time
@@ -149,7 +143,7 @@
         (recur (rest dir)
                (conj coll (str "<p><a href=\"." (subs (str target) 5) "\" class=\"logFiles\"> "(subs (str target) 14)" </a></p>")))))))
 
-;;category html page presetting
+;category html page presetting
 (defn- category-preset
   []
   (html
