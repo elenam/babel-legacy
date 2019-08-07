@@ -102,24 +102,20 @@
         {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
-        wrong-num-args-msg "Wrong number of arguments, expected in (%s %s): the function %s expects %s but was given %s arguments"
-        general-err-msg "The %s of (%s %s) was expected to be %s but is %s%s instead.\n"
         fn-name (d/get-function-name (str fn-full-name))
         function-args-val (apply str (interpose " " (map d/range-collapse (map d/anonymous? (map #(second (d/type-and-val %)) args-val)))))
         arg-number (first in)
         [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-        (format wrong-num-args-msg fn-name
-                                   function-args-val
-                                   fn-name
-                                   (length-ref (keyword (d/get-function-name (str (first via))))) ;num-expected-args
-                                   (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))) ;num-given-args
-        (format general-err-msg (d/arg-str arg-number) ;index of incorrect argument
-                                fn-name
-                                function-args-val
-                                (stringify path) ;correct type
-                                print-type
-                                print-val))))
+      (str "Wrong number of arguments, expected in ("
+      fn-name" "function-args-val"): the function "
+      fn-name" expects "
+      (length-ref (keyword (d/get-function-name (str (first via)))))" but was given "
+      (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))" arguments")
+        (str "The "(d/arg-str arg-number)" of ("
+        fn-name" "function-args-val") was expected to be "
+        (stringify path)" but is "
+        print-type print-val" instead.\n"))))
 
 (defn unknown-spec
   "determines if the spec function is ours or someone's else"
@@ -128,32 +124,22 @@
         {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
-         fail "Fails a predicate: 'The %s argument of (%s %s) fails a requirement: must be a %s'"
-         extra "Extra input: 'In the %s call (%s %s) there were extra arguments'"
-         insufficient "Insufficient input: 'In the %s call (%s %s) there were insufficient arguments'"
          fn-name (d/get-function-name (str fn-full-name))
          function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
          arg-number (first in)
          [print-type print-val] (d/type-and-val val)]
      (cond
-       (= (:reason (first problem-list)) "Extra input") (format extra fn-name
-                                                                      fn-name
-                                                                      function-args-val)
-      (= (:reason (first problem-list)) "Insufficient input") (format insufficient fn-name
-                                                                                   fn-name
-                                                                                   function-args-val)
-      :else (format fail arg-number
-                         fn-name
-                         function-args-val
-                         pred))))
+       (= (:reason (first problem-list)) "Extra input") (str "Extra input: 'In the " fn-name "call ("fn-name function-args-val") there were extra arguments'")
+       (= (:reason (first problem-list)) "Insufficient input") (str "Insufficient input: 'In the " fn-name "call ("fn-name function-args-val") there were insufficient arguments'")
+       :else (str "Fails a predicate: 'The " arg-number " argument of (" fn-name function-args-val ") fails a requirement: must be a " pred))))
 
 (defn spec-message
  "uses babel-spec-message"
  [exception]
  (let [{problem-list :clojure.spec.alpha/problems} exception
        {:keys [pred]} (-> problem-list
-                                          filter-extra-spec-errors
-                                          first)]
+                          filter-extra-spec-errors
+                          first)]
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
 
