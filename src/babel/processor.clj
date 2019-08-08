@@ -143,15 +143,15 @@
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
 
 
- (defn build-the-anonymous
-   "switches the anonymous symbols with readable strings"
-   [anon-func]
+ (defn print-single-arg
+   "Takes a single (atomic) argument of a macro and returns its string representation"
+   [val]
    (cond
-     (and (re-matches #"p(\d)__(.*)" (str anon-func)) (vector? anon-func)) ""
-     (string? anon-func) (str "\"" anon-func "\"")
-     (= "fn*" (str anon-func)) "#"
-     (re-matches #"p(\d)__(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
-     :else (str anon-func)))
+     (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
+     (string? val) (str "\"" val "\"")
+     (= "fn*" (str val)) "#"
+     (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
+     :else (str val)))
 
 (defn- args->str
   "Takes a vector of (as strings) arguments and returns a string of these symbols
@@ -168,23 +168,38 @@
   [val]
   (or (not (seqable? val)) (string? val)))
 
+(declare macro-args-rec) ;; needed for mutually recursive definitions
+
+(defn- map-arg->str
+  "Takes a map argument for a macro and returns its string representation"
+  [map-arg]
+  (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
+
 (defn- macro-args-rec
+  "Takes a potentially nested sequence of arguments of a macro and recursively
+   constructs a flat vector of string representations of its elements"
   [args]
   (cond
-    (single-arg? args) [(build-the-anonymous args)]
+    (single-arg? args) [(print-single-arg args)]
+    ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
+    (map? args) [(map-arg->str args)]
+    (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
     (empty? args) []
     (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
     (and (not (empty? (rest args))) (= "fn*" (str (first args))))
          (into [(args->str (macro-args-rec (first args)) "(" ")")] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
-    :else (into [(build-the-anonymous (first args))] (macro-args-rec (rest args)))))
+    :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
 
 
 (defn print-macro-arg
+  "Takes a potentially nested sequence of arguments of a macro and returns
+   its string represntation"
   [val]
   (cond
-    (single-arg? val) (build-the-anonymous val)
+    (single-arg? val) (print-single-arg val)
+    (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
     (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
-    :else (args->str (into [(build-the-anonymous (first val))] (macro-args-rec (rest val))))))
+    :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded

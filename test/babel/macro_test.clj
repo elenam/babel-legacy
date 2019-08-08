@@ -21,8 +21,8 @@
 In place of + ((#) (* %1 3)) 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
 
-(expect "Syntax problems with (let [((:a 1)) g] 7):
-In place of (:a 1) the following are allowed: a name or a vector
+(expect "Syntax problems with (let [{:a 1} g] 7):
+In place of {:a 1} the following are allowed: a name or a vector
 In place of :a the following are allowed: a name or a vector or a hashmap
 In place of 1 the following are allowed: a vector"
 (log/babel-test-message " (let [{:a 1} g] 7)"))
