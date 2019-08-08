@@ -176,12 +176,18 @@
   ([args open-sym close-sym]
   (str open-sym (apply str (interpose " " args)) close-sym)))
 
+(defn- single-arg?
+  "Returns true if the argument is not seqable or a string,
+   false Otherwise"
+  [val]
+  (or (not (seqable? val)) (string? val)))
+
 (defn- macro-args-rec
   [args]
   (cond
-    (not (seqable? args)) [(build-the-anonymous args)]
+    (single-arg? args) [(build-the-anonymous args)]
     (empty? args) []
-    (seqable? (first args)) (into [(args->str (macro-args-rec (first args)) "{" "}")]  (macro-args-rec (rest args)))
+    (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
     (and (not (empty? (rest args))) (= "fn*" (str (first args))))
          (into [(args->str (macro-args-rec (first args)) "(" ")")] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
     :else (into [(build-the-anonymous (first args))] (macro-args-rec (rest args)))))
@@ -189,9 +195,10 @@
 
 (defn print-macro-arg
   [val]
-  (not (seqable? val)) (build-the-anonymous val)
-  (seqable? (first val)) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))) "!" "!")
-  :else (args->str (into (macro-args-rec (first val)) (macro-args-rec (rest val))) "(" ")"))
+  (cond
+    (single-arg? val) (build-the-anonymous val)
+    (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
+    :else (args->str (into [(build-the-anonymous (first val))] (macro-args-rec (rest val))))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
