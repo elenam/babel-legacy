@@ -104,11 +104,11 @@
 (stest/instrument `clojure.core/min)
 
 (s/fdef clojure.core/rand
-  :args (s/and ::b-length-zero-to-one (s/cat :number (s/? number?))))
+  :args (s/and ::b-length-zero-to-one (s/cat :number (s/? ::number-or-lazy))))
 (stest/instrument `clojure.core/rand)
 
 (s/fdef clojure.core/rand-int
-  :args (s/and ::b-length-one (s/cat :number number?)))
+  :args (s/and ::b-length-one (s/cat :number ::number-or-lazy)))
 (stest/instrument `clojure.core/rand-int)
 
 (s/fdef clojure.core// ;check inline
@@ -371,4 +371,4 @@
                (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable coll?)))))))
 #_(stest/instrument `clojure.core/refer)
 
-(def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +}))
+(def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +, 'even? even?, 'odd? odd?}))

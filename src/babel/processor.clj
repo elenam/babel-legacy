@@ -108,14 +108,14 @@
         [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
       (str "Wrong number of arguments, expected in ("
-      fn-name" "function-args-val"): the function "
-      fn-name" expects "
-      (length-ref (keyword (d/get-function-name (str (first via)))))" but was given "
-      (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))" arguments")
-        (str "The "(d/arg-str arg-number)" of ("
-        fn-name" "function-args-val") was expected to be "
-        (stringify path)" but is "
-        print-type print-val" instead.\n"))))
+           fn-name" "function-args-val"): the function "
+           fn-name" expects "
+           (length-ref (keyword (d/get-function-name (str (first via)))))" but was given "
+           (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))" arguments")
+      (str "The "(d/arg-str arg-number)" of ("
+           fn-name" "function-args-val") was expected to be "
+           (stringify path)" but is "
+           print-type print-val" instead.\n"))))
 
 (defn unknown-spec
   "determines if the spec function is ours or someone's else"
@@ -224,6 +224,10 @@
    if all problems refer to the parameters and false otherwise"
    [problems]
    (let [via-lasts (distinct (map str (map last (map :via problems))))]
+  (let [exc-map (Throwable->map ex)
+        {:keys [cause data]} exc-map
+        fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
+        {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
 
 (defn spec-macro-message

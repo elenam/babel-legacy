@@ -26,6 +26,12 @@
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
 
+(expect "" (log/babel-test-message "(* 3 0)"))
+
+(expect "" (log/babel-test-message "#(+ 1)"))
+
+(expect "" (log/babel-test-message "(- 2)"))
+
 ;(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(defn greater-than-zero [x] (> x 0)) (take (range) (range))"))
 
 ;(expect "The second argument of (map f f) was expected to be a sequence but is a function f instead." (log/babel-test-message "(defn f [x] (+ x 2)) (map f f)"))

@@ -78,4 +78,18 @@
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(drop (range 20) (range 20))"))
 
-;(expect "" (log/babel-test-message "(odd? (drop 20 (range 20)))"))
+(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(rand (range))"))
+
+(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(rand-int (range 20))"))
+
+(expect "" (log/babel-test-message "(rand)"))
+
+(expect "" (log/babel-test-message "(filter even? '(1 2 3))"))
+
+(expect "The first argument of (filter (1)) was expected to be a function but is a list (1) instead." (log/babel-test-message "(filter '(1))"))
+
+(expect "The second argument of (filter even? odd?) was expected to be a sequence but is a function odd? instead." (log/babel-test-message "(filter even? odd?)"))
+
+(expect "" (log/babel-test-message "(filter 2 [])")) ;fails
+
+;(expect "" (log/babel-test-message "(take 2 "hmmmm")"))
