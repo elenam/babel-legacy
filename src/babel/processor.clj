@@ -153,22 +153,38 @@
      (re-matches #"p(\d)__(.*)" (str anon-func)) (s/replace (subs (str anon-func) 0 2) #"p" "%")
      :else (str anon-func)))
 
+(defn- args->str
+  "Takes a vector of (as strings) arguments and returns a string of these symbols
+  with separated by empty spaces, enclosed into open-sym at the start and close-sym
+  at the end, if provided"
+  ([args]
+  (apply str (interpose " " args)))
+  ([args open-sym close-sym]
+  (str open-sym (apply str (interpose " " args)) close-sym)))
 
- (defn- print-macro-arg-rec
-   "Takes an argument that fails a spec condition for a macro and returns
-    a user-readable representation of this argument as a string"
-   [val]
-   (cond
-     (not (seqable? val)) (build-the-anonymous val)
-     (empty? val) ")"
-     (seqable? (first val)) (str "(" (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest val)))
-     (and (not (empty? (rest val))) (= "fn*" (str (first val))) (seqable? val)) (str (print-macro-arg-rec (first val)) " " (print-macro-arg-rec (rest (rest val))));;condition to remove a vector after fn*
-     :else (str (build-the-anonymous (first val)) " " (print-macro-arg-rec (rest val)))))
-
-(defn- print-macro-arg
+(defn- single-arg?
+  "Returns true if the argument is not seqable or a string,
+   false Otherwise"
   [val]
-  (not (seqable? val)) (build-the-anonymous val)
-  :else (str "(" (print-macro-arg-rec (first val)) (print-macro-arg-rec (rest val))))
+  (or (not (seqable? val)) (string? val)))
+
+(defn- macro-args-rec
+  [args]
+  (cond
+    (single-arg? args) [(build-the-anonymous args)]
+    (empty? args) []
+    (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
+    (and (not (empty? (rest args))) (= "fn*" (str (first args))))
+         (into [(args->str (macro-args-rec (first args)) "(" ")")] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
+    :else (into [(build-the-anonymous (first args))] (macro-args-rec (rest args)))))
+
+
+(defn print-macro-arg
+  [val]
+  (cond
+    (single-arg? val) (build-the-anonymous val)
+    (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
+    :else (args->str (into [(build-the-anonymous (first val))] (macro-args-rec (rest val))))))
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
@@ -209,6 +225,7 @@
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
            (str "In place of " (print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           ;(str "In place of " (str val) " the following are allowed:" (print-failed-predicates probs) "\n")
            "")))
 
 (defn- process-paths-macro
@@ -224,10 +241,6 @@
    if all problems refer to the parameters and false otherwise"
    [problems]
    (let [via-lasts (distinct (map str (map last (map :via problems))))]
-  (let [exc-map (Throwable->map ex)
-        {:keys [cause data]} exc-map
-        fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
-        {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
 
 (defn spec-macro-message
@@ -249,7 +262,13 @@
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (:val (first problems)) " instead.\n")
-              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name val-str ")\n")
-              :else (str "Syntax problems with (" fn-name  val-str "):\n" (process-paths-macro problems)))))
+              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
+              (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
+                                                                      fn-name
+                                                                      " "
+                                                                      (str "[" (print-macro-arg (first value)) "] " (print-macro-arg (rest value)))
+                                                                      "):\n"
+                                                                      (process-paths-macro problems))
+              :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
