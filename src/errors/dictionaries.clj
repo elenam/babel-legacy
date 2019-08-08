@@ -176,16 +176,16 @@
    string with the numbers corresponding spelling"
   [n]
   (case n
-     "0" "zero"
-     "1" "one"
-     "2" "two"
-     "3" "three"
-     "4" "four"
-     "5" "five"
-     "6" "six"
-     "7" "seven"
-     "8" "eight"
-     "9" "nine"
+     0 "zero"
+     1 "one"
+     2 "two"
+     3 "three"
+     4 "four"
+     5 "five"
+     6 "six"
+     7 "seven"
+     8 "eight"
+     9 "nine"
     n))
 
 (defn number-arg
@@ -318,6 +318,11 @@
   "Returns a string representation of an anonymous function."
   [a]
   (if (= (str a) "an anonymous function") "#(...)" a))
+
+(defn range-collapse
+  "takes a range and if the collection is over 10 elements, returns the first 10 elements"
+  [n]
+  (if (and (cf/lazy? n) (< 10 (count n))) (cons (take 10 n) '(...)) n))
 
 (defn macro-args->str
   "Takes a sequence of arguments for a macro, returns a string

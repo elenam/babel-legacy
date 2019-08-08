@@ -21,7 +21,7 @@
 (expect "The second argument of (map map map) was expected to be a sequence but is a function map instead."
 (log/babel-test-message "(map map map)"))
 
-(expect "Wrong number of arguments, expected in (map ): the function map expects one or more arguments but was given 0 arguments"
+(expect "Wrong number of arguments, expected in (map ): the function map expects one or more arguments but was given no arguments"
 (log/babel-test-message "(map)"))
 
 (expect "The second argument of (conj {} \"a\") was expected to be a sequence of vectors with only 2 elements or a map with key-value pairs but is a string \"a\" instead."
@@ -30,15 +30,14 @@
 (expect "The second argument of (conj {} []) was expected to be a sequence of vectors with only 2 elements or a map with key-value pairs but is a vector [] instead."
 (log/babel-test-message "(conj {} [])"))
 
-(expect "Insufficient input: 'In the conj call (conj ) there were insufficient arguments'"
-(log/babel-test-message "(conj)"))
+(expect "" (log/babel-test-message "(conj)"))
 
 ;errors that give null pointers
 ;(conj "lijk" "jlksdfj")
 ;(conj 1 "a")
 ;(take "apple" "banana")
 
-(expect "The first argument of (conj 1 \"a\") was expected to be a map but is a number 1 instead." (log/babel-test-message "(conj 1 \"a\")" ))
+(expect "The first argument of (conj 1 \"a\") was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(conj 1 \"a\")" ))
 
 (expect "The second argument of (partition 1 1 1 1) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(partition 1 1 1 1)"))
 
@@ -54,7 +53,7 @@
 
 (expect "The first argument of (contains? j :a) was expected to be a sequence but is a character j instead." (log/babel-test-message "(contains? \\j :a)"))
 
-(expect "Wrong number of arguments, expected in (contains? {} \"a\" #{}): the function contains? expects two arguments but was given 3 arguments" (log/babel-test-message "(contains? {} \"a\" #{})"))
+(expect "Wrong number of arguments, expected in (contains? {} \"a\" #{}): the function contains? expects two arguments but was given three arguments" (log/babel-test-message "(contains? {} \"a\" #{})"))
 
 (expect "Expected a function, but a number was given instead." (log/babel-test-message "(drop 3 (1 2 3))")) ;fails
 
@@ -70,8 +69,12 @@
 
 (expect "" (log/babel-test-message "(map char? \"abc\")")) ;; there should be no error for this
 
-; (expect "" (log/babel-test-message ""))
-;
-; (expect "" (log/babel-test-message ""))
-;
-; (expect "" (log/babel-test-message ""))
+(expect "The first argument of (even? (0 1 2 3 4)) was expected to be a number but is a sequence (0 1 2 3 4) instead." (log/babel-test-message "(even? (range 5))"))
+
+(expect "The first argument of (even? (0 1 2 3 4 5 6 7 8 9)) was expected to be a number but is a sequence (0 1 2 3 4 5 6 7 8 9) instead." (log/babel-test-message "(even? (range 10))"))
+
+(expect "The first argument of (even? ((0 1 2 3 4 5 6 7 8 9) ...)) was expected to be a number but is a sequence ((0 1 2 3 4 5 6 7 8 9) ...) instead." (log/babel-test-message "(even? (range 11))"))
+
+(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(drop (range 20) (range 20))"))
+
+;(expect "" (log/babel-test-message "(odd? (drop 20 (range 20)))"))
