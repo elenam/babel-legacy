@@ -187,7 +187,7 @@
     (empty? args) []
     (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
     (and (not (empty? (rest args))) (= "fn*" (str (first args))))
-         (into [(args->str (macro-args-rec (first args)) "(" ")")] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
+         (into [(args->str (macro-args-rec (first args)))] (macro-args-rec (rest (rest args)))) ;;condition to remove a vector after fn*
     :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
 
 
