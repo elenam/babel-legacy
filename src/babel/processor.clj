@@ -164,7 +164,7 @@
 
 (defn- single-arg?
   "Returns true if the argument is not seqable or a string,
-   false Otherwise"
+   false otherwise"
   [val]
   (or (not (seqable? val)) (string? val)))
 

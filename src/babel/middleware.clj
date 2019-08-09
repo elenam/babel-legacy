@@ -28,16 +28,19 @@
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 
 (defn make-exception [exc msg]
-  (let [exc-class (class exc)]
+  (let [exc-class (class exc)
+        exc-as-map (Throwable->map exc)]
        (if (= clojure.lang.ExceptionInfo exc-class)
            ;(ex-info msg (ex-data exc))
-               (if (= 1 (count (:via (Throwable->map exc))))
-                   (Exception. (processor/spec-message (:data (Throwable->map exc)))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
-                   (clojure.lang.Reflector/invokeConstructor (resolve (:type (second (:via (Throwable->map exc)))))  (to-array [msg])));(str "the type is: " (:type (second (:via (Throwable->map exc)))))))
+               (cond (= 1 (count (:via exc-as-map))) (Exception. (processor/spec-message (:data exc-as-map))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
+                     (= (resolve (:type (second (:via (Throwable->map exc))))) clojure.lang.LispReader$ReaderException) (clojure.lang.LispReader$ReaderException.
+                         (:clojure.error/line (:data (second (:via exc-as-map))))
+                         (:clojure.error/column (:data (second (:via exc-as-map))))
+                         (clojure.lang.Reflector/invokeConstructor (resolve (:type (last (:via exc-as-map)))) (to-array [msg])))
+                     :else (clojure.lang.Reflector/invokeConstructor (resolve (:type (second (:via exc-as-map))))  (to-array [msg])))
            (if (= clojure.lang.Compiler$CompilerException exc-class)
-               (if (processor/macro-spec? exc)
-                   (Exception. (processor/spec-macro-message exc))
-                   (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
+               (cond (processor/macro-spec? exc) (Exception. (processor/spec-macro-message exc))
+                     :else (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
                ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
                (if (= clojure.lang.ArityException exc-class)
                   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" (.getMessage exc))]

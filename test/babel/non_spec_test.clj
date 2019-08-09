@@ -43,3 +43,9 @@
 ;(expect "Tried to divide by zero" (log/babel-test-message "(defn not-divide-zero [x] (/ x 0))"))
 
 ;(expect "Expected a number, but a string was given instead." (log/babel-test-message "(defn not-divide-zero [x] (/ x \"a\"))"))
+
+(expect #"(?s)There is an unmatched delimiter ]\.(.*)" (log/babel-test-message "(+ (])"))
+
+(expect #"(?s)You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)" (log/babel-test-message "{9 8 7}"))
+
+(expect "The format of the number 8.5.1 is invalid." (log/babel-test-message "8.5.1"))
