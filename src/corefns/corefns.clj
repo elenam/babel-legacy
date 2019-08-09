@@ -69,6 +69,7 @@
 (s/def ::number-or-lazy (s/alt :num number? :lazy ::lazy))
 (s/def ::string-or-lazy (s/alt :num string? :lazy ::lazy))
 (s/def ::map-vec-or-lazy (s/alt :or (s/alt :map map? :vector vector?) :lazy ::lazy))
+(s/def ::any-or-lazy (s/alt :any any? :lazy ::lazy))
 (s/def ::greater-than-zero greater-than-zero?)
 (s/def ::b-not-zero-or-lazy (s/alt :num-non-zero (s/and number? b-not-0?) :lazy ::lazy))
 
@@ -234,8 +235,8 @@
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :function ::function-or-lazy)
-          :arg-two (s/cat :function ::function-or-lazy :collection (s/nilable seqable?)))))
+    (s/or :arg-one (s/cat :function ::any-or-lazy :collection (s/nilable seqable?))
+          :arg-two (s/cat :function ::function-or-lazy))))
 (stest/instrument `clojure.core/filter)
 
 (s/fdef clojure.core/take
