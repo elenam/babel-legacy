@@ -20,8 +20,7 @@
                       (reify Transport
                         (recv [this] (.recv transport))
                         (recv [this timeout] (.recv transport timeout))
-                        (send [this msg]     (.send transport msg))))))));(processor/modify-errors msg)))))))))
-                        ;(send [this msg]     (.send transport msg))))))))
+                        (send [this msg]     (.send transport msg))))))))
 
 ;;sets the appropriate flags on the middleware so it is placed correctly
 (nrepl.middleware/set-descriptor! #'interceptor
@@ -29,23 +28,26 @@
 
 (defn make-exception [exc msg]
   (let [exc-class (class exc)
-        exc-as-map (Throwable->map exc)]
-       (if (= clojure.lang.ExceptionInfo exc-class)
-           ;(ex-info msg (ex-data exc))
-               (cond (= 1 (count (:via exc-as-map))) (Exception. (processor/spec-message (:data exc-as-map))) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
-                     (= (resolve (:type (second (:via (Throwable->map exc))))) clojure.lang.LispReader$ReaderException) (clojure.lang.LispReader$ReaderException.
-                         (:clojure.error/line (:data (second (:via exc-as-map))))
-                         (:clojure.error/column (:data (second (:via exc-as-map))))
-                         (clojure.lang.Reflector/invokeConstructor (resolve (:type (last (:via exc-as-map)))) (to-array [msg])))
-                     :else (clojure.lang.Reflector/invokeConstructor (resolve (:type (second (:via exc-as-map))))  (to-array [msg])))
-           (if (= clojure.lang.Compiler$CompilerException exc-class)
+        {:keys [via data]} (Throwable->map exc)
+        msg-arr (to-array [msg])]
+       (cond
+         (and (= clojure.lang.ExceptionInfo exc-class) (= 1 (count via)))
+             (Exception. (processor/spec-message data)) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
+         (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.LispReader$ReaderException))
+             (clojure.lang.LispReader$ReaderException.
+               (:clojure.error/line (:data (second via)))
+               (:clojure.error/column (:data (second via)))
+               (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via))) msg-arr))
+          (= clojure.lang.ExceptionInfo exc-class)
+               (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
+          (= clojure.lang.Compiler$CompilerException exc-class)
                (cond (processor/macro-spec? exc) (Exception. (processor/spec-macro-message exc))
                      :else (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
-               ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
-               (if (= clojure.lang.ArityException exc-class)
+          ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
+          (= clojure.lang.ArityException exc-class)
                   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" (.getMessage exc))]
                        (clojure.lang.ArityException. (Integer/parseInt howmany) fname))
-                   (clojure.lang.Reflector/invokeConstructor exc-class (to-array [msg])))))))
+          :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))
 
 (defn- record-message
   [e]
