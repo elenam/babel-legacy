@@ -1,5 +1,6 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
+            [errors.dictionaries :as d]
             [nrepl.middleware]
             [nrepl.middleware.caught]
             [clojure.repl]
@@ -26,6 +27,13 @@
 (nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 
+;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
+(defn- process-arity-exception
+  "Takes a message from arity exception and forms a new exception"
+  [msg]
+  (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" msg)]
+       (clojure.lang.ArityException. (Integer/parseInt howmany) (d/get-function-name fname))))
+
 (defn make-exception [exc msg]
   (let [exc-class (class exc)
         {:keys [via data]} (Throwable->map exc)
@@ -38,15 +46,15 @@
                (:clojure.error/line (:data (second via)))
                (:clojure.error/column (:data (second via)))
                (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via))) msg-arr))
+          (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.ArityException))
+              (process-arity-exception (:message (second via)))
           (= clojure.lang.ExceptionInfo exc-class)
-               (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
+              (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
           (= clojure.lang.Compiler$CompilerException exc-class)
-               (cond (processor/macro-spec? exc) (Exception. (processor/spec-macro-message exc))
-                     :else (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
-          ;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
+              (cond (processor/macro-spec? exc) (Exception. (processor/spec-macro-message exc))
+                    :else (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
           (= clojure.lang.ArityException exc-class)
-                  (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" (.getMessage exc))]
-                       (clojure.lang.ArityException. (Integer/parseInt howmany) fname))
+               (process-arity-exception (.getMessage exc))
           :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))
 
 (defn- record-message

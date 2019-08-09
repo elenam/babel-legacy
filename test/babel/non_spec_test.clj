@@ -49,3 +49,9 @@
 (expect #"(?s)You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)" (log/babel-test-message "{9 8 7}"))
 
 (expect "The format of the number 8.5.1 is invalid." (log/babel-test-message "8.5.1"))
+
+(expect "Wrong number of args (1) passed to: anonymous function" (log/babel-test-message "(map #(7) [0])"))
+
+(expect "Wrong number of args (2) passed to: anonymous function" (log/babel-test-message "(map #(+ %1) [9] [0])"))
+
+(expect "Wrong number of args (2) passed to: f" (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
