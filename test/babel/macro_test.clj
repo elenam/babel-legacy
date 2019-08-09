@@ -38,3 +38,6 @@ In place of + x 1 the following are allowed: a name or a vector or a hashmap"
 
 (expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] (+ 1 2)):
 In place of + 1 2 the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] (+ 1 2))"))
+
+(expect "Syntax problems with (let [{8 {9 7}} 5] 4):
+In place of {8 {9 7}} the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [{8 {9 7}} 5] 4)"))
