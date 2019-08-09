@@ -50,11 +50,16 @@
               (process-arity-exception (:message (second via)))
           (= clojure.lang.ExceptionInfo exc-class)
               (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
+          (and (= clojure.lang.Compiler$CompilerException exc-class) (processor/macro-spec? exc))
+              (Exception. (processor/spec-macro-message exc))
           (= clojure.lang.Compiler$CompilerException exc-class)
-              (cond (processor/macro-spec? exc) (Exception. (processor/spec-macro-message exc))
-                    :else (clojure.lang.Compiler$CompilerException. "" 100 100 (Exception. msg))) ; a stub for now
+              (clojure.lang.Compiler$CompilerException.
+                ""
+                (:clojure.error/line (:data (first via)))
+                (:clojure.error/column (:data (first via)))
+                (Exception. msg)) ; TO-DO: look up the wording in the dictionary - change the lookup! 
           (= clojure.lang.ArityException exc-class)
-               (process-arity-exception (.getMessage exc))
+              (process-arity-exception (.getMessage exc))
           :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))
 
 (defn- record-message

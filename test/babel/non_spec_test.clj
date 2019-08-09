@@ -55,3 +55,7 @@
 (expect "Wrong number of args (2) passed to: anonymous function" (log/babel-test-message "(map #(+ %1) [9] [0])"))
 
 (expect "Wrong number of args (2) passed to: f" (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
+
+(expect #"(?s)# must be followed by a symbol\.(.*)" (log/babel-test-message "(map # [0])"))
+
+(expect "Something reasonable, not this!" (log/babel-test-message "(def 7 8 9)"))
