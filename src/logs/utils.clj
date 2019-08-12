@@ -30,7 +30,7 @@
   "Takes the object returned by trap-response and separates it into different
   parts, returned as a map"
   [response]
-  (let [err-response (:err (second response))
+  (let [err-response (:err (first (filter :err response)))
         err-str (or err-response "")
         [whole1 _ type1 at1 message1 line1 in1 _] (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
         [whole2 _ type2 at2 message2 _] (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.+)\n(.*)" err-str)
