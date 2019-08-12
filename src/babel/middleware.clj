@@ -1,6 +1,7 @@
 (ns babel.middleware
   (:require [babel.processor :as processor]
             [errors.dictionaries :as d]
+            [errors.prettify-exception :as p-exc]
             [nrepl.middleware]
             [nrepl.middleware.caught]
             [clojure.repl]
@@ -57,7 +58,9 @@
                 ""
                 (:clojure.error/line (:data (first via)))
                 (:clojure.error/column (:data (first via)))
-                (Exception. msg)) ; TO-DO: look up the wording in the dictionary - change the lookup! 
+                (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via))) (to-array [(str (:type (last via)))])));[(str (p-exc/get-match
+                                                                                                        ;(str (:type (last via)))
+                                                                                                        ;(:message (last via))))]))) ; TO-DO: look up the wording in the dictionary - change the lookup!
           (= clojure.lang.ArityException exc-class)
               (process-arity-exception (.getMessage exc))
           :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))

@@ -108,14 +108,27 @@
         [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
       (str "Wrong number of arguments, expected in ("
-           fn-name" "function-args-val"): the function "
-           fn-name" expects "
-           (length-ref (keyword (d/get-function-name (str (first via)))))" but was given "
-           (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))" arguments")
-      (str "The "(d/arg-str arg-number)" of ("
-           fn-name" "function-args-val") was expected to be "
-           (stringify path)" but is "
-           print-type print-val" instead.\n"))))
+           fn-name
+           " "
+           function-args-val
+           "): the function "
+           fn-name
+           " expects "
+           (length-ref (keyword (d/get-function-name (str (first via)))))
+           " but was given "
+           (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))
+           " arguments")
+      (str "The "
+           (d/arg-str arg-number)
+           " of ("
+           fn-name
+           " "
+           function-args-val
+           ") was expected to be "
+           (stringify path)
+           " but is "
+           print-type print-val
+           " instead.\n"))))
 
 (defn unknown-spec
   "determines if the spec function is ours or someone's else"
@@ -129,9 +142,27 @@
          arg-number (first in)
          [print-type print-val] (d/type-and-val val)]
      (cond
-       (= (:reason (first problem-list)) "Extra input") (str "Extra input: 'In the " fn-name "call ("fn-name function-args-val") there were extra arguments'")
-       (= (:reason (first problem-list)) "Insufficient input") (str "Insufficient input: 'In the " fn-name "call ("fn-name function-args-val") there were insufficient arguments'")
-       :else (str "Fails a predicate: 'The " arg-number " argument of (" fn-name function-args-val ") fails a requirement: must be a " pred))))
+       (= (:reason (first problem-list)) "Extra input")
+          (str
+            "Extra input: 'In the "
+            fn-name
+            "call ("
+            fn-name function-args-val
+            ") there were extra arguments'")
+       (= (:reason (first problem-list)) "Insufficient input")
+          (str
+            "Insufficient input: 'In the "
+            fn-name
+            "call ("
+            fn-name function-args-val
+            ") there were insufficient arguments'")
+       :else
+          (str
+            "Fails a predicate: 'The "
+            arg-number " argument of ("
+            fn-name function-args-val
+            ") fails a requirement: must be a "
+            pred))))
 
 (defn spec-message
  "uses babel-spec-message"
@@ -140,7 +171,9 @@
        {:keys [pred]} (-> problem-list
                           filter-extra-spec-errors
                           first)]
- (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred))) (babel-spec-message exception) (unknown-spec exception))))
+ (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred)))
+     (babel-spec-message exception)
+     (unknown-spec exception))))
 
 
  (defn print-single-arg
