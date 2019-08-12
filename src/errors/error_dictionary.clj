@@ -245,12 +245,6 @@
     :match (beginandend "Reader tag must be a symbol")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "# must be followed by a symbol.\n"))}
 
-    #_{:key :invalid-tolken-error
-    ;need to test
-    :class "RuntimeException"
-    :match (beginandend "java.lang.RuntimeException: Invalid token: (\\S*)")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot use " (nth matches 1) :arg " in this position.\n"))}
-
     {:key :invalid-tolken-error
     :class "RuntimeException"
     :match (beginandend "Invalid token: (\\S*)")
