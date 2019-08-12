@@ -40,7 +40,7 @@
         line line1
         in in1
         msg (or message1 message2 message3)
-        message (if-not (nil? msg) (s/trim msg) "")]
+        message (if-not (nil? msg) (s/trim msg))]
       {:type type :at at :message message :line line :in in}))
 
 (defn get-original-error

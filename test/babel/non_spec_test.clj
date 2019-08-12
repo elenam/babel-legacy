@@ -26,11 +26,11 @@
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
 
-(expect "" (log/babel-test-message "(* 3 0)"))
+(expect nil (log/babel-test-message "(* 3 0)"))
 
-(expect "" (log/babel-test-message "#(+ 1)"))
+(expect nil (log/babel-test-message "#(+ 1)"))
 
-(expect "" (log/babel-test-message "(- 2)"))
+(expect nil (log/babel-test-message "(- 2)"))
 
 ;; 3-argument usage of 'into' has a transducer as its second argument. {} is a function
 ;; so it passes the type check, but throws a null pointer exception when applied.

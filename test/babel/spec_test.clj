@@ -30,7 +30,7 @@
 (expect "The second argument of (conj {} []) was expected to be a sequence of vectors with only 2 elements or a map with key-value pairs but is a vector [] instead."
 (log/babel-test-message "(conj {} [])"))
 
-(expect "" (log/babel-test-message "(conj)"))
+(expect nil (log/babel-test-message "(conj)"))
 
 ;errors that give null pointers
 ;(conj "lijk" "jlksdfj")
@@ -67,7 +67,7 @@
 
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
-(expect "" (log/babel-test-message "(map char? \"abc\")")) ;; there should be no error for this
+(expect nil (log/babel-test-message "(map char? \"abc\")")) ;; there should be no error for this
 
 (expect "The first argument of (even? (0 1 2 3 4)) was expected to be a number but is a sequence (0 1 2 3 4) instead." (log/babel-test-message "(even? (range 5))"))
 
@@ -81,14 +81,14 @@
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(rand-int (range 20))"))
 
-(expect "" (log/babel-test-message "(rand)"))
+(expect nil (log/babel-test-message "(rand)"))
 
-(expect "" (log/babel-test-message "(filter even? '(1 2 3))"))
+(expect nil (log/babel-test-message "(filter even? '(1 2 3))"))
 
 (expect "The first argument of (filter (1)) was expected to be a function but is a list (1) instead." (log/babel-test-message "(filter '(1))"))
 
 (expect "The second argument of (filter even? odd?) was expected to be a sequence but is a function odd? instead." (log/babel-test-message "(filter even? odd?)"))
 
-(expect "" (log/babel-test-message "(filter 2 [])")) ;fails
+(expect nil (log/babel-test-message "(filter 2 [])")) ;fails
 
 ;(expect "" (log/babel-test-message "(take 2 "hmmmm")"))
