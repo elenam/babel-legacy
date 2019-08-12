@@ -32,14 +32,15 @@
   [response]
   (let [err-response (:err (second response))
         err-str (or err-response "")
-        match1 (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
-        matches (or match1 (re-matches #"(?s)(\S+) error at (.*?)\n(.+)\n(.*)" err-str))
-        n (if match1 2 1)
-        type (get matches n)
-        at (get matches (+ n 1))
-        message (s/trim (or (get matches (+ n 2)) ""))
-        line (get matches (+ n 3))
-        in (get matches (+ n 4))]
+        [whole1 _ type1 at1 message1 line1 in1 _] (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.*)\nLine: (\d*)\nIn: (.*)\n(.*)" err-str)
+        [whole2 _ type2 at2 message2 _] (re-matches #"(?s)(\S+) error \((\S+)\) at (.*)\n(.+)\n(.*)" err-str)
+        [whole3 _ at3 message3 _] (re-matches #"(?s)(\S+) error at (.*?)\n(.+)\n(.*)" err-str)
+        type (or type1 type2)
+        at (or at1 at2 at3)
+        line line1
+        in in1
+        msg (or message1 message2 message3)
+        message (if-not (nil? msg) (s/trim msg) "")]
       {:type type :at at :message message :line line :in in}))
 
 (defn get-original-error
