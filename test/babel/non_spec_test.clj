@@ -22,6 +22,8 @@
                 (def file-name "this file")
                 (:file (meta #'file-name)))))
 
+(expect "Breaks, needs fixing!!!!" (log/babel-test-message "(loop x 5 (+ x 5))"))
+
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 0)"))
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))
@@ -53,6 +55,16 @@
 (expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined." (log/babel-test-message "(+ orange 3)"))
 
 (expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined." (log/babel-test-message "(kiwi)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name def is undefined." (log/babel-test-message "def"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function." (log/babel-test-message "(even? let)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function." (log/babel-test-message "let"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too few arguments to if." (log/babel-test-message "(if)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to if." (log/babel-test-message "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; IllegalArgumentException ;;;;;;;;;;;;;;;;;;;;;;;
@@ -115,6 +127,8 @@
 (expect "Expected a number, but a string was given instead." (log/babel-test-message "(compare 7 \"5\")"))
 
 (expect "Expected a character, but a string was given instead." (log/babel-test-message "(compare \\a \"a\")"))
+
+(expect "Expected a file or an input stream, but a number was given instead." (log/babel-test-message "(line-seq 3)"))
 
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
