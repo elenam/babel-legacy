@@ -36,29 +36,23 @@
 ;; so it passes the type check, but throws a null pointer exception when applied.
 (expect "An attempt to access a non-existing object (NullPointerException)." (log/babel-test-message "(into [] {} \"a\")"))
 
-;(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(defn greater-than-zero [x] (> x 0)) (take (range) (range))"))
-
-;(expect "The second argument of (map f f) was expected to be a sequence but is a function f instead." (log/babel-test-message "(defn f [x] (+ x 2)) (map f f)"))
-
-;(expect "Tried to divide by zero" (log/babel-test-message "(defn not-divide-zero [x] (/ x 0))"))
-
-;(expect "Expected a number, but a string was given instead." (log/babel-test-message "(defn not-divide-zero [x] (/ x \"a\"))"))
-
 (expect #"(?s)There is an unmatched delimiter ]\.(.*)" (log/babel-test-message "(+ (])"))
 
 (expect #"(?s)You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)" (log/babel-test-message "{9 8 7}"))
 
 (expect "The format of the number 8.5.1 is invalid." (log/babel-test-message "8.5.1"))
 
-(expect "Wrong number of args (1) passed to: anonymous function" (log/babel-test-message "(map #(7) [0])"))
-
-(expect "Wrong number of args (2) passed to: anonymous function" (log/babel-test-message "(map #(+ %1) [9] [0])"))
-
-(expect "Wrong number of args (2) passed to: f" (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
-
 (expect #"(?s)# must be followed by a symbol\.(.*)" (log/babel-test-message "(map # [0])"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def." (log/babel-test-message "(def 7 8 9)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined." (log/babel-test-message "(+ orange 3)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined." (log/babel-test-message "(kiwi)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; IllegalArgumentException ;;;;;;;;;;;;;;;;;;;;;;;
@@ -77,3 +71,56 @@
 
 ;; Eventually will need to fix the arg printing in this:
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function." (log/babel-test-message "(nil even? #(inc %))"))
+
+(expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 1 1 1}"))
+
+(expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 0 (- 3 2) 8}"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; IllegalStateException ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "% can only be followed by & or a number." (log/babel-test-message "(#(+ %a 1) 2 3)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;; ArityException ;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; TODO: change the wording of this error!!!
+
+(expect "Wrong number of args (1) passed to: hello" (log/babel-test-message "(defn hello [x y] (* x y)) (hello 1)"))
+
+(expect "Wrong number of args (0) passed to: hello" (log/babel-test-message "(defn hello [x y] (* x y)) (hello)"))
+
+(expect "Wrong number of args (3) passed to: hello" (log/babel-test-message "(defn hello [x y] (* x y)) (hello 1 2 3)"))
+
+(expect "Wrong number of args (1) passed to: anonymous function" (log/babel-test-message "(map #(7) [0])"))
+
+(expect "Wrong number of args (2) passed to: anonymous function" (log/babel-test-message "(map #(+ %1) [9] [0])"))
+
+(expect "Wrong number of args (2) passed to: f" (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;; ClassCastException ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Expected a function, but a number was given instead." (log/babel-test-message "(5 6)"))
+
+(expect "Expected a function, but a number was given instead." (log/babel-test-message "(def apple 5) (apple 0)"))
+
+(expect "Expected a function, but a string was given instead." (log/babel-test-message "(\"apple\")"))
+
+(expect "Expected a string, but a number was given instead." (log/babel-test-message "(compare \"5\" 7)"))
+
+(expect "Expected a number, but a string was given instead." (log/babel-test-message "(compare 7 \"5\")"))
+
+(expect "Expected a character, but a string was given instead." (log/babel-test-message "(compare \\a \"a\")"))
+
+(expect nil (log/babel-test-message "(compare 5 nil)"))
+
+(expect nil (log/babel-test-message "(compare nil 5)"))
+
+(expect nil (log/babel-test-message "(compare nil nil)"))
+
+;; Lazy sequences aren't evaluated, give a class cast exception instead
+(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(take (range) (range))"))

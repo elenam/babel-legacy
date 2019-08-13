@@ -24,6 +24,8 @@
 (expect "Wrong number of arguments, expected in (map ): the function map expects one or more arguments but was given no arguments"
 (log/babel-test-message "(map)"))
 
+(expect "The second argument of (map f f) was expected to be a sequence but is a function f instead." (log/babel-test-message "(defn f [x] (+ x 2)) (map f f)"))
+
 (expect "The second argument of (conj {} \"a\") was expected to be a sequence of vectors with only 2 elements or a map with key-value pairs but is a string \"a\" instead."
 (log/babel-test-message "(conj {} \"a\")"))
 
