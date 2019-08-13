@@ -59,3 +59,21 @@
 (expect #"(?s)# must be followed by a symbol\.(.*)" (log/babel-test-message "(map # [0])"))
 
 (expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def." (log/babel-test-message "(def 7 8 9)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; IllegalArgumentException ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; I don't think this is the wording we want, but this is what our processing currently does
+(expect "A keyword: :a can only take one or two arguments." (log/babel-test-message "(:a 4 5 6)"))
+
+(expect "Every key for a hashmap must be followed by a value, but the key :2 does not have a matching value."
+        (log/babel-test-message "(hash-map :1 1, :2)"))
+
+;; Might want to change the printing of CompilerException; definitely want to report the form (it's in the exception)
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function." (log/babel-test-message "(nil)"))
+
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function." (log/babel-test-message "(nil 5)"))
+
+;; Eventually will need to fix the arg printing in this:
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function." (log/babel-test-message "(nil even? #(inc %))"))

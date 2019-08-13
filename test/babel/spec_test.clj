@@ -32,9 +32,12 @@
 
 (expect nil (log/babel-test-message "(conj)"))
 
-;errors that give null pointers
-;(conj "lijk" "jlksdfj")
-;(conj 1 "a")
+(expect "The first argument of (conj \"lijk\" \"jlksdfj\") was expected to be a sequence but is a string \"lijk\" instead."
+        (log/babel-test-message "(conj \"lijk\" \"jlksdfj\")"))
+
+(expect "The first argument of (conj 1 \"a\") was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(conj 1 \"a\")"))
+
+;errors that give null pointers:
 ;(take "apple" "banana")
 
 (expect "The first argument of (conj 1 \"a\") was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(conj 1 \"a\")" ))
@@ -43,7 +46,7 @@
 
 (expect "The second argument of (partition 1 1 1) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(partition 1 1 1)"))
 
-;(expect "The first argument of (into 1 clojure.spec.test.alpha$spec_checking_fn$fn__3026@390565e5) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(into 1 even?)"))
+(expect "The first argument of (into 1 even?) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(into 1 even?)"))
 
 (expect "The first argument of (contains? :a :a) was expected to be a sequence but is a keyword :a instead." (log/babel-test-message "(contains? :a :a)"))
 
@@ -91,4 +94,4 @@
 
 (expect nil (log/babel-test-message "(filter 2 [])")) ;fails
 
-;(expect "" (log/babel-test-message "(take 2 "hmmmm")"))
+(expect nil (log/babel-test-message "(take 2 \"hmmmm\")"))
