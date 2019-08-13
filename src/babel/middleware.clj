@@ -59,8 +59,12 @@
                 ""
                 (:clojure.error/line (:data (first via)))
                 (:clojure.error/column (:data (first via)))
-                (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via))) (to-array [(msg-o/get-all-text
-                                                                                                         (:msg-info-obj (p-exc/process-errors (str (:type (last via)) " " (:message (last via))))))])))
+                (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via)))
+                                                          (to-array [(msg-o/get-all-text
+                                                                        (:msg-info-obj (p-exc/process-errors
+                                                                          (str (:type (last via))
+                                                                               " "
+                                                                               (:message (last via))))))])))
           (= clojure.lang.ArityException exc-class)
               (process-arity-exception (.getMessage exc))
           :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))

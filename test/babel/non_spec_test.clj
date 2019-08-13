@@ -58,4 +58,4 @@
 
 (expect #"(?s)# must be followed by a symbol\.(.*)" (log/babel-test-message "(map # [0])"))
 
-(expect "Something reasonable, not this!" (log/babel-test-message "(def 7 8 9)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def." (log/babel-test-message "(def 7 8 9)"))

@@ -288,12 +288,12 @@
 
     {:key :compiler-exception-too-many-arguments
     :class "RuntimeException"
-    :match (beginandend "Too many arguments to (\\S*),")
+    :match (beginandend "Too many arguments to (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Too many arguments to " (nth matches 1) :arg ".\n"))}
 
    {:key :compiler-exception-too-few-arguments
     :class "RuntimeException"
-    :match (beginandend "Too few arguments to (\\S*),")
+    :match (beginandend "Too few arguments to (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Too few arguments to " (nth matches 1) :arg ".\n"))}
 
     {:key :compiler-exception-end-of-file
