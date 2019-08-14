@@ -75,8 +75,8 @@
 
     {:key :cant-call-nil
     :class "IllegalArgumentException"
-    :match (beginandend "Can't call nil")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot call nil as a function.\n"))}
+    :match (beginandend "Can't call nil, form: \\((.*)\\)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "You cannot call nil as a function.\n" (read-string (str "("(nth matches 1)")"))))}
 
     {:key :duplicate-key-hashmap
     :class "IllegalArgumentException"
