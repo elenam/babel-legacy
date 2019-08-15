@@ -17,6 +17,10 @@
                 (def file-name "this file")
                 (:file (meta #'file-name)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;Syntax Problems;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (expect "Syntax problems with (let [(+ (#(* %1 3)) 2) g] 7):
 In place of + (#(* %1 3)) 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
@@ -34,8 +38,6 @@ In place of 1 1 1 the following are allowed: unknown type" (log/babel-test-messa
 In place of + x 1 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(defn macro [s] (let [(+ x 1) g] g))"))
 
-(expect "Expected a number, but a function was given instead." (log/babel-test-message "(let [g (+ #(* %1 3) 2)] 7)"))
-
 (expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] (+ 1 2)):
 In place of + 1 2 the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] (+ 1 2))"))
 
@@ -45,8 +47,19 @@ In place of [3 4] [5 6] the following are allowed: a name or a hashmap" (log/bab
 (expect "Syntax problems with (let [(\"chromosome\" (\"x\") \"y\") z] ()):\nIn place of \"chromosome\" (\"x\") \"y\" the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [#{\"chromosome\" [\"x\"] \"y\"} z])"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (expect "if-let has too many parts here: (if-let(x false y true) \"then\" \"else\") The extra parts are: y true"
 (log/babel-test-message "(if-let [x false y true] \"then\" \"else\")"))
 
 (expect "if-let has too many parts here: (if-let((w n) (re-find a(d+)x \"aaa123xxx\")) (w n) :not-found :x) The extra parts are: :x"
 (log/babel-test-message "(if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x)"))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;Nested Error;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Expected a number, but a function was given instead." (log/babel-test-message "(let [g (+ #(* %1 3) 2)] 7)"))
