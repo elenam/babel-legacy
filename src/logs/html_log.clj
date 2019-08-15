@@ -228,7 +228,7 @@
 
 (defn- replace-newlines
   [str]
-  (s/replace (s/replace str "\\r\\n" "<br />") "\\n" "<br />"))
+  (if str (s/replace (s/replace str "\\r\\n" "<br />") "\\n" "<br />") ""))
 
 ;;write html content
 (defn write-html

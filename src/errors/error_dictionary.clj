@@ -356,7 +356,7 @@
 
     {:key :out-of-memory
     :class "OutOfMemoryError"
-    :match (beginandend "Java heap space ")
+    :match (beginandend "Java heap space")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Clojure ran out of memory, likely due to an infinite computation.\n"))}
 
     {:key :stack-overflow-with-name
