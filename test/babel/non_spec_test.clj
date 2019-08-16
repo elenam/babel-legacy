@@ -157,9 +157,3 @@
 
 ;; Lazy sequences aren't evaluated, give a class cast exception instead
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(take (range) (range))"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;; OutOfMemoryError ;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(expect "Clojure ran out of memory, likely due to an infinite computation." (log/babel-test-message "(doall (range))"))

@@ -234,7 +234,7 @@
 (defn write-html
   [inp-code total partial modified original]
   (let [orig-html (replace-newlines original)
-        orig-no-quot-marks (subs orig-html 1 (dec (count orig-html)))]
+        orig-no-quot-marks (if-not (= orig-html "") (subs orig-html 1 (dec (count orig-html))) "")]
   (spit (str "./log/history/" current-time ".html") (html-content
                                                       inp-code
                                                       total

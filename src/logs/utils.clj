@@ -21,7 +21,7 @@
   "evals the code given as a string, and returns the list of associated nREPL messages"
   [code]
   (with-open [conn (repl/connect :port server-port)]
-    (-> (repl/client conn 10000)
+    (-> (repl/client conn 100000)
         (repl/message {:op :eval :code (str "(babel.middleware/setup-exc)" code)})
         doall)))
 
