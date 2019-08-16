@@ -1,6 +1,7 @@
 (ns babel.long-test
   (:require
    [expectations :refer :all]
+   [babel.non-spec-test :refer [to-log?]]
    [logs.utils :as log]))
 
 ;#########################################

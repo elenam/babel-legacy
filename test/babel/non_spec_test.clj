@@ -53,12 +53,11 @@
 (expect "An attempt to access a non-existing object (NullPointerException)." (log/babel-test-message "(into [] {} \"a\")"))
 
 
-
-
+;###############################
+;### Number Format Exception ###
+;###############################
 
 (expect "The format of the number 8.5.1 is invalid." (log/babel-test-message "8.5.1"))
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
