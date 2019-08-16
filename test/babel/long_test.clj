@@ -25,7 +25,7 @@
 ;;;;;;;;;;;;;;;;;;; OutOfMemoryError ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Clojure ran out of memory, likely due to an infinite computation or infinite recursion." (log/babel-test-message " (defn f[x] (f (inc x)))  (f 0)"))
+(expect "Clojure ran out of memory, likely due to an infinite computation or infinite recursion." (log/babel-test-message "(defn f[x] (f (inc x)))  (f 0)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;; StackOverflowError ;;;;;;;;;;;;;;;;;;;;;;;

@@ -176,64 +176,6 @@
      (unknown-spec exception))))
 
 
- (defn print-single-arg
-   "Takes a single (atomic) argument of a macro and returns its string representation"
-   [val]
-   (cond
-     (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
-     (string? val) (str "\"" val "\"")
-     (= "fn*" (str val)) "#"
-     (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
-     :else (str val)))
-
-(defn- args->str
-  "Takes a vector of (as strings) arguments and returns a string of these symbols
-  with separated by empty spaces, enclosed into open-sym at the start and close-sym
-  at the end, if provided"
-  ([args]
-  (apply str (interpose " " args)))
-  ([args open-sym close-sym]
-  (str open-sym (apply str (interpose " " args)) close-sym)))
-
-(defn- single-arg?
-  "Returns true if the argument is not seqable or a string,
-   false otherwise"
-  [val]
-  (or (not (seqable? val)) (string? val)))
-
-(declare macro-args-rec) ;; needed for mutually recursive definitions
-
-(defn- map-arg->str
-  "Takes a map argument for a macro and returns its string representation"
-  [map-arg]
-  (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
-
-(defn- macro-args-rec
-  "Takes a potentially nested sequence of arguments of a macro and recursively
-   constructs a flat vector of string representations of its elements"
-  [args]
-  (cond
-    (single-arg? args) [(print-single-arg args)]
-    ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
-    (map? args) [(map-arg->str args)]
-    (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
-    (empty? args) []
-    (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
-    (and (not (empty? (rest args))) (= "fn*" (str (first args))))
-          [(args->str (macro-args-rec (rest (rest args)))"#" "")] ;;condition to remove a vector after fn*
-    :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
-
-
-(defn print-macro-arg
-  "Takes a potentially nested sequence of arguments of a macro and returns
-   its string represntation"
-  [val]
-  (cond
-    (single-arg? val) (print-single-arg val)
-    (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
-    (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
-    :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))
-
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
 ;; name. Negativr positions are later discarded
 (def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
@@ -272,7 +214,7 @@
   [[val probs]]
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
-           (str "In place of " (print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           (str "In place of " (d/print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
            ;(str "In place of " (str val) " the following are allowed:" (print-failed-predicates probs) "\n")
            "")))
 
@@ -299,7 +241,7 @@
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
-        val-str (print-macro-arg value) ; need to be consistent between val and value
+        val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
@@ -314,7 +256,7 @@
               (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
                                                                       fn-name
                                                                       " "
-                                                                      (str "[" (print-macro-arg (first value)) "] " (print-macro-arg (rest value)))
+                                                                      (str "[" (d/print-macro-arg (first value)) "] " (d/print-macro-arg (rest value)))
                                                                       "):\n"
                                                                       (process-paths-macro problems))
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))

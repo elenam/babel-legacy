@@ -1,6 +1,6 @@
 (ns errors.dictionaries
   (:require [errors.messageobj :as m-obj]
-            [clojure.string :as cs]
+            [clojure.string :as s]
             [corefns.corefns :as cf]))
 
 ;;; A dictionary of known types and their user-friendly representations.
@@ -198,28 +198,6 @@
     (= n "1") (str (number-word n) " argument")
     :else (str (number-word n) " arguments")))
 
-; (defn number-vals
-;   "number-vals takes two strings, one which are the arguments that caused
-;    an error and the length required of the thing it errored on. It returns the
-;    number of arguments in failedvals and uses failedlength to determine
-;    the correct response."
-;   [failedvals failedlength]
-;   (if (not= 0 (count failedvals))
-;     (let [x (count failedvals)
-;           y (keyword failedlength)
-;           z ({:b-length-one (str x " arguments")
-;                :b-length-two (str x " arguments")
-;                :b-length-three (str x " arguments")
-;                :b-length-greater-one (str x " arguments")
-;                :b-length-greater-two (str x " arguments")
-;                :b-length-zero-to-one (str x " arguments")
-;                :b-length-two-to-three (str x " arguments")
-;                :b-length-zero-to-three (str x " arguments")} y)]
-;              (if (nil? z)
-;                 failedlength
-;                 z))
-;       "no arguments"))
-
 (defn ?-name
   "?-name takes a string and converts it into a new string
   that is easier to understand when reading error messages
@@ -341,3 +319,63 @@
          (if-not (empty? val)
                  (str " The extra parts are:" (macro-args->str val))
                  "")))
+
+
+ (defn print-single-arg
+   "Takes a single (atomic) argument of a macro and returns its string representation"
+   [val]
+   (cond
+     (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
+     (string? val) (str "\"" val "\"")
+     (nil? val) "nil"
+     (= "fn*" (str val)) "#"
+     (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
+     :else (str val)))
+
+(defn- args->str
+  "Takes a vector of (as strings) arguments and returns a string of these symbols
+  with separated by empty spaces, enclosed into open-sym at the start and close-sym
+  at the end, if provided"
+  ([args]
+  (apply str (interpose " " args)))
+  ([args open-sym close-sym]
+  (str open-sym (apply str (interpose " " args)) close-sym)))
+
+(defn- single-arg?
+  "Returns true if the argument is not seqable or a string or nil,
+   false otherwise"
+  [val]
+  (or (not (seqable? val)) (string? val) (nil? val)))
+
+(declare macro-args-rec) ;; needed for mutually recursive definitions
+
+(defn- map-arg->str
+  "Takes a map argument for a macro and returns its string representation"
+  [map-arg]
+  (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
+
+(defn- macro-args-rec
+  "Takes a potentially nested sequence of arguments of a macro and recursively
+   constructs a flat vector of string representations of its elements"
+  [args]
+  (cond
+    (single-arg? args) [(print-single-arg args)]
+    ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
+    (map? args) [(map-arg->str args)]
+    (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
+    (empty? args) []
+    (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
+    (and (not (empty? (rest args))) (= "fn*" (str (first args))))
+          [(args->str (macro-args-rec (rest (rest args)))"#" "")] ;;condition to remove a vector after fn*
+    :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
+
+
+(defn print-macro-arg
+  "Takes a potentially nested sequence of arguments of a macro and returns
+   its string represntation"
+  [val]
+  (cond
+    (single-arg? val) (print-single-arg val)
+    (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
+    (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
+    :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))
