@@ -376,6 +376,7 @@
   [val]
   (cond
     (single-arg? val) (print-single-arg val)
+    (empty? val) ""
     (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
     (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
     :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))

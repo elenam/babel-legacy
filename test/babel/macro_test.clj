@@ -44,7 +44,10 @@ In place of + 1 2 the following are allowed: a name or a vector or a hashmap" (l
 (expect "Syntax problems with (let [[[3 4] [5 6]] y] ()):
 In place of [3 4] [5 6] the following are allowed: a name or a hashmap" (log/babel-test-message "(let [[[3 4] [5 6]] y])"))
 
-(expect "Syntax problems with (let [(\"chromosome\" (\"x\") \"y\") z] ()):\nIn place of \"chromosome\" (\"x\") \"y\" the following are allowed: a name or a vector or a hashmap"
+(expect "Syntax problems with (let [5 x] ):
+In place of 5 the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [5 x])"))
+
+(expect "Syntax problems with (let [(\"chromosome\" (\"x\") \"y\") z] ):\nIn place of \"chromosome\" (\"x\") \"y\" the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [#{\"chromosome\" [\"x\"] \"y\"} z])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
