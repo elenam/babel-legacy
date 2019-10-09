@@ -241,13 +241,13 @@
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
-        val-str (d/print-macro-arg value) ; need to be consistent between val and value
+        val-str (s/join " " (d/macro-args-rec value)) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n")
               ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9)
-              (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (d/macro-args->str args)  ")\n")
+              (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
@@ -256,7 +256,9 @@
               (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
                                                                       fn-name
                                                                       " "
-                                                                      (str "[" (d/print-macro-arg (first value)) "] " (d/print-macro-arg (rest value)))
+                                                                      (str (print-str (d/macro-args-rec (first value))) (cond (= (count (rest value)) 0) ""
+                                                                                                                  (= (count (rest value)) 1) (str " " (d/print-single-arg (first (rest value))))
+                                                                                                                  :else (print-str (d/macro-args-rec (rest value)))))
                                                                       "):\n"
                                                                       (process-paths-macro problems))
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))

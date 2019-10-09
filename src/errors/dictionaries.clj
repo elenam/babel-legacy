@@ -337,9 +337,10 @@
   with separated by empty spaces, enclosed into open-sym at the start and close-sym
   at the end, if provided"
   ([args]
-  (apply str (interpose " " args)))
+  (apply print-str args))
   ([args open-sym close-sym]
-  (str open-sym (apply str (interpose " " args)) close-sym)))
+  ;(s/join (cons open-sym (conj (vec (interpose " " args)) close-sym)))))
+  (apply str [open-sym (apply print-str args) close-sym])))
 
 (defn- single-arg?
   "Returns true if the argument is not seqable or a string or nil,
@@ -354,7 +355,14 @@
   [map-arg]
   (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
 
-(defn- macro-args-rec
+(defn seq-arg->str
+  [arg]
+  (cond
+    (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
+    (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
+    :else [(args->str (macro-args-rec arg) "(" ")")]))
+
+(defn macro-args-rec
   "Takes a potentially nested sequence of arguments of a macro and recursively
    constructs a flat vector of string representations of its elements"
   [args]
@@ -364,11 +372,10 @@
     (map? args) [(map-arg->str args)]
     (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
     (empty? args) []
-    (not (single-arg? (first args))) (into [(args->str (macro-args-rec (first args)) "(" ")")]  (macro-args-rec (rest args)))
+    (not (single-arg? (first args))) (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
     (and (not (empty? (rest args))) (= "fn*" (str (first args))))
           [(args->str (macro-args-rec (rest (rest args)))"#" "")] ;;condition to remove a vector after fn*
     :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
-
 
 (defn print-macro-arg
   "Takes a potentially nested sequence of arguments of a macro and returns
@@ -378,5 +385,5 @@
     (single-arg? val) (print-single-arg val)
     (empty? val) ""
     (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
-    (not (single-arg? (first val))) (args->str (into [(args->str (macro-args-rec (first val)) "(" ")")]  (macro-args-rec (rest val))))
+    (not (single-arg? (first val))) (args->str (into (seq-arg->str (first val))  (macro-args-rec (rest val))))
     :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))
