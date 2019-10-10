@@ -100,7 +100,7 @@
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil 5\)(.*)" (log/babel-test-message "(nil 5)"))
 
 ;; Eventually will need to fix the arg printing in this:
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil even\? \(#\(inc %1\)\)\)(.*)" (log/babel-test-message "(nil even? #(inc %))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil even\? #\(inc %1\)\)(.*)" (log/babel-test-message "(nil even? #(inc %))"))
 
 (expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 1 1 1}"))
 

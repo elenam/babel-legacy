@@ -240,7 +240,7 @@
         {:keys [cause data]} exc-map
         fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
-        val-str (s/join " " (d/macro-args-rec value)) ; need to be consistent between val and value
+        val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?

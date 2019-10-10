@@ -360,9 +360,10 @@
   (cond
     (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
     (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
+    (= "fn*" (str (first arg))) [(args->str (macro-args-rec (rest (rest arg)))"#" "")] ;;condition to remove a vector after fn*
     :else [(args->str (macro-args-rec arg) "(" ")")]))
 
-(defn macro-args-rec
+(defn- macro-args-rec
   "Takes a potentially nested sequence of arguments of a macro and recursively
    constructs a flat vector of string representations of its elements"
   [args]
@@ -372,14 +373,14 @@
     (map? args) [(map-arg->str args)]
     (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
     (empty? args) []
-    (not (single-arg? (first args))) (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
-    (and (not (empty? (rest args))) (= "fn*" (str (first args))))
-          [(args->str (macro-args-rec (rest (rest args)))"#" "")] ;;condition to remove a vector after fn*
+    (not (single-arg? (first args)))
+          (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
     :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
 
 (defn print-macro-arg
   "Takes a potentially nested sequence of arguments of a macro and returns
-   its string represntation"
+   its string represntation. If one argument is given, doesn't add any
+   delimeters. Can take optional delimeters."
   ([val]
    (s/join " " (macro-args-rec val)))
   ([val open-sym close-sym]
