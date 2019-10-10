@@ -355,7 +355,7 @@
   [map-arg]
   (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
 
-(defn seq-arg->str
+(defn- seq-arg->str
   [arg]
   (cond
     (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
@@ -380,10 +380,7 @@
 (defn print-macro-arg
   "Takes a potentially nested sequence of arguments of a macro and returns
    its string represntation"
-  [val]
-  (cond
-    (single-arg? val) (print-single-arg val)
-    (empty? val) ""
-    (or (map? val) (map? (first val))) (args->str (macro-args-rec val))
-    (not (single-arg? (first val))) (args->str (into (seq-arg->str (first val))  (macro-args-rec (rest val))))
-    :else (args->str (into [(print-single-arg (first val))] (macro-args-rec (rest val))))))
+  ([val]
+   (s/join " " (macro-args-rec val)))
+  ([val open-sym close-sym]
+   (str open-sym (s/join " " (macro-args-rec val)) close-sym)))

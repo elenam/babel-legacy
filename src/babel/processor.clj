@@ -215,7 +215,6 @@
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
            (str "In place of " (d/print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
-           ;(str "In place of " (str val) " the following are allowed:" (print-failed-predicates probs) "\n")
            "")))
 
 (defn- process-paths-macro
@@ -256,9 +255,9 @@
               (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
                                                                       fn-name
                                                                       " "
-                                                                      (str (print-str (d/macro-args-rec (first value))) (cond (= (count (rest value)) 0) ""
+                                                                      (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
                                                                                                                   (= (count (rest value)) 1) (str " " (d/print-single-arg (first (rest value))))
-                                                                                                                  :else (print-str (d/macro-args-rec (rest value)))))
+                                                                                                                  :else (d/print-macro-arg (rest value))))
                                                                       "):\n"
                                                                       (process-paths-macro problems))
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
