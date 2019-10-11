@@ -360,7 +360,8 @@
   (cond
     (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
     (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
-    (= "fn*" (str (first arg))) [(args->str (macro-args-rec (rest (rest arg)))"#" "")] ;;condition to remove a vector after fn*
+    (= "fn*" (str (first arg)))  ;;condition to remove a vector after fn*
+                              [(args->str (macro-args-rec (rest (rest arg)))"#" "")] 
     :else [(args->str (macro-args-rec arg) "(" ")")]))
 
 (defn- macro-args-rec

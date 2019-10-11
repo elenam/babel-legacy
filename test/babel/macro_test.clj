@@ -54,6 +54,9 @@ In place of 5 the following are allowed: a name or a vector or a hashmap" (log/b
 (expect "Syntax problems with (let [#{\"chromosome\" [\"x\"] \"y\"} z]):\nIn place of \"chromosome\" [\"x\"] \"y\" the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [#{\"chromosome\" [\"x\"] \"y\"} z])"))
 
+(expect "Syntax problems with (let [(let [x 5] #(+ %1)) 9] 8):
+In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(let [x 5] #(+ %1)) 9] 8)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

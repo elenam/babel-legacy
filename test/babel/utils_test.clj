@@ -21,3 +21,5 @@
 (expect "+ (* 2 3) 9 (/ 8 9)" (print-macro-arg '(+ (* 2 3) 9 (/ 8 9))))
 (expect "(+ 7 8) (* 2 3) 9" (print-macro-arg '((+ 7 8) (* 2 3) 9)))
 (expect "((+ 7 8))" (print-macro-arg '(((+ 7 8)))))
+(expect "+ #(* %1 3) 2" (print-macro-arg '(+ (fn* [p1__2107#] (* p1__2107# 3)) 2)))
+(expect "#()" (print-macro-arg '((fn* [] ()))))
