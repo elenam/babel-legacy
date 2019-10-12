@@ -361,7 +361,7 @@
     (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
     (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
     (= "fn*" (str (first arg)))  ;;condition to remove a vector after fn*
-                              [(args->str (macro-args-rec (rest (rest arg)))"#" "")] 
+                              [(args->str (macro-args-rec (rest (rest arg)))"#" "")]
     :else [(args->str (macro-args-rec arg) "(" ")")]))
 
 (defn- macro-args-rec
@@ -376,6 +376,7 @@
     (empty? args) []
     (not (single-arg? (first args)))
           (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
+    (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
     :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
 
 (defn print-macro-arg

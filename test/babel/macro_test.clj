@@ -57,6 +57,9 @@ In place of 5 the following are allowed: a name or a vector or a hashmap" (log/b
 (expect "Syntax problems with (let [(let [x 5] #(+ %1)) 9] 8):
 In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(let [x 5] #(+ %1)) 9] 8)"))
 
+(expect "Syntax problems with (let [#() 1] 5):
+In place of #() the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [#() 1] 5)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
