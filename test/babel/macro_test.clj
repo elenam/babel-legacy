@@ -34,7 +34,7 @@
 (expect "let requires a vector of name/expression pairs, but is given {8 7} instead."
 (log/babel-test-message "(let {8 7} 5)"))
 
-(expect "let requires a vector of name/expression pairs, but is given {8 7, 9 0} instead."
+(expect "let requires a vector of name/expression pairs, but is given {8 7 9 0} instead."
 (log/babel-test-message "(let {8 7 9 0} 5)"))
 
 (expect "let requires a vector of name/expression pairs, but is given {8 7 #(+ %1) 7} instead."
