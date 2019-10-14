@@ -24,3 +24,5 @@
 (expect "+ #(* %1 3) 2" (print-macro-arg '(+ (fn* [p1__2107#] (* p1__2107# 3)) 2)))
 (expect "#()" (print-macro-arg '((fn* [] ()))))
 (expect "{2 3 4 5}" (print-macro-arg '{2 3 4 5}))
+(expect "(+ 2 3 4 5)" (print-macro-arg '(+ 2 3 4 5) :sym))
+(expect "#{6}" (print-macro-arg '#{6} :sym))

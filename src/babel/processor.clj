@@ -250,7 +250,7 @@
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
-                   (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems))) " instead.\n")
+                   (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
               (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
               (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
                                                                       fn-name

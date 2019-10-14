@@ -385,5 +385,9 @@
    delimeters. Can take optional delimeters."
   ([val]
    (s/join " " (macro-args-rec val)))
+  ([val k]
+   (if (and (= k :sym) (not (single-arg? val)) (not (map? val)))
+       (s/join " " (macro-args-rec (list val)))
+       (s/join " " (macro-args-rec val))))
   ([val open-sym close-sym]
    (str open-sym (s/join " " (macro-args-rec val)) close-sym)))

@@ -46,6 +46,9 @@
 (expect "let requires a vector of name/expression pairs, but is given \"a\" instead."
 (log/babel-test-message "(let \"a\" 5)"))
 
+(expect "let requires a vector of name/expression pairs, but is given #{7 8} instead."
+(log/babel-test-message "(let #{7 8} 9)"))
+
 (expect "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
 In place of + #(* %1 3) 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
