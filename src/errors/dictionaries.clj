@@ -302,6 +302,8 @@
   [n]
   (if (and (cf/lazy? n) (< 10 (count n))) (cons (take 10 n) '(...)) n))
 
+(declare print-macro-arg)
+
 (defn macro-args->str
   "Takes a sequence of arguments for a macro, returns a string
    representation of these arguments for printing."
@@ -317,7 +319,7 @@
     [spec-problem]
     (let [{:keys [val]} spec-problem]
          (if-not (empty? val)
-                 (str " The extra parts are:" (macro-args->str val))
+                 (str " The extra parts are: " (print-macro-arg val))
                  "")))
 
 

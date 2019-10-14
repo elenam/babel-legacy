@@ -49,6 +49,12 @@
 (expect "let requires a vector of name/expression pairs, but is given #{7 8} instead."
 (log/babel-test-message "(let #{7 8} 9)"))
 
+(expect "if-let requires a vector of name/expression pairs, but is given \"a\" instead."
+(log/babel-test-message "(if-let \"a\" 6)"))
+
+(expect "if-let requires a vector of name/expression pairs, but is given {8 9 5 4} instead."
+(log/babel-test-message "(if-let {8 9 5 4} 6)"))
+
 (expect "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
 In place of + #(* %1 3) 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
@@ -100,12 +106,14 @@ In place of 1 1 1 the following are allowed: unknown type" (log/babel-test-messa
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "if-let has too many parts here: (if-let[x false y true] \"then\" \"else\") The extra parts are: y true"
+(expect "if-let has too many parts here: (if-let [x false y true] \"then\" \"else\") The extra parts are: y true"
 (log/babel-test-message "(if-let [x false y true] \"then\" \"else\")"))
 
-(expect "if-let has too many parts here: (if-let[[w n] (re-find a(d+)x \"aaa123xxx\")] [w n] :not-found :x) The extra parts are: :x"
+(expect "if-let has too many parts here: (if-let [[w n] (re-find a(d+)x \"aaa123xxx\")] [w n] :not-found :x) The extra parts are: :x"
 (log/babel-test-message "(if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x)"))
 
+(expect "if-let has too many parts here: (if-let [a 8 #(+ %1) #(+ %3)] 6 7) The extra parts are: #(+ %1) #(+ %3)"
+(log/babel-test-message "(if-let [a 8 #(+ %) #(+ %3)] 6 7)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Nested Error;;;;;;;;;;;;;;;;;;;;;;;

@@ -244,7 +244,7 @@
         n (count problems)]
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
-              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name val-str ")" (d/extra-macro-args-info (first problems)) "\n")
+              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
               ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9)
               (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
