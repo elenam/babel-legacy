@@ -228,10 +228,10 @@
     (s/cat :value (s/nilable any?) :value (s/nilable any?))))
 (stest/instrument `clojure.core/identical?)
 
-(s/fdef clojure.core/contains?
-  :args (s/and ::b-length-two
-    (s/or :arg-one (s/cat :collection (s/nilable coll?) :key (s/nilable keyword?)))))
-(stest/instrument `clojure.core/contains?)
+; (s/fdef clojure.core/contains?
+;   :args (s/and ::b-length-two
+;     (s/or :arg-one (s/cat :collection (s/nilable coll?) :key (s/nilable keyword?)))))
+; (stest/instrument `clojure.core/contains?)
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
