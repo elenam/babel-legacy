@@ -80,16 +80,19 @@ In place of + 1 2 the following are allowed: a name or a vector or a hashmap" (l
 In place of [3 4] [5 6] the following are allowed: a name or a hashmap" (log/babel-test-message "(let [[[3 4] [5 6]] y])"))
 
 (expect "Syntax problems with (let [5 x]):
-In place of 5 the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [5 x])"))
+In place of 5 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [5 x])"))
 
 (expect "Syntax problems with (let [#{\"chromosome\" [\"x\"] \"y\"} z]):\nIn place of \"chromosome\" [\"x\"] \"y\" the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [#{\"chromosome\" [\"x\"] \"y\"} z])"))
 
 (expect "Syntax problems with (let [(let [x 5] #(+ %1)) 9] 8):
-In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [(let [x 5] #(+ %1)) 9] 8)"))
+In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(let [x 5] #(+ %1)) 9] 8)"))
 
 (expect "Syntax problems with (let [#() 1] 5):
-In place of #() the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [#() 1] 5)"))
+In place of #() the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [#() 1] 5)"))
 
 (expect "Syntax problems with (let [{8 7} 1] 0):
 In place of {8 7} the following are allowed: a name or a vector
@@ -100,7 +103,20 @@ In place of 7 the following are allowed: a vector" (log/babel-test-message "(let
 In place of {8 7 #(+ %1) 7} the following are allowed: a name or a vector
 In place of 8 the following are allowed: a name or a vector or a hashmap
 In place of 7 the following are allowed: a vector
-In place of #(+ %1) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [{8 7 #(+ %) 7} 1] 8)"))
+In place of #(+ %1) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [{8 7 #(+ %) 7} 1] 8)"))
+
+(expect "Syntax problems with (let [\"(let [7 8] 1)\" 0] 5):
+In place of \"(let [7 8] 1)\" the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [\"(let [7 8] 1)\" 0] 5)"))
+
+(expect "Syntax problems with (let [#\"regex\" 5] 0):
+In place of #\"regex\" the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [#\"regex\" 5] 0)"))
+
+(expect "Syntax problems with (let [#\"(let [5 6] 7)\" 5] 0):
+In place of #\"(let [5 6] 7)\" the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [#\"(let [5 6] 7)\" 5] 0)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Macros with no vector ;;;;;;;;;
@@ -116,7 +132,7 @@ In place of 1 1 1 the following are allowed: unknown type" (log/babel-test-messa
 (expect "if-let has too many parts here: (if-let [x false y true] \"then\" \"else\") The extra parts are: y true"
 (log/babel-test-message "(if-let [x false y true] \"then\" \"else\")"))
 
-(expect "if-let has too many parts here: (if-let [[w n] (re-find a(d+)x \"aaa123xxx\")] [w n] :not-found :x) The extra parts are: :x"
+(expect "if-let has too many parts here: (if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x) The extra parts are: :x"
 (log/babel-test-message "(if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x)"))
 
 (expect "if-let has too many parts here: (if-let [a 8 #(+ %1) #(+ %3)] 6 7) The extra parts are: #(+ %1) #(+ %3)"

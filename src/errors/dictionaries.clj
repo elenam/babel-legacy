@@ -329,6 +329,7 @@
    (cond
      (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
      (string? val) (str "\"" val "\"")
+     (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
      (nil? val) "nil"
      (= "fn*" (str val)) "#"
      (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
