@@ -85,7 +85,7 @@
 
     {:key :loop-req-vector
     :class "IllegalArgumentException"
-    :match (beginandend "loop requires a vector for its binding (\\S*)")
+    :match (beginandend "loop requires a vector for its binding")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Loop requires a vector for its binding.\n"))}
 
     {:key :recur-arg-mismatch

@@ -148,6 +148,12 @@
 
 (expect "Expected a file or an input stream, but a number was given instead." (log/babel-test-message "(line-seq 3)"))
 
+(expect "Expected a regular expression pattern, but a number was given instead." (log/babel-test-message "(re-find 5 6)"))
+
+(expect "Expected a string, but a number was given instead." (log/babel-test-message "(re-find #\"a\" 6)"))
+
+(expect "Expected a string, but a regular expression pattern was given instead." (log/babel-test-message "(re-find #\"a\" #\"a\")"))
+
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
 (expect nil (log/babel-test-message "(compare nil 5)"))

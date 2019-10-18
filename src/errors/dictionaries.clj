@@ -118,9 +118,8 @@
 ;;; get-match-name: string -> string
 (defn get-match-name
   "extract a function name from a qualified name"
-  [fname]
-  (let [;check-spec ((merge corefns-map specs-map) fname)
-        ;m (if check-spec check-spec (nth (re-matches #"(.*)\$(.*)" fname) 2))
+  [name]
+  (let [fname (or name "")
         matched (or (nth (re-matches #"(.*)\$(.*)@(.*)" fname) 2)
                     (nth (re-matches #"(.*)\$(.*)" fname) 2)
                     (nth (re-matches #"(.*)/(.*)" fname) 2)

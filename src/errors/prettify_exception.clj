@@ -16,7 +16,7 @@
 (defn get-match
   [e-class message]
   (let [match (first-match e-class message)]
-    (if match match (first-match "default" message))))
+    (or match (first-match "default" message))))
 
 (defn fn-name
   "Takes a function object and returns a symbol that corresponds to the result of
