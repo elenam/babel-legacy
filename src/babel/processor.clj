@@ -246,8 +246,9 @@
    the problem as a string"
   [ex]
   (let [exc-map (Throwable->map ex)
-        {:keys [cause data]} exc-map
-        fn-name (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
+        {:keys [cause data via]} exc-map
+        conf-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
+        fn-name (if conf-name (d/get-function-name conf-name) (str (:clojure.error/symbol (:data (first via)))))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]

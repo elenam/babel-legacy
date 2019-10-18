@@ -50,21 +50,20 @@
     (map? v) (reduce #(apply assoc %1 %2) {} (map lookup-fns v));; map has key/val pairs
     :else v))
 
-(defn msg-from-matched-entry [entry message]
+(defn msg-from-matched-entry
   "Creates a message info object from an exception and its data, if exists"
+  [entry message]
   (cond
     ;(and data entry) (msg-info-obj-with-data entry message data)
     entry ((:make-msg-info-obj entry) (re-matches (:match entry) message))
     :else (make-msg-info-hashes message)))
 
 ; This was added from another file and isn't needed:
-(defn get-sum-text [msg-obj]
+(defn get-sum-text
   "concatenate all text from a message object into a string"
-      ;(println (str "MESSAGE in get-all-text" msg-obj))
-  (reduce #(str %1 (:msg %2)) "" msg-obj))
+  [msg-obj]
+  (reduce #(str %1 (:msg %2)) "" msg-obj)) ;; replace by join?
 
-
-;; TO-DO: simplify handling the rest: now there is only one match -EM 5/20
 (defn get-exception-class-and-rest
   "returns a vector containing the class and then the message without the class marking"
   [ex-str]
