@@ -91,9 +91,16 @@ In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a
 (expect "Syntax problems with (let [#() 1] 5):
 In place of #() the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [#() 1] 5)"))
 
-;; RESTORE this later:
-;;(expect "Syntax problems with (let [{8 7 #(+ %1) 7} 1] 8):
-;; SOMETHING REASONABLE, NOT THIS!!!" (log/babel-test-message "(let [{8 7 #(+ %) 7} 1] 8)"))
+(expect "Syntax problems with (let [{8 7} 1] 0):
+In place of {8 7} the following are allowed: a name or a vector
+In place of 8 the following are allowed: a name or a vector or a hashmap
+In place of 7 the following are allowed: a vector" (log/babel-test-message "(let [{8 7} 1] 0)"))
+
+(expect "Syntax problems with (let [{8 7 #(+ %1) 7} 1] 8):
+In place of {8 7 #(+ %1) 7} the following are allowed: a name or a vector
+In place of 8 the following are allowed: a name or a vector or a hashmap
+In place of 7 the following are allowed: a vector
+In place of #(+ %1) the following are allowed: a name or a vector or a hashmap" (log/babel-test-message "(let [{8 7 #(+ %) 7} 1] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Macros with no vector ;;;;;;;;;

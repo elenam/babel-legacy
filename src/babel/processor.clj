@@ -198,7 +198,7 @@
    that describes them for beginners"
   [probs]
   (->> probs
-       (filter #(nil? (:reason %)) ; eliminate "Extra input" and "Insufficient input"
+       (filter #(nil? (:reason %))) ; eliminate "Extra input" and "Insufficient input"
        (map :pred) ; get the failed predicates
        (distinct) ; eliminate duplicates
        (map #(predicate-name %)) ; get position/name pairs
@@ -206,7 +206,7 @@
        (filter #(>= (first %) 0)); remove negative positions
        (map second) ; take names only
        (distinct) ; eliminate duplicates
-       (s/join " or")))) ; join into a string with " or" as a separator
+       (s/join " or"))) ; join into a string with " or" as a separator
 
 (defn- process-group
   "Takes a vector of a value and hashmaps of predicates it failed and returns
