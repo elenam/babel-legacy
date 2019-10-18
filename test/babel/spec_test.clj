@@ -62,6 +62,10 @@
 
 (expect "The first argument of (filter (1)) was expected to be a function but is a list (1) instead." (log/babel-test-message "(filter '(1))"))
 
+(expect "The first argument of (take [] []) was expected to be a number but is a vector [] instead." (log/babel-test-message "(take [] [])"))
+
+(expect "The first argument of (take \"apple\" \"banana\") was expected to be a number but is a string \"apple\" instead." (log/babel-test-message "(take \"apple\" \"banana\")"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -86,7 +90,7 @@
 
 (expect "The second argument of (filter even? odd?) was expected to be a sequence but is a function odd? instead." (log/babel-test-message "(filter even? odd?)"))
 
-
+(expect "The second argument of (take 4 5) was expected to be a sequence but is a number 5 instead." (log/babel-test-message "(take 4 5)"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

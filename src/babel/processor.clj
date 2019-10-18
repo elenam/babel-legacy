@@ -66,8 +66,9 @@
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
-                :regex "a regular expression", :num-non-zero "a number that's not zero", :arg-one "not wrong" :num "a number" :lazy "a lazy sequence"
-                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs" :number-greater-than-zero "a number that's greater than zero"
+                :regex "a regular expression", :num-non-zero "a number that's not zero", :num "a number", :lazy "a lazy sequence"
+                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs",
+                :number-greater-than-zero "a number that's greater than zero",
                 :collection-map "a sequence"})
 
 (def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
@@ -76,10 +77,18 @@
                  :b-length-two-to-four "two or up to four arguments", :b-length-one-to-three "one or up to three arguments", :b-length-zero-to-three "zero or up to three arguments"})
 
 (defn stringify
-  "If there's only one item inside of path, it will use it's name via spec-ref and return a string.
-   If there's two or more then it will only take the second item in the path because there's usually only three items."
+  "Takes a vector of keywords of failed predicates. If there is
+  only one, returns the result of looking it up in spec-ref.
+  Otherwise returns the first result of looking up the rest of
+  the keywords in spec-ref, as a string.
+  Returns an empty string if no matches are found"
   [vector-of-keywords]
-  (if (= (count vector-of-keywords) 1) (name (spec-ref (first vector-of-keywords))) (name (spec-ref (second vector-of-keywords)))))
+  (if (= (count vector-of-keywords) 1)
+      (or (spec-ref (first vector-of-keywords)) "unknown condition")
+      (or (->> (rest vector-of-keywords)
+               (map #(spec-ref %))
+               (filter #(not (nil? %)))
+               first) "unknown condition")))
 
 (defn has-alpha-nil?
   [{:keys [path]}]
