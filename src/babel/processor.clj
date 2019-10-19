@@ -252,6 +252,8 @@
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]
+        ;; If there is no value, I need to get the exc type and the messages from the second of via
+        ;; and pass it to processing.  
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
