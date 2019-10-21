@@ -61,27 +61,39 @@
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def." (log/babel-test-message "(def 7 8 9)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def."
+(log/babel-test-message "(def 7 8 9)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined." (log/babel-test-message "(+ orange 3)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined."
+(log/babel-test-message "(+ orange 3)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined." (log/babel-test-message "(kiwi)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined."
+(log/babel-test-message "(kiwi)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name def is undefined." (log/babel-test-message "def"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name def is undefined."
+(log/babel-test-message "def"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function." (log/babel-test-message "(even? let)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function."
+(log/babel-test-message "(even? let)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function." (log/babel-test-message "let"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function."
+(log/babel-test-message "let"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too few arguments to if." (log/babel-test-message "(if)"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too few arguments to if."
+(log/babel-test-message "(if)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to if." (log/babel-test-message "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to if."
+(log/babel-test-message "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
-(expect #"(?s)# must be followed by a symbol\.(.*)" (log/babel-test-message "(map # [0])"))
+(expect #"(?s)# must be followed by a symbol\.(.*)"
+(log/babel-test-message "(map # [0])"))
 
-(expect #"(?s)There is an unmatched delimiter ]\.(.*)" (log/babel-test-message "(+ (])"))
+(expect #"(?s)There is an unmatched delimiter ]\.(.*)"
+(log/babel-test-message "(+ (])"))
 
-(expect #"(?s)You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)" (log/babel-test-message "{9 8 7}"))
+(expect #"(?s)You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"
+(log/babel-test-message "{9 8 7}"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; IllegalArgumentException ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -93,24 +105,43 @@
         (log/babel-test-message "(hash-map :1 1, :2)"))
 
 ;; Might want to change the printing of CompilerException; definitely want to report the form (it's in the exception)
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil\)(.*)" (log/babel-test-message "(nil)"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil\)(.*)"
+(log/babel-test-message "(nil)"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil 5\)(.*)" (log/babel-test-message "(nil 5)"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil 5\)(.*)"
+(log/babel-test-message "(nil 5)"))
 
 ;; Eventually will need to fix the arg printing in this:
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil even\? #\(inc %1\)\)(.*)" (log/babel-test-message "(nil even? #(inc %))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)You cannot call nil as a function. The expression was: \(nil even\? #\(inc %1\)\)(.*)"
+(log/babel-test-message "(nil even? #(inc %))"))
 
 (expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 1 1 1}"))
 
 (expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 0 (- 3 2) 8}"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given 1 argument.(.*)" (log/babel-test-message "(loop [] (recur 5))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given 1 argument.(.*)"
+(log/babel-test-message "(loop [] (recur 5))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given no arguments.(.*)" (log/babel-test-message "(loop [x 2] (recur))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given no arguments.(.*)"
+(log/babel-test-message "(loop [x 2] (recur))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 2 arguments but was given 1 argument.(.*)" (log/babel-test-message "(defn f[x y] (if x 1 (recur 2)))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 2 arguments but was given 1 argument.(.*)"
+(log/babel-test-message "(defn f[x y] (if x 1 (recur 2)))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given 2 arguments.(.*)" (log/babel-test-message "(fn [x] (recur 2 3))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given 2 arguments.(.*)"
+(log/babel-test-message "(fn [x] (recur 2 3))"))
+
+(expect #"The 'case' input 13 didn't match any of the options."
+(log/babel-test-message "(case (+ 6 7))"))
+
+(expect #"The 'case' input Hi there didn't match any of the options."
+(log/babel-test-message "(case \"Hi there\")"))
+
+(expect #"The 'case' input (\S+) didn't match any of the options."
+(log/babel-test-message "(case map)"))
+
+(expect #"The 'case' input (\S+) didn't match any of the options."
+(log/babel-test-message "(case #(+ % 1))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; IllegalStateException ;;;;;;;;;;;;;;;;;;;;;;;

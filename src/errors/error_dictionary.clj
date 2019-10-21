@@ -93,6 +93,11 @@
     :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur expected " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
 
+    {:key :no-matching-clause
+    :class "IllegalArgumentException"
+    :match (beginandend #"No matching clause: (.*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The 'case' input " (nth matches 1) " didn't match any of the options.\n"))}
+
     {:key :illegal-input-stream
     :class "IllegalArgumentException"
     :match (beginandend "Cannot open \\<(.*)\\> as an InputStream")
