@@ -119,16 +119,16 @@
 
 (expect "You have duplicated the key 1, you cannot use the same key in a hashmap twice." (log/babel-test-message "{1 0 (- 3 2) 8}"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given 1 argument.(.*)"
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given 1 argument\.(.*)"
 (log/babel-test-message "(loop [] (recur 5))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given no arguments.(.*)"
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given no arguments\.(.*)"
 (log/babel-test-message "(loop [x 2] (recur))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 2 arguments but was given 1 argument.(.*)"
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 2 arguments but was given 1 argument\.(.*)"
 (log/babel-test-message "(defn f[x y] (if x 1 (recur 2)))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given 2 arguments.(.*)"
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected 1 argument but was given 2 arguments\.(.*)"
 (log/babel-test-message "(fn [x] (recur 2 3))"))
 
 (expect #"The 'case' input 13 didn't match any of the options."

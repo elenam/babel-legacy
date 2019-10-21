@@ -61,8 +61,11 @@
   "Takes an exception object. Returns a true value if it's a spec error for a macro,
    a false value otherwise."
   [exc]
-  (and (> (count (:via (Throwable->map exc))) 1)
-       (= :macro-syntax-check (:clojure.error/phase (:data (first (:via (Throwable->map exc))))))))
+  (let [exc-map (Throwable->map exc)
+        {:keys [via cause]} exc-map]
+      (and (> (count via) 1)
+           (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
+           (re-matches #"Call to (.*) did not conform to spec." cause))))
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
@@ -247,13 +250,12 @@
   [ex]
   (let [exc-map (Throwable->map ex)
         {:keys [cause data via]} exc-map
-        conf-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
-        fn-name (if conf-name (d/get-function-name conf-name) (str (:clojure.error/symbol (:data (first via)))))
+        fn-name  (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]
         ;; If there is no value, I need to get the exc type and the messages from the second of via
-        ;; and pass it to processing.  
+        ;; and pass it to processing.
         (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
