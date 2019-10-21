@@ -90,7 +90,7 @@
 
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
-    :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)\,")
+    :match (beginandend #"Mismatched argument count to recur, expected: (.*) args, got: (.*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Recur expected " (number-arg (nth matches 1)) " but was given " (number-arg (nth matches 2)) :arg ".\n"))}
 
     {:key :illegal-input-stream
