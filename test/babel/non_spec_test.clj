@@ -27,8 +27,6 @@
 ;;;;;;;;;;;;;;;;;ArithmeticExceptions;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Breaks, needs fixing!!!!" (log/babel-test-message "(loop x 5 (+ x 5))"))
-
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 0)"))
 
 (expect "Tried to divide by zero" (log/babel-test-message "(/ 70 8 0)"))

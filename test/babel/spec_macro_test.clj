@@ -1,4 +1,4 @@
-(ns babel.macro-test
+(ns babel.spec-macro-test
   (:require
    [logs.utils :as log]
    [babel.non-spec-test :refer [to-log?]]
