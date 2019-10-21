@@ -191,6 +191,10 @@
 
 (expect "Expected a string, but a regular expression pattern was given instead." (log/babel-test-message "(re-find #\"a\" #\"a\")"))
 
+(expect "Expected a function, but a number was given instead." (log/babel-test-message "(-> 4 5)"))
+
+(expect "Expected a function, but a number was given instead." (log/babel-test-message "(->> 4 5)"))
+
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
 (expect nil (log/babel-test-message "(compare nil 5)"))

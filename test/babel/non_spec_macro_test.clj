@@ -27,7 +27,8 @@
 ;;;;;;;;;;;;;;;;;ArithmeticExceptions;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Loop requires a vector for its binding." (log/babel-test-message "(loop x 5 (+ x 5))"))
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Loop requires a vector for its binding\.(.*)"
+(log/babel-test-message "(loop x 5 (+ x 5))"))
 
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Parameters for cond must come in pairs, but one of them does not have a match\.(.*)"
 (log/babel-test-message "(cond 4 5 6)"))
