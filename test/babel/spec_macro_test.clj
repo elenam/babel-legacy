@@ -22,7 +22,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;; let and if-let ;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; let, if-let, when-let ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "let requires a vector of name/expression pairs, but is given 5 instead."
@@ -54,6 +54,9 @@
 
 (expect "if-let requires a vector of name/expression pairs, but is given {8 9 5 4} instead."
 (log/babel-test-message "(if-let {8 9 5 4} 6)"))
+
+(expect "when-let requires a vector of name/expression pairs, but is given 6 instead."
+(log/babel-test-message "(when-let 6)"))
 
 ;; TO-DO:
 ;; This wording is different from the wording above, and there is no space before the argument of 'let':
@@ -133,6 +136,10 @@ In place of & the following are allowed: a vector or a hashmap
 In place of 5 the following are allowed: a vector"
 (log/babel-test-message "(let [{& 5} 6] 9)"))
 
+(expect "Syntax problems with (when-let [7 8]):
+In place of 7 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(when-let [7 8])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Macros with no vector ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -152,6 +159,13 @@ In place of 1 1 1 the following are allowed: unknown type" (log/babel-test-messa
 
 (expect "if-let has too many parts here: (if-let [a 8 #(+ %1) #(+ %3)] 6 7) The extra parts are: #(+ %1) #(+ %3)"
 (log/babel-test-message "(if-let [a 8 #(+ %) #(+ %3)] 6 7)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Insufficient Input;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "when-let requires more parts than given here: (when-let)"
+(log/babel-test-message "(when-let)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Nested Error;;;;;;;;;;;;;;;;;;;;;;;

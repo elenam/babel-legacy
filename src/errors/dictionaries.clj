@@ -386,7 +386,7 @@
    its string represntation. If one argument is given, doesn't add any
    delimeters. Can take optional delimeters."
   ([val]
-   (s/join " " (macro-args-rec val)))
+   (if (nil? val) "" (s/join " " (macro-args-rec val))))
   ([val k]
    (if (and (= k :sym) (not (single-arg? val)) (not (map? val)))
        (s/join " " (macro-args-rec (list val)))
