@@ -141,13 +141,6 @@ In place of 7 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(when-let [7 8])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;; Macros with no vector ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(expect "Syntax problems with (when-first 1 1 1):
-In place of 1 1 1 the following are allowed: unknown type" (log/babel-test-message "(when-first 1 1 1)"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

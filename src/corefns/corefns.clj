@@ -166,8 +166,8 @@
 
 (s/fdef clojure.core/subs ;incomplete
   :args (s/and ::b-length-two-to-three
-               (s/or :arg-one (s/cat :string ::string-or-lazy :integer int?) ;(s/and (s/cat :str1 string? :int1 int?) (fn [{:keys [str1 int1]}] (b-not-greater-count str1 int1)))
-                     :arg-two (s/cat :string ::string-or-lazy :integer int? :integer int?)))) ;(s/and (s/cat :str2 string? :int2 int? :int3 int?) (fn [{:keys [str2 int2 int3]}] (b-not-greater-count str2 int2 int3))))))
+               (s/or :arg-one (s/cat :string ::string-or-lazy :integer int?)
+                     :arg-two (s/cat :string ::string-or-lazy :integer int? :integer int?))))
 (stest/instrument `clojure.core/subs)
 
 (s/fdef clojure.core/reduce
@@ -192,21 +192,16 @@
     (s/or :arg-one (s/cat :future future?))))
 (stest/instrument `clojure.core/future-cancel)
 
-(s/fdef clojure.core/->>
-  :args (s/and ::b-length-greater-zero
-    (s/or :arg-one (s/cat :value (s/+ any?)))))
-(stest/instrument `clojure.core/->>)
+; (s/fdef clojure.core/->>
+;   :args (s/and ::b-length-greater-zero
+;     (s/or :arg-one (s/cat :value (s/+ any?)))))
+; (stest/instrument `clojure.core/->>)
 
-(s/fdef clojure.core/if-some
-  :args (s/and ::b-length-two-to-three
-               (s/or :arg-one (s/cat :bindings :clojure.core.specs.alpha/bindings :value any?)
-                     :arg-two (s/cat :bindings :clojure.core.specs.alpha/bindings :value any? :value any?))))
-(stest/instrument `clojure.core/if-some)
-
-(s/fdef clojure.core/when-first
-  :args (s/and ::b-length-two
-    (s/or :arg-one (s/cat :bindings ::bindings-seq2 :value any?))))
-(stest/instrument `clojure.core/when-first)
+; (s/fdef clojure.core/if-some
+;   :args (s/and ::b-length-two-to-three
+;                (s/or :arg-one (s/cat :bindings :clojure.core.specs.alpha/bindings :value any?)
+;                      :arg-two (s/cat :bindings :clojure.core.specs.alpha/bindings :value any? :value any?))))
+; (stest/instrument `clojure.core/if-some)
 
 (s/fdef clojure.core/gen-class
   :args (s/and ::b-length-zero-or-greater

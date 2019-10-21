@@ -41,3 +41,11 @@
 
 (expect #"when-some requires exactly two elements in its vector, but a different number was given\.(.*)"
 (log/babel-test-message "(when-some [6] 8)"))
+
+(expect #"if-some requires exactly two elements in its vector, but a different number was given\.(.*)"
+(log/babel-test-message "(if-some [6] 8)"))
+
+(expect #"if-some requires exactly two elements in its vector, but a different number was given\.(.*)"
+(log/babel-test-message "(if-some [4 7 8] 9)"))
+
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)when-first requires a vector for its binding\.(.*)" (log/babel-test-message "(when-first 1 1 1)"))

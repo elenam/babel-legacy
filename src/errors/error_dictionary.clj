@@ -75,7 +75,7 @@
     {:key :illegal-argument-exactly-two-forms
     :class "IllegalArgumentException"
     :match #"(?s)(\S*) requires exactly 2 forms in binding vector(.*)"
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " requires exactly two elements in its vector, but a different number was given.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-function-name (nth matches 1)) :arg " requires exactly two elements in its vector, but a different number was given.\n"))}
 
     {:key :cant-call-nil
     :class "IllegalArgumentException"
@@ -95,7 +95,7 @@
     {:key :other-req-vector
     :class "IllegalArgumentException"
     :match (beginandend "(\\S+) requires a vector for its binding")
-    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " requires a vector for its binding.\n"))}
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (get-function-name (nth matches 1)) :arg " requires a vector for its binding.\n"))}
 
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
