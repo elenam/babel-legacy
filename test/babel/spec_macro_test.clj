@@ -55,6 +55,11 @@
 (expect "if-let requires a vector of name/expression pairs, but is given {8 9 5 4} instead."
 (log/babel-test-message "(if-let {8 9 5 4} 6)"))
 
+;; TO-DO:
+;; This wording is different from the wording above, and there is no space before the argument of 'let':
+(expect "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match."
+(log/babel-test-message "(let [[8 _]] 9)"))
+
 (expect "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
 In place of + #(* %1 3) 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
@@ -117,6 +122,16 @@ In place of #\"regex\" the following are allowed: a name or a vector or a hashma
 (expect "Syntax problems with (let [#\"(let [5 6] 7)\" 5] 0):
 In place of #\"(let [5 6] 7)\" the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [#\"(let [5 6] 7)\" 5] 0)"))
+
+(expect "Syntax problems with (let [& 5] 8):
+In place of & the following are allowed: a vector or a hashmap"
+(log/babel-test-message "(let [& 5] 8)"))
+
+(expect "Syntax problems with (let [{& 5} 6] 9):
+In place of {& 5} the following are allowed: a name or a vector
+In place of & the following are allowed: a vector or a hashmap
+In place of 5 the following are allowed: a vector"
+(log/babel-test-message "(let [{& 5} 6] 9)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Macros with no vector ;;;;;;;;;

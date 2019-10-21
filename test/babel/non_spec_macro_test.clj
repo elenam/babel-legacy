@@ -24,7 +24,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;ArithmeticExceptions;;;;;;;;;;;;
+;;;;;;;;;;;;;InvalidArgumentException;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Loop requires a vector for its binding\.(.*)"
@@ -35,3 +35,9 @@
 
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Parameters for cond must come in pairs, but one of them does not have a match\.(.*)"
 (log/babel-test-message "(cond 4)"))
+
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)when-some requires a vector for its binding\.(.*)"
+(log/babel-test-message "(when-some 8)"))
+
+(expect #"when-some requires exactly two elements in its vector, but a different number was given\.(.*)"
+(log/babel-test-message "(when-some [6] 8)"))

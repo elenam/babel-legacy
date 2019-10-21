@@ -201,6 +201,7 @@
   [p]
   (cond (symbol? p) (or (macro-predicates (resolve p)) [10 " unknown type"]) ; for debugging purposes
         (set? p) [-1 " one of specific keywords"]
+        (= (str p) "(clojure.core/fn [%] (clojure.core/not= (quote &) %))") [-1 " not &"]
         (and (seq? p) (re-find #"clojure.core/sequential\?" (apply str (flatten p))))
              (macro-predicates #'clojure.core/sequential?)
         :else  [10 (str " unknown type " p)]))

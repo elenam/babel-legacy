@@ -67,11 +67,15 @@
     :match #"(?s)Don't know how to create (\S*) from: (\S*)(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Don't know how to create " (get-type (nth matches 1)) :type " from "(get-type (nth matches 2)) :type ".\n"))}
 
-    ;; This might go away now
     {:key :illegal-argument-even-number-of-forms
     :class "IllegalArgumentException"
     :match #"(?s)(\S*) requires an even number of forms(.*)"
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Parameters for " (nth matches 1) :arg " must come in pairs, but one of them does not have a match.\n"))}
+
+    {:key :illegal-argument-exactly-two-forms
+    :class "IllegalArgumentException"
+    :match #"(?s)(\S*) requires exactly 2 forms in binding vector(.*)"
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " requires exactly two elements in its vector, but a different number was given.\n"))}
 
     {:key :cant-call-nil
     :class "IllegalArgumentException"
@@ -87,6 +91,11 @@
     :class "IllegalArgumentException"
     :match (beginandend "loop requires a vector for its binding")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Loop requires a vector for its binding.\n"))}
+
+    {:key :other-req-vector
+    :class "IllegalArgumentException"
+    :match (beginandend "(\\S+) requires a vector for its binding")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes (nth matches 1) :arg " requires a vector for its binding.\n"))}
 
     {:key :recur-arg-mismatch
     :class "IllegalArgumentException"
