@@ -245,36 +245,49 @@
    (let [via-lasts (distinct (map str (map last (map :via problems))))]
         (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
 
+(defn- let-macros
+  "Takes parts of the spec message for let and related macros and returns an error message as a string"
+  [fn-name value problems]
+  (str "Syntax problems with ("
+        fn-name
+        " "
+        (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
+                                                    (= (count (rest value)) 1) (str " " (d/print-macro-arg (first (rest value)) :sym))
+                                                    :else (str " " (d/print-macro-arg (rest value)))))
+        "):\n"
+        (process-paths-macro problems)))
+
+(defn- fn-macros
+  "Takes parts of the spec message for fn and defn and returns an error message as a string"
+  [fn-name value problems]
+  "Placeholder for a message for fn")
+
+
 (defn spec-macro-message
   "Takes an exception of a macro spec failure and returns the description of
    the problem as a string"
   [ex]
   (let [exc-map (Throwable->map ex)
         {:keys [cause data via]} exc-map
-        fn-name  (d/get-function-name (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1))
+        fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
+        fn-name (if (= (str fn-name-match) "clojure.core/fn") "fn" (d/get-function-name fn-name-match))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg value) ; need to be consistent between val and value
         n (count problems)]
         ;; If there is no value, I need to get the exc type and the messages from the second of via
         ;; and pass it to processing.
-        (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
+        (cond (#{"fn" "defn"} fn-name) (fn-macros fn-name value problems)
+              (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
-              ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9)
+              ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9) - WE MIGHT NOT NEED THIS CASE
               (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
               (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
-              (and (#{"let" "if-let"} fn-name) (seqable? value)) (str "Syntax problems with ("
-                                                                      fn-name
-                                                                      " "
-                                                                      (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
-                                                                                                                  (= (count (rest value)) 1) (str " " (d/print-macro-arg (first (rest value)) :sym))
-                                                                                                                  :else (str " " (d/print-macro-arg (rest value)))))
-                                                                      "):\n"
-                                                                      (process-paths-macro problems))
+              (and (#{"let" "if-let"} fn-name) (seqable? value)) (let-macros fn-name value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
