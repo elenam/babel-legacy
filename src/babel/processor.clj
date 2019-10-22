@@ -257,10 +257,18 @@
         "):\n"
         (process-paths-macro problems)))
 
+(defn- with-space-if-needed
+  [val-str]
+  (if (= val-str "") "" (str " " val-str)))
+
 (defn- fn-macros
   "Takes parts of the spec message for fn and defn and returns an error message as a string"
   [fn-name value problems]
-  "Placeholder for a message for fn")
+  (let [n (count problems)
+       val-str (d/print-macro-arg value)
+       error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")]
+       (cond (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str error-name "fn is missing a vector of parameters.")
+             :else (str error-name "Placeholder for a message for fn"))))
 
 
 (defn spec-macro-message
