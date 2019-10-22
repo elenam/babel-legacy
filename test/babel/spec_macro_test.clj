@@ -166,6 +166,10 @@ In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
 In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\")"))
 
+(expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\" '(8)):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\" '(8))"))
+
 (expect "Syntax problems with (when-let [7 8]):
 In place of 7 the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(when-let [7 8])"))

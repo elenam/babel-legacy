@@ -272,7 +272,7 @@
                                                                       " "
                                                                       (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
                                                                                                                   (= (count (rest value)) 1) (str " " (d/print-macro-arg (first (rest value)) :sym))
-                                                                                                                  :else (d/print-macro-arg (rest value))))
+                                                                                                                  :else (str " " (d/print-macro-arg (rest value)))))
                                                                       "):\n"
                                                                       (process-paths-macro problems))
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
