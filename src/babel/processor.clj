@@ -271,7 +271,7 @@
                                                                       fn-name
                                                                       " "
                                                                       (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
-                                                                                                                  (= (count (rest value)) 1) (str " " (d/print-single-arg (first (rest value))))
+                                                                                                                  (= (count (rest value)) 1) (str " " (d/print-macro-arg (first (rest value)) :sym))
                                                                                                                   :else (d/print-macro-arg (rest value))))
                                                                       "):\n"
                                                                       (process-paths-macro problems))

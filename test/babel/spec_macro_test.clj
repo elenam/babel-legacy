@@ -146,13 +146,25 @@ In place of 5 the following are allowed: a vector"
 In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let ['(1 2) 6])"))
 
-(expect "Syntax problems with (let ['(1 2) '(3 4)] #(+ %)):
+(expect "Syntax problems with (let ['(1 2) '(3 4)] #(+ %1)):
 In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let ['(1 2) '(3 4)] #(+ %))"))
 
 (expect "Syntax problems with (let ['(1 2) '(3 4)] '(1 2 3 4)):
 In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
 (log/babel-test-message "(let ['(1 2) '(3 4)] '(1 2 3 4))"))
+
+(expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8]):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8])"))
+
+(expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8 #(+ %1)]):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8 #(+ %)])"))
+
+(expect "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\"):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\")"))
 
 (expect "Syntax problems with (when-let [7 8]):
 In place of 7 the following are allowed: a name or a vector or a hashmap"
