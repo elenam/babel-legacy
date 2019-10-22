@@ -5,7 +5,7 @@
    [expectations :refer :all]))
 
 ;#########################################
-;### Tests for macros                  ###
+;### Tests for specced macros          ###
 ;#########################################
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
@@ -57,6 +57,12 @@
 
 (expect "when-let requires a vector of name/expression pairs, but is given 6 instead."
 (log/babel-test-message "(when-let 6)"))
+
+(expect "let requires a vector of name/expression pairs, but is given '(8) instead."
+(log/babel-test-message "(let '(8))"))
+
+(expect "let requires a vector of name/expression pairs, but is given '(1 2) instead."
+(log/babel-test-message "(let '(1 2))"))
 
 ;; TO-DO:
 ;; This wording is different from the wording above, and there is no space before the argument of 'let':
@@ -135,6 +141,18 @@ In place of {& 5} the following are allowed: a name or a vector
 In place of & the following are allowed: a vector or a hashmap
 In place of 5 the following are allowed: a vector"
 (log/babel-test-message "(let [{& 5} 6] 9)"))
+
+(expect "Syntax problems with (let ['(1 2) 6]):
+In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let ['(1 2) 6])"))
+
+(expect "Syntax problems with (let ['(1 2) '(3 4)] #(+ %)):
+In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let ['(1 2) '(3 4)] #(+ %))"))
+
+(expect "Syntax problems with (let ['(1 2) '(3 4)] '(1 2 3 4)):
+In place of '(1 2) the following are allowed: a name or a vector or a hashmap"
+(log/babel-test-message "(let ['(1 2) '(3 4)] '(1 2 3 4))"))
 
 (expect "Syntax problems with (when-let [7 8]):
 In place of 7 the following are allowed: a name or a vector or a hashmap"

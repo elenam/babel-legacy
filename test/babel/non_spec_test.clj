@@ -61,28 +61,31 @@
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to def\."
 (log/babel-test-message "(def 7 8 9)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name orange is undefined\."
 (log/babel-test-message "(+ orange 3)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name kiwi is undefined\."
 (log/babel-test-message "(kiwi)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name def is undefined."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Name def is undefined\."
 (log/babel-test-message "def"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)def must be followed by a name\.(.*)"
+(log/babel-test-message "(def 2 3)"))
+
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function\."
 (log/babel-test-message "(even? let)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)let is a macro and cannot be used by itself or passed to a function\."
 (log/babel-test-message "let"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too few arguments to if."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too few arguments to if\."
 (log/babel-test-message "(if)"))
 
-(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to if."
+(expect #"(?s)Syntax error compiling at \(:(\d+):(\d+)\)\.(.*)Too many arguments to if\."
 (log/babel-test-message "(if (= 0 0) (+ 2 3) (+ 2 3) (+2 3))"))
 
 (expect #"(?s)# must be followed by a symbol\.(.*)"

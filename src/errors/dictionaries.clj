@@ -330,6 +330,7 @@
      (string? val) (str "\"" val "\"")
      (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
      (nil? val) "nil"
+     (and (symbol? val) (= "quote" (str val))) "'"
      (= "fn*" (str val)) "#"
      (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
      :else (str val)))
@@ -364,6 +365,7 @@
     (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
     (= "fn*" (str (first arg)))  ;;condition to remove a vector after fn*
                               [(args->str (macro-args-rec (rest (rest arg)))"#" "")]
+    (and (symbol? (first arg)) (= "quote" (str (first arg)))) [(args->str (macro-args-rec (rest arg)) "'" "")]
     :else [(args->str (macro-args-rec arg) "(" ")")]))
 
 (defn- macro-args-rec
@@ -379,6 +381,7 @@
     (not (single-arg? (first args)))
           (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
     (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
+    (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
     :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
 
 (defn print-macro-arg
