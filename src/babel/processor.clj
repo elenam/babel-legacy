@@ -272,10 +272,12 @@
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")]
        (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
                   (str error-name "fn is missing a vector of parameters.")
-             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)))
+             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
                   val1
                   " instead.")
+             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
+                  (str error-name "fn is missing a vector of parameters or it is misplaced.")
              :else (str error-name "Placeholder for a message for fn"))))
 
 
