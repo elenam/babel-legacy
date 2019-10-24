@@ -34,24 +34,24 @@ fn is missing a vector of parameters."
 (log/babel-test-message "(fn)"))
 
 (expect "Syntax problems with (fn 5 6):
-fn requires a vector of parameters, but is given 5 instead."
+A function definition requires a vector of parameters, but was given 5 instead."
 (log/babel-test-message "(fn 5 6)"))
 
 (expect "Syntax problems with (fn a 6):
-fn requires a vector of parameters, but is given 6 instead."
+A function definition requires a vector of parameters, but is given 6 instead."
 (log/babel-test-message "(fn a 6)"))
 
 ;; Note: the name is optional, so the message may be misleading
 (expect "Syntax problems with (fn a b):
-fn requires a vector of parameters, but is given b instead."
+A function definition requires a vector of parameters, but is given b instead."
 (log/babel-test-message "(fn a b)"))
 
 (expect "Syntax problems with (fn {x y}):
-fn requires a vector of parameters, but is given {x y} instead."
+A function definition requires a vector of parameters, but is given {x y} instead."
 (log/babel-test-message "(fn {x y})"))
 
 (expect "Syntax problems with (fn '(x y)):
-fn requires a vector of parameters, but is given '(x y) instead."
+A function definition requires a vector of parameters, but is given '(x y) instead."
 (log/babel-test-message "(fn '(x y))"))
 
 (expect "Syntax problems with (fn 4 []):
