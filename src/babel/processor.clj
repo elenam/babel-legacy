@@ -268,7 +268,9 @@
        val-str (d/print-macro-arg value)
        prob1 (first problems)
        pred1 (:pred prob1)
-       val1 (d/print-macro-arg (:val prob1))
+       val-raw1 (:val prob1)
+       val1 (d/print-macro-arg val-raw1)
+       in1 (:in prob1)
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")]
        (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
                   (str error-name "fn is missing a vector of parameters.")
@@ -278,6 +280,13 @@
                   " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
+             (and (= "Extra input" (:reason prob1)) (= 2 (count in1)))
+                  (str error-name "Parameter vector must consist of names, but "
+                  (let [not-names (filter #(not (symbol? %)) val-raw1)
+                        not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
+                        (if (= 1 (count not-names))
+                            (str not-names-printed " is not a name.")
+                            (str not-names-printed " are not names."))))
              :else (str error-name "Placeholder for a message for fn"))))
 
 

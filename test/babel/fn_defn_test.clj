@@ -72,13 +72,23 @@ fn is missing a vector of parameters or it is misplaced."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "Syntax problems with (fn [5] {7 \"hello\"}):
-parameter vector must consist of names, but 5 is not a name."
+Parameter vector must consist of names, but 5 is not a name."
 (log/babel-test-message "(fn [5] {7 \"hello\"})"))
 
 (expect "Syntax problems with (fn [5 x] {7 \"hello\"}):
-parameter vector must consist of names, but 5 is not a name."
+Parameter vector must consist of names, but 5 is not a name."
 (log/babel-test-message "(fn [5 x] {7 \"hello\"})"))
 
 (expect "Syntax problems with (fn [x 5 y] {7 \"hello\"}):
-parameter vector must consist of names, but 5 y has elements other than names."
+Parameter vector must consist of names, but 5 is not a name."
 (log/babel-test-message "(fn [x 5 y] {7 \"hello\"})"))
+
+(expect "Syntax problems with (fn [x #(+ %1) y] 2):
+Parameter vector must consist of names, but #(+ %1) is not a name."
+(log/babel-test-message "(fn [x #(+ %) y] 2)"))
+
+(expect "Syntax problems with (fn [x #(+ %1) 3] 2):
+Parameter vector must consist of names, but #(+ %1), 3 are not names."
+(log/babel-test-message "(fn [x #(+ %) 3] 2)"))
+
+;; TODO: check how it works with multiple arities of fn
