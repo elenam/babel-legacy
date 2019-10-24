@@ -266,12 +266,15 @@
   [fn-name value problems]
   (let [n (count problems)
        val-str (d/print-macro-arg value)
+       prob1 (first problems)
+       pred1 (:pred prob1)
+       val1 (d/print-macro-arg (:val prob1))
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")]
-       (cond (and (= n 1) (= "Insufficient input" (:reason (first problems))))
+       (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
                   (str error-name "fn is missing a vector of parameters.")
-             (= #'clojure.core/vector? (resolve (:pred (first problems))))
+             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
-                  (d/print-macro-arg (:val (first problems)))
+                  val1
                   " instead.")
              :else (str error-name "Placeholder for a message for fn"))))
 
