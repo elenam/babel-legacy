@@ -223,10 +223,11 @@
     (s/cat :value (s/nilable any?) :value (s/nilable any?))))
 (stest/instrument `clojure.core/identical?)
 
-; (s/fdef clojure.core/contains?
-;   :args (s/and ::b-length-two
-;     (s/or :arg-one (s/cat :collection (s/nilable coll?) :key (s/nilable keyword?)))))
-; (stest/instrument `clojure.core/contains?)
+(s/fdef clojure.core/contains?
+  :args (s/and ::b-length-two
+    (s/alt :arg-one (s/cat :collection (s/alt :map (s/nilable map?) :set (s/nilable set?) :vector (s/nilable vector?)) :any (s/nilable any?))
+          :arg-two (s/cat :string (s/nilable string?) :number (s/nilable number?)))))
+(stest/instrument `clojure.core/contains?)
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
@@ -329,6 +330,11 @@
   :args (s/and ::b-length-greater-zero
             (s/cat :function (s/* any?))))
 (stest/instrument `clojure.core/comp)
+
+(s/fdef clojure.core/int
+  :args (s/and ::b-length-one
+      (s/or :arg-one (s/alt :number number? :char char?))))
+(stest/instrument `clojure.core/int)
 
 (s/def ::innervector (s/cat :symbol symbol? :b (s/* (s/cat :key keyword :symbol-or-collection (s/or :symbol symbol?
                                                                           :collection (s/nilable coll?))))))
