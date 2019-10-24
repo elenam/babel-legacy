@@ -66,6 +66,8 @@
 
 (expect "The first argument of (take \"apple\" \"banana\") was expected to be a number but is a string \"apple\" instead." (log/babel-test-message "(take \"apple\" \"banana\")"))
 
+(expect "The first argument of (contains? 1 1) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(contains? 1 1)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,6 +94,10 @@
 
 (expect "The second argument of (take 4 5) was expected to be a sequence but is a number 5 instead." (log/babel-test-message "(take 4 5)"))
 
+(expect "The second argument of (contains? \"apple\" :a) was expected to be a number but is a keyword :a instead." (log/babel-test-message "(contains? \"apple\" :a)"))
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Lazy Sequence;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,6 +114,7 @@
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(mod (range 5) (range 10))"))
 
+(contains? [1 2 3] (contains? "a" 1))
 
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
@@ -127,3 +134,13 @@
 (expect nil (log/babel-test-message "(take 2 \"hmmmm\")"))
 
 (expect nil (log/babel-test-message "(conj)"))
+
+(expect nil (log/babel-test-message "(contains? {:a nil} :a)"))
+
+(expect nil (log/babel-test-message "(contains? [:a :b :c] 2)"))
+
+(expect nil (log/babel-test-message "(contains? \"f\" 2)"))
+
+(expect nil (log/babel-test-message "(contains? [1 2 3] (contains? \"a\" 1)"))
+
+(expect nil (log/babel-test-message "(contains? [] '(1 2 3)"))
