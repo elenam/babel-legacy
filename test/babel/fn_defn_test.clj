@@ -9,9 +9,6 @@
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
 
-;start logging
-(log/start-log)
-
 (def to-log? true)
 
 (expect #(not= % nil) (log/set-log to-log?))

@@ -46,7 +46,9 @@
 
 (expect "The first argument of (contains? :a :a) was expected to be a sequence but is a keyword :a instead." (log/babel-test-message "(contains? :a :a)"))
 
-(expect "The first argument of (contains? \"a\" :a) was expected to be a sequence but is a string \"a\" instead." (log/babel-test-message "(contains? \"a\" :a)"))
+;; TODO: the message is correct since only a number is allowed as teh second arg when the first one is a string
+;; However, this may not be the best message for beginners. 
+(expect "The second argument of (contains? \"a\" :a) was expected to be a number but is a keyword :a instead." (log/babel-test-message "(contains? \"a\" :a)"))
 
 (expect "The first argument of (contains? 1 :a) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(contains? 1 :a)"))
 
@@ -141,6 +143,6 @@
 
 (expect nil (log/babel-test-message "(contains? \"f\" 2)"))
 
-(expect nil (log/babel-test-message "(contains? [1 2 3] (contains? \"a\" 1)"))
+(expect nil (log/babel-test-message "(contains? [1 2 3] (contains? \"a\" 1))"))
 
-(expect nil (log/babel-test-message "(contains? [] '(1 2 3)"))
+(expect nil (log/babel-test-message "(contains? [] '(1 2 3))"))
