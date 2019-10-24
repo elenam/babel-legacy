@@ -47,7 +47,7 @@
 (expect "The first argument of (contains? :a :a) was expected to be a sequence but is a keyword :a instead." (log/babel-test-message "(contains? :a :a)"))
 
 ;; TODO: the message is correct since only a number is allowed as teh second arg when the first one is a string
-;; However, this may not be the best message for beginners. 
+;; However, this may not be the best message for beginners.
 (expect "The second argument of (contains? \"a\" :a) was expected to be a number but is a keyword :a instead." (log/babel-test-message "(contains? \"a\" :a)"))
 
 (expect "The first argument of (contains? 1 :a) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(contains? 1 :a)"))
@@ -113,13 +113,17 @@
 
 (expect "Expected a function, but a number was given instead." (log/babel-test-message "(drop 3 (1 2 3))")) ;fails
 
+(expect "java.lang.Long cannot be cast to clojure.lang.IFn" (log/babel-test-message "(drop 3 (1 2 3))"))
+
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(mod (range 5) (range 10))"))
 
-(contains? [1 2 3] (contains? "a" 1))
 
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
+(expect "Expected a sequence, but a sequence was given instead." (log/babel-test-message "(contains? (range) 2)")) ;;These are not the expected strings just to put test in
+
+(expect "Expected a sequence, but a sequence was given instead." (log/babel-test-message "(contains? (drop 3 (1 2 3)) 1)"))  ;;These are not the expected strings just to put test in
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;Pass Tests;;;;;;;;;;;;;;;;;;;;;;
