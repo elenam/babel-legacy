@@ -120,6 +120,8 @@
 
 (expect "The function contains? doesn't work on a sequence." (log/babel-test-message "(contains? (seq [1 2 3]) 9)"))
 
+(expect "The function contains? doesn't work on a string." (log/babel-test-message "(contains?\"a\" (range))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;Pass Tests;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
