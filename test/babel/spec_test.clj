@@ -44,15 +44,15 @@
 
 (expect "The first argument of (into 1 even?) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(into 1 even?)"))
 
-(expect "The first argument of (contains? :a :a) was expected to be a sequence but is a keyword :a instead." (log/babel-test-message "(contains? :a :a)"))
+(expect "The first argument of (contains? :a :a) was expected to be a collection but is a keyword :a instead." (log/babel-test-message "(contains? :a :a)"))
 
 ;; TODO: the message is correct since only a number is allowed as teh second arg when the first one is a string
 ;; However, this may not be the best message for beginners.
 (expect "The second argument of (contains? \"a\" :a) was expected to be a number but is a keyword :a instead." (log/babel-test-message "(contains? \"a\" :a)"))
 
-(expect "The first argument of (contains? 1 :a) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(contains? 1 :a)"))
+(expect "The first argument of (contains? 1 :a) was expected to be a collection but is a number 1 instead." (log/babel-test-message "(contains? 1 :a)"))
 
-(expect "The first argument of (contains? j :a) was expected to be a sequence but is a character j instead." (log/babel-test-message "(contains? \\j :a)"))
+(expect "The first argument of (contains? j :a) was expected to be a collection but is a character j instead." (log/babel-test-message "(contains? \\j :a)"))
 
 (expect "The first argument of (reduce 4 \"strawberry\") was expected to be a function but is a number 4 instead." (log/babel-test-message "(reduce 4 \"strawberry\")"))
 
@@ -68,7 +68,9 @@
 
 (expect "The first argument of (take \"apple\" \"banana\") was expected to be a number but is a string \"apple\" instead." (log/babel-test-message "(take \"apple\" \"banana\")"))
 
-(expect "The first argument of (contains? 1 1) was expected to be a sequence but is a number 1 instead." (log/babel-test-message "(contains? 1 1)"))
+(expect "The first argument of (contains? 1 1) was expected to be a collection but is a number 1 instead." (log/babel-test-message "(contains? 1 1)"))
+
+(expect "The first argument of (contains? (1 2 3) 9) was expected to be a collection but is a list (1 2 3) instead." (log/babel-test-message "(contains? '(1 2 3) 9)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
@@ -98,9 +100,6 @@
 
 (expect "The second argument of (contains? \"apple\" :a) was expected to be a number but is a keyword :a instead." (log/babel-test-message "(contains? \"apple\" :a)"))
 
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Lazy Sequence;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -111,19 +110,15 @@
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(rand-int (range 20))"))
 
-(expect "Expected a function, but a number was given instead." (log/babel-test-message "(drop 3 (1 2 3))")) ;fails
-
-(expect "java.lang.Long cannot be cast to clojure.lang.IFn" (log/babel-test-message "(drop 3 (1 2 3))"))
-
-
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(mod (range 5) (range 10))"))
-
 
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
-(expect "Expected a sequence, but a sequence was given instead." (log/babel-test-message "(contains? (range) 2)")) ;;These are not the expected strings just to put test in
+(expect "The function contains? doesn't work on a sequence." (log/babel-test-message "(contains? (range) 2)"))
 
-(expect "Expected a sequence, but a sequence was given instead." (log/babel-test-message "(contains? (drop 3 (1 2 3)) 1)"))  ;;These are not the expected strings just to put test in
+(expect "The function contains? doesn't work on a sequence." (log/babel-test-message "(contains? (drop 3 '(1 2 3)) 1)"))
+
+(expect "The function contains? doesn't work on a sequence." (log/babel-test-message "(contains? (seq [1 2 3]) 9)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;Pass Tests;;;;;;;;;;;;;;;;;;;;;;

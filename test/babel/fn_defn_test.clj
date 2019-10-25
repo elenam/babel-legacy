@@ -91,8 +91,8 @@ Parameter vector must consist of names, but #(+ %1) is not a name."
 Parameter vector must consist of names, but #(+ %1), 3 are not names."
 (log/babel-test-message "(fn [x #(+ %) 3] 2)"))
 
-(expect "Syntax problems with (fn [`(2 3) 5]):
-Parameter vector must consist of names, but `(2 3), 5 are not names."
-(log/babel-test-message "(fn [`(2 3) 5])"))
+(expect "Syntax problems with (fn ['(2 3) 5]):
+Parameter vector must consist of names, but '(2 3), 5 are not names."
+(log/babel-test-message "(fn ['(2 3) 5])"))
 
 ;; TODO: check how it works with multiple arities of fn

@@ -173,6 +173,8 @@
 
 (expect "Expected a function, but a number was given instead." (log/babel-test-message "(5 6)"))
 
+(expect "Expected a function, but a number was given instead." (log/babel-test-message "(drop 3 (1 2 3))")) 
+
 (expect "Expected a function, but a number was given instead." (log/babel-test-message "(def apple 5) (apple 0)"))
 
 (expect "Expected a function, but a string was given instead." (log/babel-test-message "(\"apple\")"))

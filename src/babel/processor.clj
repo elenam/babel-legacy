@@ -72,7 +72,7 @@
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :num "a number", :lazy "a lazy sequence"
                 :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs",
                 :number-greater-than-zero "a number that's greater than zero",
-                :collection-map "a sequence"})
+                :collection-map "a sequence" :only-collection "a collection"})
 
 (def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
                  :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",

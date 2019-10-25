@@ -120,6 +120,13 @@
                                                            " but is " (nth matches 2) :arg
                                                            ".\n"))}
 
+   {:key :illegal-not-supported-on-type
+   :class "IllegalArgumentException"
+   :match (beginandend #"(\S*) not supported on type: (\S+)")
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The function " (get-function-name (nth matches 1))
+                                                          " doesn't work on "
+                                                          (get-type (nth matches 2)) ".\n"))}
+
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################

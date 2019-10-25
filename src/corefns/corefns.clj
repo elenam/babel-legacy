@@ -225,7 +225,7 @@
 
 (s/fdef clojure.core/contains?
   :args (s/and ::b-length-two
-    (s/alt :arg-one (s/cat :collection (s/alt :map (s/nilable map?) :set (s/nilable set?) :vector (s/nilable vector?) :lazy ::lazy) :any (s/nilable any?))
+    (s/alt :arg-one (s/cat :only-collection (s/alt :map (s/nilable map?) :set (s/nilable set?) :vector (s/nilable vector?) :lazy ::lazy) :any (s/nilable any?))
           :arg-two (s/cat :string (s/nilable string?) :number (s/nilable number?)))))
 (stest/instrument `clojure.core/contains?)
 
