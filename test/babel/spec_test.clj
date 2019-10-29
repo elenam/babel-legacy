@@ -112,6 +112,7 @@
 
 (expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(mod (range 5) (range 10))"))
 
+;; This is actually not a lazy sequence, it's a class cast exception on a call to > since > isn't specced
 (expect "Expected a number, but a character was given instead." (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
 (expect "The function contains? doesn't work on a sequence." (log/babel-test-message "(contains? (range) 2)"))

@@ -95,4 +95,39 @@ Parameter vector must consist of names, but #(+ %1), 3 are not names."
 Parameter vector must consist of names, but '(2 3), 5 are not names."
 (log/babel-test-message "(fn ['(2 3) 5])"))
 
+;; This is actually somewhat misleading since this would've been
+;; correct as destructuring with keywords and names as map
+;; elements
+(expect "Syntax problems with (fn [{a :a 5 6}] [a x]):
+Parameter vector must consist of names, but {a :a 5 6} is not a name."
+(log/babel-test-message "(fn [{a :a 5 6}] [a x])"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; fn: nested parameter vector errors ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Syntax problems with (fn [[[5]]] 6):
+???"
+(log/babel-test-message "(fn [[[5]]] 6)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; fn: map binding errors ;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; fn: more than one argument after & ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect #"(?s)Syntax error compiling at (.*)Name x is undefined\."
+(log/babel-test-message "(fn [{a x}] [a])"))
+
+(expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"
+(log/babel-test-message "(fn [{a :a x}] [a x])"))
+
 ;; TODO: check how it works with multiple arities of fn
