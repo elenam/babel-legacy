@@ -106,6 +106,10 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ;;; fn: nested parameter vector errors ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(expect "Syntax problems with (fn [[5]] 6):
+???"
+(log/babel-test-message "(fn [[5]] 6)"))
+
 (expect "Syntax problems with (fn [[[5]]] 6):
 ???"
 (log/babel-test-message "(fn [[[5]]] 6)"))
@@ -114,7 +118,38 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ;;;;;;;;;;; fn: map binding errors ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(expect "Syntax problems with (fn [{a :a 5 :b}] [a x]):
+???"
+(log/babel-test-message "(fn [{a :a 5 :b}] [a x])"))
 
+(expect "Syntax problems with (fn [[{a :a 5 x}]] [a x]):
+???"
+(log/babel-test-message "(fn [[{a :a 5 x}]] [a x])"))
+
+(expect "Syntax problems with (fn [[[{a :a 5 x}]]] [a x]):
+???"
+(log/babel-test-message "(fn [[[{a :a 5 x}]]] [a x])"))
+
+(expect "Syntax problems with (fn [[[{a :a 5 x}] 5]] [a x]):
+???"
+(log/babel-test-message "(fn [[[{a :a 5 x}] 5]] [a x])"))
+
+(expect "Syntax problems with (fn [[[{a :a 5 x}] z]] [a x]):
+???"
+(log/babel-test-message "(fn [[[{a :a 5 x}] z]] [a x])"))
+
+(expect "Syntax problems with (fn [x {:a 5}] 7):
+???"
+(log/babel-test-message "(fn [x {:a 5}] 7)"))
+
+(expect "Syntax problems with (fn [[x] {:a 5}] 7):
+???"
+(log/babel-test-message "(fn [[x] {:a 5}] 7)"))
+
+;; Not sure what happens here:
+(expect "Syntax problems with (fn [[x] {:a 5}] [[y] 7]):
+???"
+(log/babel-test-message "(fn [[x] {:a 5}] [[y] 7])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: more than one argument after & ;;;;;;;;;
@@ -129,5 +164,17 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 
 (expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"
 (log/babel-test-message "(fn [{a :a x}] [a x])"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; fn valid definitions (maps) ;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect nil (log/babel-test-message "(fn [{a :a x :b}] [a x])"))
+
+(expect nil (log/babel-test-message "(fn [{a :a x 5}] [a x])"))
+
+(expect nil (log/babel-test-message "(fn [{a :a x #(+ %)}] [a x])"))
+
+(expect nil (log/babel-test-message "(fn [[x] {y 5}] [[y] 7])"))
 
 ;; TODO: check how it works with multiple arities of fn
