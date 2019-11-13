@@ -146,10 +146,42 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ???"
 (log/babel-test-message "(fn [[x] {:a 5}] 7)"))
 
-;; Not sure what happens here:
+(expect "Syntax problems with (fn [[x] 6] 5):
+???"
+(log/babel-test-message "(fn [[x] 6] 5)"))
+
+(expect "Syntax problems with (fn ([[x] 6])):
+???"
+(log/babel-test-message "(fn ([[x] 6]))"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (expect "Syntax problems with (fn [[x] {:a 5}] [[y] 7]):
 ???"
 (log/babel-test-message "(fn [[x] {:a 5}] [[y] 7])"))
+
+(expect "Syntax problems with (fn [[x] 6 z] [[x] 7]):
+???"
+(log/babel-test-message "(fn [[x] 6 z] [[x] 7])"))
+
+(expect "Syntax problems with (fn [[x] 6] [[x] 7]):
+???"
+(log/babel-test-message "(fn [[x] 6] [[x] 7])"))
+
+(expect "Syntax problems with (fn [[x] 6] [[x] 7]):
+???"
+(log/babel-test-message "(fn [[x] 6] [[x] 7])"))
+
+(expect "Syntax problems with (fn [[[x]] #(+ %1 %2)] [[x] 7]):
+???"
+(log/babel-test-message "(fn [[[x]] #(+ %1 %2)] [[x] 7])"))
+
+;; The spec failure doesn't contain the function name a
+(expect "Syntax problems with (fn [[[x]] :a] [[x] 7]):
+???"
+(log/babel-test-message "(fn [[[x]] :a] [[x] 7])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: more than one argument after & ;;;;;;;;;

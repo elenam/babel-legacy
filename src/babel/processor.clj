@@ -300,7 +300,7 @@
    the problem as a string"
   [ex]
   (let [exc-map (Throwable->map ex)
-        {:keys [cause data via]} exc-map
+        {:keys [cause data via trace]} exc-map
         fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
         fn-name (if (= (str fn-name-match) "clojure.core/fn") "fn" (d/get-function-name fn-name-match))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
@@ -319,7 +319,8 @@
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
               (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
-              (and (#{"let" "if-let"} fn-name) (seqable? value)) (let-macros fn-name value problems)
+              (and (#{"let" "if-let"} fn-name) (seqable? value)) 
+                   (let-macros (if (d/let-is-fn? trace) "fn" fn-name) value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")
