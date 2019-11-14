@@ -352,7 +352,7 @@
   [val]
   (or (not (seqable? val)) (string? val) (nil? val)))
 
-(declare macro-args-rec) ;; needed for mutually recursive definitions
+(declare macro-args-rec) ;; needed for mutually recursive definitions & process-args
 
 (defn- map-arg->str
   "Takes a map argument for a macro and returns its string representation"
@@ -369,22 +369,28 @@
     (and (symbol? (first arg)) (= "quote" (str (first arg)))) [(args->str (macro-args-rec (rest arg)) "'" "")]
     :else [(args->str (macro-args-rec arg) "(" ")")]))
 
+(defn- process-args
+  [args]
+  (cond
+      (single-arg? args) [(print-single-arg args)]
+      ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
+      (map? args) [(map-arg->str args)]
+      (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
+      (empty? args) []
+      (not (single-arg? (first args)))
+            (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
+      (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
+      (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
+      :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
+
 (defn- macro-args-rec
   "Takes a potentially nested sequence of arguments of a macro and recursively
    constructs a flat vector of string representations of its elements"
   [args]
-  (filter #(not (re-matches #"( *)" %))
-          (cond
-              (single-arg? args) [(print-single-arg args)]
-              ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
-              (map? args) [(map-arg->str args)]
-              (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
-              (empty? args) []
-              (not (single-arg? (first args)))
-                    (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
-              (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
-              (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
-              :else (into [(print-single-arg (first args))] (macro-args-rec (rest args))))))
+  (->> args
+       process-args
+       (filter #(not (re-matches #"( *)" %)))
+       vec))
 
 (defn print-macro-arg
   "Takes a potentially nested sequence of arguments of a macro and returns
