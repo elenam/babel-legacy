@@ -333,6 +333,7 @@
      (and (symbol? val) (= "quote" (str val))) "'"
      (= "fn*" (str val)) "#"
      (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
+     (re-matches #"p__(.*)" (str val)) ""
      :else (str val)))
 
 (defn- args->str
@@ -372,17 +373,18 @@
   "Takes a potentially nested sequence of arguments of a macro and recursively
    constructs a flat vector of string representations of its elements"
   [args]
-  (cond
-    (single-arg? args) [(print-single-arg args)]
-    ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
-    (map? args) [(map-arg->str args)]
-    (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
-    (empty? args) []
-    (not (single-arg? (first args)))
-          (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
-    (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
-    (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
-    :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
+  (filter #(not (re-matches #"( *)" %))
+          (cond
+              (single-arg? args) [(print-single-arg args)]
+              ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
+              (map? args) [(map-arg->str args)]
+              (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
+              (empty? args) []
+              (not (single-arg? (first args)))
+                    (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
+              (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
+              (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
+              :else (into [(print-single-arg (first args))] (macro-args-rec (rest args))))))
 
 (defn print-macro-arg
   "Takes a potentially nested sequence of arguments of a macro and returns
