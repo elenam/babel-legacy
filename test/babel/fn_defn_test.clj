@@ -186,6 +186,37 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: more than one argument after & ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(expect "Syntax problems with (fn [x & y z] 8):
+???"
+(log/babel-test-message "(fn [x & y z] 8)"))
+
+(expect "Syntax problems with (fn [x & y 5] 8):
+???"
+(log/babel-test-message "(fn [x & y 5] 8)"))
+
+(expect "Syntax problems with (fn [x & y & z] 8):
+???"
+(log/babel-test-message "(fn [x & y & z] 8)"))
+
+(expect "Syntax problems with (fn [x & y & z & u] 8):
+???"
+(log/babel-test-message "(fn [x & y & z & u] 8)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;; fn with & ;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Syntax problems with (fn [2 & y] 8):
+???"
+(log/babel-test-message "(fn [2 & y] 8)"))
+
+(expect "Syntax problems with (fn [x & 7] 8):
+???"
+(log/babel-test-message "(fn [x & 7] 8)"))
+
+(expect "Syntax problems with (fn [5 & 7] 8):
+???"
+(log/babel-test-message "(fn [5 & 7] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
