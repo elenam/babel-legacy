@@ -275,7 +275,7 @@
        val-raw2 (:val prob2)
        val2 (if val-raw2 (d/print-macro-arg val-raw2) "")
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")
-       has-quote? (and (seqable? val-raw1) (not (empty? (filter #(= % (symbol '&')) val-raw1))))
+       has-quote? (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value)))))
        ]
        (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
                   (str error-name "fn is missing a vector of parameters.")

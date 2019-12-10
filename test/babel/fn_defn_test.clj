@@ -119,7 +119,7 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "Syntax problems with (fn [{a :a 5 :b}] [a x]):
-???"
+Parameter vector must consist of names, but {a :a 5 :b} is not a name."
 (log/babel-test-message "(fn [{a :a 5 :b}] [a x])"))
 
 (expect "Syntax problems with (fn [[{a :a 5 x}]] [a x]):
@@ -139,7 +139,7 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 (log/babel-test-message "(fn [[[{a :a 5 x}] z]] [a x])"))
 
 (expect "Syntax problems with (fn [x {:a 5}] 7):
-???"
+Parameter vector must consist of names, but {:a 5} is not a name."
 (log/babel-test-message "(fn [x {:a 5}] 7)"))
 
 (expect "Syntax problems with (fn [[x] {:a 5}] 7):
@@ -151,7 +151,7 @@ Var-arg fn message, will look into later."
 (log/babel-test-message "(fn [[x] 6] 5)"))
 
 (expect "Syntax problems with (fn ([[x] 6])):
-Var-arg fn message, will look into later."
+A function definition requires a vector of parameters, but was given [[x] 6] instead."
 (log/babel-test-message "(fn ([[x] 6]))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -190,10 +190,6 @@ Fails let spec; might be fixed in spec2."
 ???"
 (log/babel-test-message "(fn [& y z] 8)"))
 
-(expect "Syntax problems with (fn [x & 5] 8):
-???"
-(log/babel-test-message "(fn [x & 5] 8)"))
-
 (expect "Syntax problems with (fn [x & y 5] 8):
 ???"
 (log/babel-test-message "(fn [x & y 5] 8)"))
@@ -222,6 +218,50 @@ Parameter vector must consist of names, but 2 is not a name."
 Parameter vector must consist of names, but 5, 7 are not names."
 (log/babel-test-message "(fn [5 & 7] 8)"))
 
+(expect "Syntax problems with (fn [x & [5]] 2 3):
+???"
+(log/babel-test-message "(fn [x & [5]] 2 3)"))
+
+(expect "Syntax problems with (fn [[x] & [5]] 2 3):
+???"
+(log/babel-test-message "(fn [[x] & [5]] 2 3)"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; var-arg fn ;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Syntax problems with (fn ([x & y] 2 3) 5):
+???"
+(log/babel-test-message "(fn ([x & y] 2 3) 5)"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) [5]):
+???"
+(log/babel-test-message "(fn ([x & y] 2 3) [5])"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) [x]):
+???"
+(log/babel-test-message "(fn ([x & y] 2 3) [x])"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) (x 3)):
+???"
+(log/babel-test-message "(fn ([x & y] 2 3) (x 3))"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) ([5] 3)):
+Parameter vector must consist of names, but 5 is not a name."
+(log/babel-test-message "(fn ([x & y] 2 3) ([5] 3))"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) ([& x y] 3)):
+???"
+(log/babel-test-message "(fn ([x & y] 2 3) ([& x y] 3))"))
+
+(expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
+???"
+(log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
+
+(expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
+???"
+(log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -232,6 +272,11 @@ Parameter vector must consist of names, but 5, 7 are not names."
 (expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"
 (log/babel-test-message "(fn [{a :a x}] [a x])"))
 
+(expect #"The fn definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
+(log/babel-test-message "(fn ([x] 2 3) ([y] 3))"))
+
+(expect #"The fn definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
+(log/babel-test-message "(fn ([x] 2 3) ([y] 3) ([x] 8))"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; fn valid definitions (maps) ;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
