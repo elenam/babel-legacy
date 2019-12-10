@@ -274,7 +274,9 @@
        pred2 (:pred prob2)
        val-raw2 (:val prob2)
        val2 (if val-raw2 (d/print-macro-arg val-raw2) "")
-       error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")]
+       error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")
+       has-quote? (and (seqable? val-raw1) (not (empty? (filter #(= % (symbol '&')) val-raw1))))
+       ]
        (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
                   (str error-name "fn is missing a vector of parameters.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
@@ -283,6 +285,8 @@
                   " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
+             (and (= "Extra input" (:reason prob1)) (not (= "Extra input" (:reason prob2))) has-quote?)
+                  (str error-name "& must be followed by exactly one name, but is followed by something else instead")
              (and (= "Extra input" (:reason prob1)) (not (= "Extra input" (:reason prob2))))
                   (str error-name "Parameter vector must consist of names, but "
                   (let [not-names (filter #(not (symbol? %)) val-raw1)
@@ -319,8 +323,9 @@
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
               (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
-              (and (#{"let" "if-let"} fn-name) (seqable? value)) 
-                   (let-macros (if (d/let-is-fn? trace) "fn" fn-name) value problems)
+              (and (#{"let" "if-let"} fn-name) (seqable? value))
+                   ;(let-macros (if (d/let-is-fn? trace) "fn" fn-name) value problems)
+                   (let-macros fn-name value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (println "babel.processor loaded")

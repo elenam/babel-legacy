@@ -66,7 +66,7 @@
 
 ;; TO-DO:
 ;; This wording is different from the wording above, and there is no space before the argument of 'let':
-(expect "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match."
+(expect "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match. FIX!!!"
 (log/babel-test-message "(let [[8 _]] 9)"))
 
 (expect "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
