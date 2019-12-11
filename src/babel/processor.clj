@@ -267,17 +267,14 @@
   (let [n (count problems)
        val-str (d/print-macro-arg value)
        [prob1 prob2] problems
-       ;; Might want to change to destructuring, add :reason, what else?
-       pred1 (:pred prob1)
-       val-raw1 (:val prob1)
-       val1 (d/print-macro-arg val-raw1)
-       pred2 (:pred prob2)
-       val-raw2 (:val prob2)
-       val2 (if val-raw2 (d/print-macro-arg val-raw2) "")
+       {pred1 :pred val1 :val in1 :in reason1 :reason} prob1
+       {pred2 :pred val2 :val in2 :in reason2 :reason} prob2
+       str-val1 (d/print-macro-arg val1)
+       str-val2 (if val2 (d/print-macro-arg val2) "")
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")
        has-quote? (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value)))))
        ]
-       (cond (and (= n 1) (= "Insufficient input" (:reason prob1)))
+       (cond (and (= n 1) (= "Insufficient input" reason1))
                   (str error-name "fn is missing a vector of parameters.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
@@ -285,16 +282,16 @@
                   " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
-             (and (= "Extra input" (:reason prob1)) (not (= "Extra input" (:reason prob2))) has-quote?)
+             (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-quote?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead")
-             (and (= "Extra input" (:reason prob1)) (not (= "Extra input" (:reason prob2))))
+             (and (= "Extra input" reason1) (not (= "Extra input" reason2)))
                   (str error-name "Parameter vector must consist of names, but "
-                  (let [not-names (filter #(not (symbol? %)) val-raw1)
+                  (let [not-names (filter #(not (symbol? %)) val1)
                         not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
                         (if (= 1 (count not-names))
                             (str not-names-printed " is not a name.")
                             (str not-names-printed " are not names."))))
-             (= "Extra input" (:reason prob1) (:reason prob2))
+             (= "Extra input" reason1 reason2)
                   (str error-name "Two extra inputs")
              :else (str error-name "Placeholder for a message for fn"))))
 

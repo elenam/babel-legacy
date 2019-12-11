@@ -262,6 +262,10 @@ Parameter vector must consist of names, but 5 is not a name."
 ???"
 (log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
 
+(expect "Syntax problems with (fn a ([x] 2 3) ([] 8) ([& x y] 3)):
+???"
+(log/babel-test-message "(fn a ([x] 2 3) ([] 8) ([& x y] 3))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -277,6 +281,7 @@ Parameter vector must consist of names, but 5 is not a name."
 
 (expect #"The fn definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
 (log/babel-test-message "(fn ([x] 2 3) ([y] 3) ([x] 8))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; fn valid definitions (maps) ;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
