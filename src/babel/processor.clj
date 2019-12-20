@@ -272,13 +272,15 @@
        str-val1 (d/print-macro-arg val1)
        str-val2 (if val2 (d/print-macro-arg val2) "")
        error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")
+       named? (and (seq? value) (simple-symbol? (first value)))
+       multi-arg? (or (and named? (> (count value) 2)) (and (not named?) (> (count value) 1)))
        has-quote? (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value)))))
        ]
        (cond (and (= n 1) (= "Insufficient input" reason1))
                   (str error-name "fn is missing a vector of parameters.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
-                  val1
+                  (d/print-macro-arg val1)
                   " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")

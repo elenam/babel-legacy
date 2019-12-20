@@ -154,6 +154,10 @@ Var-arg fn message, will look into later."
 A function definition requires a vector of parameters, but was given [[x] 6] instead."
 (log/babel-test-message "(fn ([[x] 6]))"))
 
+(expect "Syntax problems with (fn a \"abc\"):
+A function definition requires a vector of parameters, but was given \"abc\" instead."
+(log/babel-test-message "(fn a \"abc\")"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
