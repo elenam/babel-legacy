@@ -57,7 +57,7 @@ A function definition requires a vector of parameters, but was given '([]) inste
 
 (expect "Syntax problems with (fn a b []):
 fn is missing a vector of parameters or it is misplaced."
-(log/babel-test-message " (fn a b [])"))
+(log/babel-test-message "(fn a b [])"))
 
 (expect "Syntax problems with (fn 4 []):
 fn is missing a vector of parameters or it is misplaced."
@@ -66,6 +66,15 @@ fn is missing a vector of parameters or it is misplaced."
 (expect "Syntax problems with (fn a #(= %5) [] #\"hi\" ['(8 9)]):
 fn is missing a vector of parameters or it is misplaced."
 (log/babel-test-message "(fn a #(= %5) [] #\"hi\" ['(8 9)])"))
+
+(expect "Syntax problems with (fn &):
+fn is missing a vector of parameters."
+(log/babel-test-message "(fn &)"))
+
+; & is a symbol, so this may be misleading:
+(expect "Syntax problems with (fn & x):
+A function definition requires a vector of parameters, but was given x instead."
+(log/babel-test-message "(fn & x)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: parameter vector has non-names ;;;;;;;;;

@@ -2,6 +2,7 @@
  (:require [clojure.string :as s]
            [errors.messageobj :as m-obj]
            [errors.prettify-exception :as p-exc]
+           [errors.utils :as u]
            [errors.dictionaries :as d]))
 
 ;;an atom that record original error response
@@ -234,8 +235,7 @@
   "Takes the 'problems' part of a spec for a macro and returns a description
    of the problems as a string"
   [problems]
-  (let [grouped (group-by :val (map #(select-keys % [:pred :val :reason]) problems))
-        num-groups (count grouped)] ;; doesn't seem to be used???
+  (let [grouped (group-by :val (map #(select-keys % [:pred :val :reason]) problems))]
        (apply str (map process-group grouped))))
 
 (defn- invalid-macro-params?
@@ -257,10 +257,6 @@
         "):\n"
         (process-paths-macro problems)))
 
-(defn- with-space-if-needed
-  [val-str]
-  (if (= val-str "") "" (str " " val-str)))
-
 (defn- fn-macros
   "Takes parts of the spec message for fn and defn and returns an error message as a string"
   [fn-name value problems]
@@ -271,10 +267,10 @@
        {pred2 :pred val2 :val in2 :in reason2 :reason} prob2
        str-val1 (d/print-macro-arg val1)
        str-val2 (if val2 (d/print-macro-arg val2) "")
-       error-name (str "Syntax problems with (" fn-name (with-space-if-needed val-str) "):\n")
-       named? (and (seq? value) (simple-symbol? (first value)))
-       multi-arg? (or (and named? (> (count value) 2)) (and (not named?) (> (count value) 1)))
-       has-quote? (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value)))))
+       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")
+       named? (u/fn-named? value)
+       multi-arity? (u/fn-multi-arity? value)
+       has-amp? (u/fn-has-amp? value)
        ]
        (cond (and (= n 1) (= "Insufficient input" reason1))
                   (str error-name "fn is missing a vector of parameters.")
@@ -284,7 +280,7 @@
                   " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
-             (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-quote?)
+             (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)))
                   (str error-name "Parameter vector must consist of names, but "
