@@ -149,43 +149,34 @@
   "extract a macro name from a qualified name"
   (nth (re-matches #"(.*)/(.*)" mname) 2))
 
+(defn position-0-based->word
+  "number word takes a positive integer as a string and changes it to its
+  position (first, second, etc.) spelled out."
+  [n]
+  (let [m (inc n)
+        n1 (mod (Math/abs m) 100)
+        n2 (mod (Math/abs m) 10)]
+        (if (< n 5)
+            (["first" "second" "third" "fourth" "fifth"] n)
+            (cond
+              (or (= 11 n1) (= 12 n1) (= 13 n1)) (str m "th")
+              (= 1 n2) (str m "st")
+              (= 2 n2) (str m "nd")
+              (= 3 n2) (str m "rd")
+              :else   (str m "th")))))
+
 ;;; arg-str: non-negative integer as a string -> string
 (defn arg-str
   "arg-str takes a non-negative integer and matches it
    to the corresponding argument number as a string, number as adjective"
   [n]
-  (let [m (inc n)
-        n1 (mod (Math/abs m) 100)
-        n2 (mod (Math/abs m) 10)]
-    (case m
-      1 "first argument"
-      2 "second argument"
-      3 "third argument"
-      4 "fourth argument"
-      5 "fifth argument"
-      (cond
-        (or (= 11 n1) (= 12 n1) (= 13 n1)) (str m "th argument")
-        (= 1 n2) (str m "st argument")
-        (= 2 n2) (str m "nd argument")
-        (= 3 n2) (str m "rd argument")
-        :else   (str m "th argument")))))
+  (str (position-0-based->word n) " argument"))
 
 (defn number-word
-  "number word takes a positive integer as a string and changes it to a
+  "number-word takes a non-negative integer as a string and changes it to a
    string with the numbers corresponding spelling"
   [n]
-  (case n
-     0 "zero"
-     1 "one"
-     2 "two"
-     3 "three"
-     4 "four"
-     5 "five"
-     6 "six"
-     7 "seven"
-     8 "eight"
-     9 "nine"
-    n))
+  (if (< n 10) (["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"] n) n))
 
 (defn number-arg
   "number-arg takes a positive integer as a string and changes it to a
@@ -194,8 +185,8 @@
   [n]
   (cond
     (= n "0") "no arguments"
-    (= n "1") (str (number-word n) " argument")
-    :else (str (number-word n) " arguments")))
+    (= n "1") "one argument"
+    :else (str (number-word (read-string n)) " arguments")))
 
 (defn ?-name
   "?-name takes a string and converts it into a new string

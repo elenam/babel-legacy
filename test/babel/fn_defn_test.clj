@@ -244,11 +244,11 @@ Parameter vector must consist of names, but 5, 7 are not names."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "Syntax problems with (fn ([x & y] 2 3) 5):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) 5)"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [5]):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) [5])"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [x]):

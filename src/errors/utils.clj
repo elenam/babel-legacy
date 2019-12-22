@@ -15,7 +15,7 @@
 
 (defn fn-named?
   "Takes a value of a failing spec and returns true if the fn has a name
-  and false otherwise"
+  and false otherwise."
   [value]
   (and (seq? value) (simple-symbol? (first value))))
 
