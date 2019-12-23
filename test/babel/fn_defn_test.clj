@@ -252,31 +252,31 @@ The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) [5])"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [x]):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) [x])"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) (x 3)):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) (x 3))"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) ([5] 3)):
-Parameter vector must consist of names, but 5 is not a name."
+The problem is in the second clause. Parameter vector must consist of names, but 5 is not a name."
 (log/babel-test-message "(fn ([x & y] 2 3) ([5] 3))"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) ([& x y] 3)):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
-???"
+The problem is in the second clause. ???"
 (log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn a ([x] 2 3) ([] 8) ([& x y] 3)):
-???"
+The problem is in the third clause. ???"
 (log/babel-test-message "(fn a ([x] 2 3) ([] 8) ([& x y] 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
