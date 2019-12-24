@@ -267,11 +267,12 @@
        {pred2 :pred val2 :val in2 :in reason2 :reason} prob2
        str-val1 (d/print-macro-arg val1)
        str-val2 (if val2 (d/print-macro-arg val2) "")
-       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")
        named? (u/fn-named? value)
        multi-arity? (u/fn-multi-arity? value)
        has-amp? (u/fn-has-amp? value)
-       ]
+       in (apply max (filter number? (map first [in1 in2])))
+       clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
+       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) (= "Insufficient input" reason1))
                   (str error-name "fn is missing a vector of parameters.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))

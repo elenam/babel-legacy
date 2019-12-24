@@ -123,6 +123,9 @@
 
 (expect "The function contains? doesn't work on a string." (log/babel-test-message "(contains?\"a\" (range))"))
 
+(expect #"Fix this!!! The first argument of \(max clojure\.lang\.LazySeq(.*)\) was expected to be a number but is a sequence \(max clojure\.lang\.LazySeq(.*)\) instead." 
+(log/babel-test-message "(max (map first [[9] [0]]))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;Pass Tests;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

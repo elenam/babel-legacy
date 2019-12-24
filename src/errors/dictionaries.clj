@@ -151,7 +151,7 @@
 
 (defn position-0-based->word
   "number word takes a positive integer as a string and changes it to its
-  position (first, second, etc.) spelled out."
+  position (first, second, etc.) spelled out; 0 corresponds to 'first'."
   [n]
   (let [m (inc n)
         n1 (mod (Math/abs m) 100)

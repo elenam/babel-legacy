@@ -279,6 +279,10 @@ The problem is in the second clause. ???"
 The problem is in the third clause. ???"
 (log/babel-test-message "(fn a ([x] 2 3) ([] 8) ([& x y] 3))"))
 
+(expect "Syntax problems with (fn ([x 5] 2 3) ([x y] 3)):
+The problem is in the first clause. ???"
+(log/babel-test-message "(fn ([x 5] 2 3) ([x y] 3))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
