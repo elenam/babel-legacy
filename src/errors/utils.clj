@@ -25,7 +25,8 @@
   [value]
   (let [named? (fn-named? value)
         n (count value)]
-       (or (and named? (> n 2)) (and (not named?) (> n 1)))))
+       (or (and named? (> n 2) (every? seq? (rest value)))
+           (and (not named?) (> n 1) (every? seq? value)))))
 
 (defn fn-has-amp?
   "Takes a value of a failing spec and returns true if the value has

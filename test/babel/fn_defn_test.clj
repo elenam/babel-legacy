@@ -196,23 +196,23 @@ Fails let spec; might be fixed in spec2."
 ;;; fn: more than one argument after & ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (expect "Syntax problems with (fn [x & y z] 8):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & y z] 8)"))
 
 (expect "Syntax problems with (fn [& y z] 8):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [& y z] 8)"))
 
 (expect "Syntax problems with (fn [x & y 5] 8):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & y 5] 8)"))
 
 (expect "Syntax problems with (fn [x & y & z] 8):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & y & z] 8)"))
 
 (expect "Syntax problems with (fn [x & y & z & u] 8):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & y & z & u] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

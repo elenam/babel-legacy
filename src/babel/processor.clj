@@ -282,7 +282,7 @@
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
-                  (str error-name "& must be followed by exactly one name, but is followed by something else instead")
+                  (str error-name "& must be followed by exactly one name, but is followed by something else instead.")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)))
                   (str error-name "Parameter vector must consist of names, but "
                   (let [not-names (filter #(not (symbol? %)) val1)
