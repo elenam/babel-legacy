@@ -270,7 +270,7 @@
        named? (u/fn-named? value)
        multi-arity? (u/fn-multi-arity? value)
        has-amp? (u/fn-has-amp? value)
-       in (apply max (filter number? (map first [in1 in2])))
+       in (u/clause-number [in1 in2])
        clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) (= "Insufficient input" reason1))

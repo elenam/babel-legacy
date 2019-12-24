@@ -32,3 +32,10 @@
   & in it and false otherwise"
   [value]
   (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value))))))
+
+(defn clause-number
+  "Takes a vector of failed 'in' entries from a spec error and returns the max one.
+   If none available, returns 0."
+  [ins]
+  (let [valid-ins (filter number? (map first ins))]
+       (if (empty? valid-ins) 0 (apply max valid-ins))))
