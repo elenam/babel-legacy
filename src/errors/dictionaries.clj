@@ -273,6 +273,7 @@
   [s]
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["nil " "nil"]
+        (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
