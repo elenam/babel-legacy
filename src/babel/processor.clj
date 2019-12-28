@@ -262,15 +262,19 @@
   [fn-name value problems]
   (let [n (count problems)
        val-str (d/print-macro-arg value)
-       [prob1 prob2] problems
-       {pred1 :pred val1 :val in1 :in reason1 :reason} prob1
-       {pred2 :pred val2 :val in2 :in reason2 :reason} prob2
+       probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
+       [prob1 prob2 & probs] problems
+       [pred1 pred2 & preds] (map :pred problems)
+       [val1 val2 & vals] (map :val problems)
+       ins (map :in problems)
+       [reason1 reason2 & reasons] (map :reason problems)
        str-val1 (d/print-macro-arg val1)
        str-val2 (if val2 (d/print-macro-arg val2) "")
        named? (u/fn-named? value)
        multi-arity? (u/fn-multi-arity? value)
        has-amp? (u/fn-has-amp? value)
-       in (u/clause-number [in1 in2])
+       in (u/clause-number ins)
+       depth (apply max (map count ins)) ; return the spec number?
        clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) (= "Insufficient input" reason1))
@@ -290,8 +294,8 @@
                         (if (= 1 (count not-names))
                             (str not-names-printed " is not a name.")
                             (str not-names-printed " are not names."))))
-             (= "Extra input" reason1 reason2)
-                  (str error-name "Two extra inputs")
+             (and (= "Extra input" reason1 reason2) (> depth 2)) ;; The arg is in the second spec error (the one with larger depth)
+                  (str error-name "Nested error")
              :else (str error-name "Placeholder for a message for fn"))))
 
 
