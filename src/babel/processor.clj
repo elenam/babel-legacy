@@ -284,7 +284,7 @@
                   (str error-name "A function definition requires a vector of parameters, but was given "
                   (if (u/same-position prob1 prob2)
                       (d/print-macro-arg val1)
-                      (if (u/prefix-position prob1 prob2) (d/print-macro-arg val2) (d/print-macro-arg val1)))
+                      (if (u/prefix-position prob1 prob2) (d/print-macro-arg val1) (d/print-macro-arg val2)))
                       " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")

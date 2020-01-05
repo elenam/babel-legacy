@@ -169,6 +169,15 @@ Parameter vector must consist of names, but 6 is not a name."
 A function definition requires a vector of parameters, but was given \"abc\" instead."
 (log/babel-test-message "(fn a \"abc\")"))
 
+;; It would be nice to have parentheses around 'count []'
+(expect "Syntax problems with (fn a (count [])):
+A function definition requires a vector of parameters, but was given count [] instead."
+(log/babel-test-message "(fn a (count []))"))
+
+(expect "Syntax problems with (fn a #{8}):
+A function definition requires a vector of parameters, but was given #{8} instead."
+(log/babel-test-message "(fn a #{8})"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
