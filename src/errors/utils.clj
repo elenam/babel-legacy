@@ -42,20 +42,36 @@
        (if (empty? valid-ins) 0 (apply max valid-ins))))
 
 (defn label-vect-maps
-  "Takes a vector of maps and returns it as a sequence with an extra
-   key/val pair added to each entry: :n and the index in the original vector.
+  "Takes a vector of maps and returns it with an extra key/val pair added to each entry:
+  :n and the index in the original vector.
    For instance, given [{:a 1} {:b 0} {:c 5}] it returns
-   ({:a 1, :n 0} {:b 0, :n 1} {:c 5, :n 2}).
+   []{:a 1, :n 0} {:b 0, :n 1} {:c 5, :n 2}].
    Helpful for subsequent sorting since it preserves the index in the original vector."
   [v-maps]
-  (map #(assoc %1 :n %2) v-maps (range)))
+  (mapv #(assoc %1 :n %2) v-maps (range)))
+
+(defn cmp-spec
+  "A comparison function for two spec fails. Compares first by the arity clause,
+  then by depth (in both cases higher values first), then by the position in
+  the 'problems' vector (higher numbers last, i.e. preserving the given order)."
+  [p1 p2]
+  (let [in1 (:in p1)
+        in2 (:in p2)
+        clause1 (or (first in1) -1)
+        clause2 (or (first in2) -1)
+        depth1 (if (sequential? in1) (count in1) 0)
+        depth2 (if (sequential? in2) (count in2) 0)]
+        (cond
+          (not (= depth1 depth2)) (- depth2 depth1) ; Depth first, as it is more precise.
+          (not (= clause1 clause2)) (- clause2 clause1)
+          :else (- (:n p1) (:n p2)))))
 
 ;; Not quite what I want, perhaps group-by? Also need to deal with the nil values
 ;; Need to select largest depth and highest clause (and handle nil)
 (defn sort-by-clause
   "TODO"
   [probs]
-  (sort #(> (first (:in %1)) (first (:in %2))) (filter #(number? (:in %)) probs)))
+  (sort cmp-spec probs))
 
 ; (defn max-depth-fail
 ;   "Takes a vector of failed specs and returns the number of the spec

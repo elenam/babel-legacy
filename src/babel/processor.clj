@@ -263,18 +263,19 @@
   (let [n (count problems)
        val-str (d/print-macro-arg value)
        probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
-       [prob1 prob2 & probs] problems
-       [pred1 pred2 & preds] (map :pred problems)
-       [val1 val2 & vals] (map :val problems)
-       ins (map :in problems)
-       [reason1 reason2 & reasons] (map :reason problems)
+       probs-sorted (u/sort-by-clause probs-labeled)
+       [prob1 prob2 & probs] probs-sorted
+       [pred1 pred2 & preds] (map :pred probs-sorted)
+       [val1 val2 & vals] (map :val probs-sorted)
+       ins (map :in probs-sorted)
+       [reason1 reason2 & reasons] (map :reason probs-sorted)
        str-val1 (d/print-macro-arg val1)
        str-val2 (if val2 (d/print-macro-arg val2) "")
        named? (u/fn-named? value)
        multi-arity? (u/fn-multi-arity? value)
        has-amp? (u/fn-has-amp? value)
        in (u/clause-number ins)
-       depth (apply max (map count ins)) ; return the spec number?
+       depth (if (seq? (:in (first probs-sorted))) (count (:in (first probs-sorted))) 0)
        clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) (= "Insufficient input" reason1))
