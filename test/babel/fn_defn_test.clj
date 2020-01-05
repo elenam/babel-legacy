@@ -292,7 +292,8 @@ The issue is in third clause.
 
 (expect "Syntax problems with (fn ([x 5] 2 3) ([x y] 3)):
 The issue is in first clause.
-Parameter vector must consist of names, but 5 is not a name.(log/babel-test-message "(fn ([x 5] 2 3) ([x y] 3))"))
+Parameter vector must consist of names, but 5 is not a name."
+(log/babel-test-message "(fn ([x 5] 2 3) ([x y] 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;

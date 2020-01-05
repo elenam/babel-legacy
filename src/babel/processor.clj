@@ -282,8 +282,10 @@
                   (str error-name "fn is missing a vector of parameters.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
-                  (d/print-macro-arg val1)
-                  " instead.")
+                  (if (u/same-position prob1 prob2)
+                      (d/print-macro-arg val1)
+                      (if (u/prefix-position prob1 prob2) (d/print-macro-arg val2) (d/print-macro-arg val1)))
+                      " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
@@ -318,7 +320,7 @@
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
               ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9) - WE MIGHT NOT NEED THIS CASE
-              (or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
+              ;(or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))

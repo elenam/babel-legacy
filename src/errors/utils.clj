@@ -66,12 +66,27 @@
           (not (= clause1 clause2)) (- clause2 clause1)
           :else (- (:n p1) (:n p2)))))
 
-;; Not quite what I want, perhaps group-by? Also need to deal with the nil values
-;; Need to select largest depth and highest clause (and handle nil)
 (defn sort-by-clause
-  "TODO"
+  "Sorts spec-failures according to cmp-spec."
   [probs]
   (sort cmp-spec probs))
+
+;; TODO: generalize to multiple args?
+(defn same-position
+  "Takes two spec problems and returns true if their 'in' is exactly the same
+   and false otherwise"
+  [p1 p2]
+  (= (:in p1) (:in p2)))
+
+(defn prefix-position
+  "Takes two spec problems and returns true if the 'in' of the first one is a
+   proper prefix of the second one and false otherwise."
+  [p1 p2]
+  (let [in1 (:in p1)
+        in2 (:in p2)]
+       (and (< (count in1) (count in2)) (reduce #(and %1 %2) (map = in1 in2)))))
+
+
 
 ; (defn max-depth-fail
 ;   "Takes a vector of failed specs and returns the number of the spec
