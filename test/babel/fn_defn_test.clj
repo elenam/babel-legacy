@@ -174,6 +174,7 @@ A function definition requires a vector of parameters, but was given \"abc\" ins
 A function definition requires a vector of parameters, but was given count [] instead."
 (log/babel-test-message "(fn a (count []))"))
 
+;; Still fails at this point
 (expect "Syntax problems with (fn a #{8}):
 A function definition requires a vector of parameters, but was given #{8} instead."
 (log/babel-test-message "(fn a #{8})"))
@@ -226,6 +227,15 @@ Fails let spec; might be fixed in spec2."
 & must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & y & z & u] 8)"))
 
+(expect "Syntax problems with (fn [x & #(+ %1)] 8):
+???"
+(log/babel-test-message "(fn [x & #(+ %)] 8)"))
+
+;; This is insufficient input, need to determine that it has &
+(expect "Syntax problems with (fn [x &] 8):
+???."
+(log/babel-test-message "(fn [x &] 8)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; fn with & ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -238,6 +248,22 @@ Parameter vector must consist of names, but 2 is not a name."
 (expect "Syntax problems with (fn [x & 7] 8):
 ???"
 (log/babel-test-message "(fn [x & 7] 8)"))
+
+(expect "Syntax problems with (fn [& 7] 8):
+???"
+(log/babel-test-message "(fn [& 7] 8)"))
+
+(expect "Syntax problems with (fn [&] 8):
+fn is missing a name after &."
+(log/babel-test-message "(fn [&] 8)"))
+
+(expect "Syntax problems with (fn [x &] 8):
+fn is missing a name after &."
+(log/babel-test-message "(fn [x &] 8)"))
+
+(expect "Syntax problems with (fn [[x] &] 8):
+Misleading message here!!!!"
+(log/babel-test-message "(fn [[x] &] 8)"))
 
 ;; FAILED AFTER THE CHANGE
 (expect "Syntax problems with (fn [5 & 7] 8):

@@ -50,3 +50,9 @@
 
 (expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)when-first requires a vector for its binding\.(.*)"
 (log/babel-test-message "(when-first 1 1 1)"))
+
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected two arguments but was given one argument\.(.*)"
+(log/babel-test-message "(fn [x y] (recur 5))"))
+
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given one argument\.(.*)"
+(log/babel-test-message "(fn [] (recur 5))"))

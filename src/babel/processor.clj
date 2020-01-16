@@ -3,7 +3,8 @@
            [errors.messageobj :as m-obj]
            [errors.prettify-exception :as p-exc]
            [errors.utils :as u]
-           [errors.dictionaries :as d]))
+           [errors.dictionaries :as d]
+           [clojure.core.specs.alpha]))
 
 ;;an atom that record original error response
 (def recorder (atom {:msg [] :detail []}))
@@ -280,6 +281,10 @@
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) (= "Insufficient input" reason1))
                   (str error-name "fn is missing a vector of parameters.")
+             (and (= "Insufficient input" reason1) (= pred1 :clojure.core.specs.alpha/binding-form))
+                         (str error-name "fn is missing a name after &.")
+             (and (= "Insufficient input" reason2) (= pred2 :clojure.core.specs.alpha/binding-form))
+                         (str error-name "fn is missing a name after &.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
                   (if (u/same-position prob1 prob2)
