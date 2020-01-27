@@ -47,12 +47,10 @@ A function definition requires a vector of parameters, but was given b instead."
 A function definition requires a vector of parameters, but was given {x y} instead."
 (log/babel-test-message "(fn {x y})"))
 
-;; FAILED WITH THE NEW APPROACH
 (expect "Syntax problems with (fn '(x y)):
 A function definition requires a vector of parameters, but was given '(x y) instead."
 (log/babel-test-message "(fn '(x y))"))
 
-;; FAILED WITH THE NEW APPROACH
 (expect "Syntax problems with (fn a '([])):
 A function definition requires a vector of parameters, but was given '([]) instead."
 (log/babel-test-message "(fn a '([]))"))
@@ -161,10 +159,6 @@ Var-arg fn message, will look into later."
 Var-arg fn message, will look into later."
 (log/babel-test-message "(fn [[x] 6] 5)"))
 
-(expect "Syntax problems with (fn ([[x] 6])):
-Parameter vector must consist of names, but 6 is not a name."
-(log/babel-test-message "(fn ([[x] 6]))"))
-
 (expect "Syntax problems with (fn a \"abc\"):
 A function definition requires a vector of parameters, but was given \"abc\" instead."
 (log/babel-test-message "(fn a \"abc\")"))
@@ -174,10 +168,13 @@ A function definition requires a vector of parameters, but was given \"abc\" ins
 A function definition requires a vector of parameters, but was given count [] instead."
 (log/babel-test-message "(fn a (count []))"))
 
-;; Still fails at this point
 (expect "Syntax problems with (fn a #{8}):
 A function definition requires a vector of parameters, but was given #{8} instead."
 (log/babel-test-message "(fn a #{8})"))
+
+(expect "Syntax problems with (fn a nil):
+A function definition requires a vector of parameters, but was given nil instead."
+(log/babel-test-message "(fn a nil)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
@@ -271,7 +268,7 @@ Parameter vector must consist of names, but 5, 7 are not names."
 (log/babel-test-message "(fn [5 & 7] 8)"))
 
 (expect "Syntax problems with (fn [x & [5]] 2 3):
-???"
+& must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x & [5]] 2 3)"))
 
 (expect "Syntax problems with (fn [[x] & [5]] 2 3):
@@ -279,11 +276,19 @@ Parameter vector must consist of names, but 5, 7 are not names."
 (log/babel-test-message "(fn [[x] & [5]] 2 3)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;; a nested seq fn ;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Syntax problems with (fn ([[x] 6])):
+Parameter vector must consist of names, but 6 is not a name."
+(log/babel-test-message "(fn ([[x] 6]))"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; var-arg fn ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "Syntax problems with (fn ([x & y] 2 3) 5):
-The problem is in the second clause. ???"
+The issue is in the second clause. ???"
 (log/babel-test-message "(fn ([x & y] 2 3) 5)"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [5]):

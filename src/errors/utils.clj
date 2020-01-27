@@ -1,5 +1,7 @@
 (ns errors.utils
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [com.rpl.specter :as sp]
+            [errors.dictionaries :as d]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;; Utilities for handling macro specs ;;;;;;;;;;;;
@@ -78,18 +80,56 @@
   [p1 p2]
   (= (:in p1) (:in p2)))
 
+(defn- v-prefix=?
+  "Returns true if one vector is a prefix of the other one or
+  the two are exactly the same"
+  [v1 v2]
+  (and (<= (count v1) (count v2)) (every? #{true} (map = v1 v2))))
+
+(defn- v-prefix?
+  "Returns true if one vector is a strict prefix of the other one"
+  [v1 v2]
+  (and (< (count v1) (count v2)) (every? #{true} (map = v1 v2))))
+
+
 (defn prefix-position
   "Takes two spec problems and returns true if the 'in' of the first one is a
    proper prefix of the second one and false otherwise."
   [p1 p2]
   (let [in1 (:in p1)
         in2 (:in p2)]
-       (and (< (count in1) (count in2)) (reduce #(and %1 %2) (map = in1 in2)))))
+       (v-prefix? in1 in2)))
 
+(defn arity-n?
+  [{:keys [path]}]
+  (v-prefix=? [:fn-tail :arity-n :params] path))
 
+;; Can be used to tell whether a clause is falsely identified,
+;; in particular confused with a function call.
+(defn clause?
+  "Takes an element of value and returns true if it is a function clause
+   and false otherwise."
+  [s]
+  (and (seq? s) (or (empty? s) (vector? (first s)))))
 
-; (defn max-depth-fail
-;   "Takes a vector of failed specs and returns the number of the spec
-;    with the largest depth"
-;   [problems]
-;   (second (first (reverse (sort #(< (first %1) (count (:in (first %2))))) (seq (zipmap problems (range))))))
+(defn pred-vector?
+  "Takes a predicate of a spec failure and returns true if it is clojure.core/vector?
+  and false otherwise."
+  [pred]
+  (and (symbol? pred) (= #'clojure.core/vector? (resolve pred))))
+
+(defn pick-vector-fail
+  "Takes a list of spec failures and returns the message and the value to
+   report for a failed parameter vector for fn"
+  [probs]
+  (let [vector-fails (filter #(and (pred-vector? (:pred %))
+                                   (v-prefix=? [:fn-tail :arity-1 :params] (:path %))) probs)]
+       (first vector-fails)))
+
+(defn multi-clause
+  [probs]
+  (let [vector-probs (pick-vector-fail probs)
+        val (:val vector-probs)]
+       (cond (clause? val) (str "Detected multi-clause fn; issue with " (d/print-macro-arg val))
+             (#{"fn*" "quote"} (str (first val))) (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
+             :else (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))

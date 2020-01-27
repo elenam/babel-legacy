@@ -285,11 +285,13 @@
                          (str error-name "fn is missing a name after &.")
              (and (= "Insufficient input" reason2) (= pred2 :clojure.core.specs.alpha/binding-form))
                          (str error-name "fn is missing a name after &.")
-             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1)) (empty? (filter vector? value)))
+             (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1)) (str error-name (u/multi-clause probs-sorted))
+             (and (u/pred-vector? pred1) (empty? (filter vector? value)))
                   (str error-name "A function definition requires a vector of parameters, but was given "
                   (if (u/same-position prob1 prob2)
-                      (d/print-macro-arg val1)
-                      (if (u/prefix-position prob1 prob2) (d/print-macro-arg val1) (d/print-macro-arg val2)))
+                      (if (nil? val1) "nil" (d/print-macro-arg val1))
+                      (if (u/prefix-position prob1 prob2) (if (nil? val1) "nil" (d/print-macro-arg val1))
+                                                              (if (nil? val2) "nil" (d/print-macro-arg val2))))
                       " instead.")
              (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
                   (str error-name "fn is missing a vector of parameters or it is misplaced.")
