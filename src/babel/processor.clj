@@ -304,8 +304,8 @@
                         (if (= 1 (count not-names))
                             (str not-names-printed " is not a name.")
                             (str not-names-printed " are not names."))))
-             (and (= "Extra input" reason1 reason2) (> depth 2)) ;; The arg is in the second spec error (the one with larger depth)
-                  (str error-name "Nested error")
+             (and (= "Extra input" reason1 reason2) #_(> depth 2))
+                  (str error-name (u/process-nested-error probs-sorted))
              :else (str error-name "Placeholder for a message for fn"))))
 
 

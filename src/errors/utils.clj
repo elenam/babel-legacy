@@ -133,3 +133,11 @@
        (cond (clause? val) (str "Detected multi-clause fn; issue with " (d/print-macro-arg val))
              (#{"fn*" "quote"} (str (first val))) (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
              :else (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
+
+(defn process-nested-error
+  "Takes probs of a spec with two 'Extra input' conditions, returns a message based
+   on the less nested problem"
+  [probs]
+  (let [prob (if (v-prefix? (:in (first probs)) (:in (second probs))) (first probs) (second probs))
+        val (:val prob)]
+        (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
