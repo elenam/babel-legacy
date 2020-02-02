@@ -30,11 +30,18 @@
        (or (and named? (> n 2) (every? seq? (rest value)))
            (and (not named?) (> n 1) (every? seq? value)))))
 
+;; Need to change so that it checks the clause corresponding to the error
 (defn fn-has-amp?
-  "Takes a value of a failing spec and returns true if the value has
-  & in it and false otherwise"
-  [value]
-  (and (vector? (first value)) (not (empty? (filter #(= % (symbol '&)) (first value))))))
+  "Takes a value of a failing spec and the 'in' index and returns true if the
+  value at the index has & in it and false otherwise"
+  [value in]
+  (and (vector? (nth value in)) (not (empty? (filter #(= % (symbol '&)) (nth value in))))))
+
+(defn key-vals-match
+  "Takes a map of keys and values and returns a function that matches
+  a spec prblem based on these key/vals."
+  [m]
+  (fn [p] (= m (sp/select-one (sp/submap (keys m)) p))))
 
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.

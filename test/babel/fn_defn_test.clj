@@ -116,11 +116,11 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect "Syntax problems with (fn [[5]] 6):
-???"
+Function parameters must be a vector of names, but [5] was given instead."
 (log/babel-test-message "(fn [[5]] 6)"))
 
 (expect "Syntax problems with (fn [[[5]]] 6):
-???"
+Function parameters must be a vector of names, but [[5]] was given instead."
 (log/babel-test-message "(fn [[[5]]] 6)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -132,19 +132,19 @@ Parameter vector must consist of names, but {a :a 5 :b} is not a name."
 (log/babel-test-message "(fn [{a :a 5 :b}] [a x])"))
 
 (expect "Syntax problems with (fn [[{a :a 5 x}]] [a x]):
-???"
+Function parameters must be a vector of names, but [{a :a 5 x}] was given instead."
 (log/babel-test-message "(fn [[{a :a 5 x}]] [a x])"))
 
 (expect "Syntax problems with (fn [[[{a :a 5 x}]]] [a x]):
-???"
+Function parameters must be a vector of names, but [[{a :a 5 x}]] was given instead."
 (log/babel-test-message "(fn [[[{a :a 5 x}]]] [a x])"))
 
 (expect "Syntax problems with (fn [[[{a :a 5 x}] 5]] [a x]):
-???"
+Function parameters must be a vector of names, but [[{a :a 5 x}] 5] was given instead."
 (log/babel-test-message "(fn [[[{a :a 5 x}] 5]] [a x])"))
 
 (expect "Syntax problems with (fn [[[{a :a 5 x}] z]] [a x]):
-???"
+Function parameters must be a vector of names, but [[{a :a 5 x}] z] was given instead."
 (log/babel-test-message "(fn [[[{a :a 5 x}] z]] [a x])"))
 
 (expect "Syntax problems with (fn [x {:a 5}] 7):
@@ -230,7 +230,7 @@ Fails let spec; might be fixed in spec2."
 
 ;; This is insufficient input, need to determine that it has &
 (expect "Syntax problems with (fn [x &] 8):
-???."
+fn is missing a name after &."
 (log/babel-test-message "(fn [x &] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -321,10 +321,6 @@ The issue is in second clause.
 ???"
 (log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
 
-(expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
-The problem is in the second clause. ???"
-(log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
-
 (expect "Syntax problems with (fn a ([x] 2 3) ([] 8) ([& x y] 3)):
 The issue is in third clause.
 ???"
@@ -334,6 +330,16 @@ The issue is in third clause.
 The issue is in first clause.
 Parameter vector must consist of names, but 5 is not a name."
 (log/babel-test-message "(fn ([x 5] 2 3) ([x y] 3))"))
+
+(expect "Syntax problems with (fn ([x] 5) ([6 & 7] 8)):
+The issue is in second clause.
+& must be followed by exactly one name, but is followed by something else instead."
+(log/babel-test-message "(fn ([x] 5) ([6 & 7] 8))"))
+
+(expect "Syntax problems with (fn ([x] 5) ([x & y z] 8)):
+The issue is in second clause.
+& must be followed by exactly one name, but is followed by something else instead."
+(log/babel-test-message "(fn ([x] 5) ([x & y z] 8))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
