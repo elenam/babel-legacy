@@ -75,6 +75,7 @@
             (if no-vectors?
                 (str "A function definition requires a vector of parameters, but was given "
                      (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
+                ;; Perhaps should report the failing argument
                 "fn is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
 
@@ -177,9 +178,13 @@
              :else (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
 
 (defn process-nested-error
-  "Takes probs of a spec with two 'Extra input' conditions, returns a message based
+  "Takes grouped problems of a spec with all 'Extra input' conditions, returns a message based
    on the less nested problem"
-  [probs]
-  (let [prob (if (v-prefix? (:in (first probs)) (:in (second probs))) (first probs) (second probs))
+  [gp]
+  (let [ins (keys gp)
+        less-nested-groups (if (and (> (count ins) 1) (v-prefix? (second ins) (first ins)))
+                               (gp (second ins))
+                               (gp (first ins)))
+        prob (first less-nested-groups)
         val (:val prob)]
         (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
