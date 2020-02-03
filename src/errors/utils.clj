@@ -79,6 +79,15 @@
                 "fn is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
 
+(defn missing-vector-message-seq
+  "Takes a failing spec with a value that's a sequence and returns its
+  error message for a missing vector"
+  [prob]
+  (let [val (:val prob)]
+  (if (#{"fn*" "quote"} (str (first val)))
+      (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
+      (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
+
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
    If none available, returns 0."

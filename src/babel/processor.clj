@@ -290,6 +290,12 @@
                    (str error-name (u/missing-vector-message probs-grouped value))
              (u/all-match? probs-grouped {:reason "Extra input"})
                   (str error-name (u/process-nested-error probs-grouped))
+             (u/has-every-match? probs-grouped
+                  [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
+                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}])
+                  (str error-name (u/missing-vector-message-seq
+                                    (first (u/get-match probs-grouped
+                                                 {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead.")
