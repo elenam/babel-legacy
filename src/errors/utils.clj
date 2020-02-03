@@ -43,6 +43,41 @@
   [m]
   (fn [p] (= m (sp/select-one (sp/submap (keys m)) p))))
 
+(defn get-match
+  "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
+  a vector of matching spec problems."
+  [grouped-probs m]
+  (sp/select [sp/MAP-VALS sp/ALL (key-vals-match m)] grouped-probs))
+
+(defn has-match?
+  "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
+  true if any matches were found and false otherwise."
+  [grouped-probs m]
+  (not (empty? (get-match grouped-probs m))))
+
+(defn has-every-match?
+  "Takes spec failures grouped by 'in' and a sequence of maps of key/val pairs
+  and returns true if each map was matched by some spec and false otherwise."
+  [grouped-probs ms]
+  (every? true? (map #(has-match? grouped-probs %) ms)))
+
+(defn all-match?
+  "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
+  true if any matches were found and false otherwise."
+  [grouped-probs m]
+  (= (get-match grouped-probs m) (sp/select [sp/MAP-VALS sp/ALL] grouped-probs)))
+
+(defn missing-vector-message
+  [grouped-probs value]
+  (if (= 1 (count grouped-probs))
+      (let [no-vectors? (empty? (filter vector? value))
+            val (:val (first (first (vals grouped-probs))))] ; replace by specter?
+            (if no-vectors?
+                (str "A function definition requires a vector of parameters, but was given "
+                     (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
+                "fn is missing a vector of parameters or it is misplaced."))
+      "Need to handle this case"))
+
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
    If none available, returns 0."

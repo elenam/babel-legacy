@@ -282,20 +282,13 @@
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
        (cond (and (= n 1) ((u/key-vals-match {:reason "Insufficient input", :path [:fn-tail]}) (first problems)))
                   (str error-name "fn is missing a vector of parameters.")
-             (and (= "Insufficient input" reason1) (= pred1 :clojure.core.specs.alpha/binding-form))
-                         (str error-name "fn is missing a name after &.")
-             (and (= "Insufficient input" reason2) (= pred2 :clojure.core.specs.alpha/binding-form))
-                         (str error-name "fn is missing a name after &.")
+             (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
+                  (str error-name "fn is missing a name after &.")
+             (u/has-every-match? probs-grouped
+                  [{:pred 'clojure.core/vector?}
+                   {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))}])
+                   (str error-name (u/missing-vector-message probs-grouped value))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
-             (and (u/pred-vector? pred1) (empty? (filter vector? value)))
-                  (str error-name "A function definition requires a vector of parameters, but was given "
-                  (if (u/same-position prob1 prob2)
-                      (if (nil? val1) "nil" (d/print-macro-arg val1))
-                      (if (u/prefix-position prob1 prob2) (if (nil? val1) "nil" (d/print-macro-arg val1))
-                                                              (if (nil? val2) "nil" (d/print-macro-arg val2))))
-                      " instead.")
-             (and (symbol? pred1) (= #'clojure.core/vector? (resolve pred1))) ;; special case when there is a vector among parameters
-                  (str error-name "fn is missing a vector of parameters or it is misplaced.")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead.")
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)))
