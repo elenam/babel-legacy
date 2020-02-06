@@ -341,6 +341,14 @@ The issue is in second clause.
 & must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn ([x] 5) ([x & y z] 8))"))
 
+(expect "Syntax problems with (fn [x u [& z y ]] 8):
+& must be followed by exactly one name, but is followed by something else instead."
+(log/babel-test-message "(fn [x u [& z y ]] 8)"))
+
+ (expect "Syntax problems with (fn [x & u [z y ]] 8):
+ & must be followed by exactly one name, but is followed by something else instead."
+ (log/babel-test-message "(fn [x & u [z y ]] 8)"))
+ 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

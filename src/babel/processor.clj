@@ -292,22 +292,20 @@
                   (str error-name (u/process-nested-error probs-grouped))
              (u/has-every-match? probs-grouped
                   [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
-                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}])
+                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :params]}])
                   (str error-name (u/missing-vector-message-seq
                                     (first (u/get-match probs-grouped
                                                  {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))))
+             (u/has-every-match? probs-grouped
+                  [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :params]}])
+                 (str error-name (u/parameters-not-names
+                                    (first (u/get-match probs-grouped
+                                                 {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
+                                    value))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead.")
-             (and (= "Extra input" reason1) (not (= "Extra input" reason2)))
-                  (str error-name "Parameter vector must consist of names, but "
-                  (let [not-names (filter #(not (symbol? %)) val1)
-                        not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
-                        (if (= 1 (count not-names))
-                            (str not-names-printed " is not a name.")
-                            (str not-names-printed " are not names."))))
-             ; (and (= "Extra input" reason1 reason2))
-             ;      (str error-name (u/process-nested-error probs-sorted))
              :else (str error-name "Placeholder for a message for fn"))))
 
 

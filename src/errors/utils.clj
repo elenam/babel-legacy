@@ -88,6 +88,29 @@
       (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
       (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
 
+(defn parameters-not-names
+  [prob value]
+  (let [val (:val prob)
+        [n1 _] (:in prob)
+        val-in (nth value n1)
+        [before-amp amp-and-after] (split-with (complement #{'&}) val-in)
+        has-amp? (not (empty? amp-and-after))
+        not-names-before-amp (filter #(not (symbol? %)) before-amp)
+        count-after-amp (dec (count amp-and-after))
+        length-issue-after-amp? (not= count-after-amp 1)
+        not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))
+        not-names (filter #(not (symbol? %)) val)
+        not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
+        (cond
+          (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
+                (str "& must be followed by exactly one name, but is followed by "
+                     (d/print-macro-arg (rest amp-and-after))
+                     " instead.")                 
+          :else (str "Parameter vector must consist of names, but "
+                (if (= 1 (count not-names))
+                    (str not-names-printed " is not a name.")
+                    (str not-names-printed " are not names."))))))
+
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
    If none available, returns 0."
