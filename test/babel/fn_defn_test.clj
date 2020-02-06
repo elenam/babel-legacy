@@ -205,23 +205,23 @@ Fails let spec; might be fixed in spec2."
 ;;; fn: more than one argument after & ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (expect "Syntax problems with (fn [x & y z] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y z instead."
 (log/babel-test-message "(fn [x & y z] 8)"))
 
 (expect "Syntax problems with (fn [& y z] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y z instead."
 (log/babel-test-message "(fn [& y z] 8)"))
 
 (expect "Syntax problems with (fn [x & y 5] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y 5 instead."
 (log/babel-test-message "(fn [x & y 5] 8)"))
 
 (expect "Syntax problems with (fn [x & y & z] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y & z instead."
 (log/babel-test-message "(fn [x & y & z] 8)"))
 
 (expect "Syntax problems with (fn [x & y & z & u] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y & z & u instead."
 (log/babel-test-message "(fn [x & y & z & u] 8)"))
 
 (expect "Syntax problems with (fn [x & #(+ %1)] 8):
@@ -346,9 +346,9 @@ The issue is in second clause.
 (log/babel-test-message "(fn [x u [& z y ]] 8)"))
 
  (expect "Syntax problems with (fn [x & u [z y ]] 8):
- & must be followed by exactly one name, but is followed by something else instead."
+ & must be followed by exactly one name, but is followed by u [z y] instead."
  (log/babel-test-message "(fn [x & u [z y ]] 8)"))
- 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
