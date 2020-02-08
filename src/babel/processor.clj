@@ -303,6 +303,15 @@
                                     (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                     value))
+              (u/has-every-match? probs-grouped
+                   [{:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}
+                    {:path [:fn-tail :arity-1 :params :var-params :var-form :seq-destructure]}
+                    {:path [:fn-tail :arity-1 :params :var-params :var-form :map-destructure]}
+                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :params]}])
+                  (str error-name (u/parameters-not-names
+                                     (first (u/get-match probs-grouped
+                                                  {:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}))
+                                     value))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              (and (= "Extra input" reason1) (not (= "Extra input" reason2)) has-amp?)
                   (str error-name "& must be followed by exactly one name, but is followed by something else instead.")

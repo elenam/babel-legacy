@@ -99,13 +99,13 @@
         count-after-amp (dec (count amp-and-after))
         length-issue-after-amp? (not= count-after-amp 1)
         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))
-        not-names (filter #(not (symbol? %)) val)
+        not-names (if (seq? val) (filter #(not (symbol? %)) val) '())
         not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
         (cond
           (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
                 (str "& must be followed by exactly one name, but is followed by "
                      (d/print-macro-arg (rest amp-and-after))
-                     " instead.")                 
+                     " instead.")
           :else (str "Parameter vector must consist of names, but "
                 (if (= 1 (count not-names))
                     (str not-names-printed " is not a name.")

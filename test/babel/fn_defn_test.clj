@@ -272,7 +272,7 @@ Parameter vector must consist of names, but 5, 7 are not names."
 (log/babel-test-message "(fn [x & [5]] 2 3)"))
 
 (expect "Syntax problems with (fn [[x] & [5]] 2 3):
-???"
+& must be followed by exactly one name, but is followed by [5] instead."
 (log/babel-test-message "(fn [[x] & [5]] 2 3)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -341,13 +341,13 @@ The issue is in second clause.
 & must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn ([x] 5) ([x & y z] 8))"))
 
-(expect "Syntax problems with (fn [x u [& z y ]] 8):
+(expect "Syntax problems with (fn [x u [& z y]] 8):
 & must be followed by exactly one name, but is followed by something else instead."
-(log/babel-test-message "(fn [x u [& z y ]] 8)"))
+(log/babel-test-message "(fn [x u [& z y]] 8)"))
 
- (expect "Syntax problems with (fn [x & u [z y ]] 8):
- & must be followed by exactly one name, but is followed by u [z y] instead."
- (log/babel-test-message "(fn [x & u [z y ]] 8)"))
+(expect "Syntax problems with (fn [x & u [z y]] 8):
+& must be followed by exactly one name, but is followed by u [z y] instead."
+(log/babel-test-message "(fn [x & u [z y]] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
