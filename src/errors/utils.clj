@@ -82,11 +82,15 @@
 (defn missing-vector-message-seq
   "Takes a failing spec with a value that's a sequence and returns its
   error message for a missing vector"
-  [prob]
-  (let [val (:val prob)]
-  (if (#{"fn*" "quote"} (str (first val)))
-      (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
-      (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
+  [prob value]
+  (let [val (:val prob)
+        no-vectors? (empty? (filter vector? value))]
+        (if no-vectors?
+            (if (#{"fn*" "quote"} (str (first val)))
+                (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
+                (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))
+            ;; Perhaps should report the failing argument
+            "fn is missing a vector of parameters or it is misplaced.")))
 
 (defn parameters-not-names
   [prob value]
@@ -99,8 +103,8 @@
         count-after-amp (dec (count amp-and-after))
         length-issue-after-amp? (not= count-after-amp 1)
         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))
-        not-names (if (seq? val) (filter #(not (symbol? %)) val) '())
-        not-names-printed (s/join ", " (map d/print-macro-arg not-names))]
+        not-names (if (seq? val) (filter #(not (symbol? %)) val) (if (nil? val) '(nil) '()))
+        not-names-printed (s/join ", " (map #(if (nil? %) "nil" (d/print-macro-arg %)) not-names))]
         (cond
           (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
                 (str "& must be followed by exactly one name, but is followed by "

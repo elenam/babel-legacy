@@ -295,14 +295,22 @@
                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :params]}])
                   (str error-name (u/missing-vector-message-seq
                                     (first (u/get-match probs-grouped
-                                                 {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))))
+                                                 {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))
+                                     value))
              (u/has-every-match? probs-grouped
                   [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :params]}])
-                 (str error-name (u/parameters-not-names
+                  (str error-name (u/parameters-not-names
                                     (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                     value))
+            (u/has-every-match? probs-grouped
+                 [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
+                  {:reason "Insufficient input", :path [:fn-tail :arity-n :params]}])
+                 (str error-name (u/parameters-not-names
+                                   (first (u/get-match probs-grouped
+                                                {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))
+                                   value))
               (u/has-every-match? probs-grouped
                    [{:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}
                     {:path [:fn-tail :arity-1 :params :var-params :var-form :seq-destructure]}

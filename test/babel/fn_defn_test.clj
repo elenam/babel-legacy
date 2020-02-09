@@ -111,6 +111,10 @@ Parameter vector must consist of names, but '(2 3), 5 are not names."
 Parameter vector must consist of names, but {a :a 5 6} is not a name."
 (log/babel-test-message "(fn [{a :a 5 6}] [a x])"))
 
+(expect "Syntax problems with (fn a [nil]):
+Parameter vector must consist of names, but nil is not a name."
+(log/babel-test-message "(fn a [nil])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: nested parameter vector errors ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -165,7 +169,7 @@ A function definition requires a vector of parameters, but was given \"abc\" ins
 
 ;; It would be nice to have parentheses around 'count []'
 (expect "Syntax problems with (fn a (count [])):
-A function definition requires a vector of parameters, but was given count [] instead."
+A function definition requires a vector of parameters, but was given (count []) instead."
 (log/babel-test-message "(fn a (count []))"))
 
 (expect "Syntax problems with (fn a #{8}):
@@ -225,7 +229,7 @@ Fails let spec; might be fixed in spec2."
 (log/babel-test-message "(fn [x & y & z & u] 8)"))
 
 (expect "Syntax problems with (fn [x & #(+ %1)] 8):
-???"
+& must be followed by exactly one name, but is followed by #(+ %1) instead."
 (log/babel-test-message "(fn [x & #(+ %)] 8)"))
 
 ;; This is insufficient input, need to determine that it has &
@@ -243,11 +247,11 @@ Parameter vector must consist of names, but 2 is not a name."
 (log/babel-test-message "(fn [2 & y] 8)"))
 
 (expect "Syntax problems with (fn [x & 7] 8):
-???"
+& must be followed by exactly one name, but is followed by 7 instead."
 (log/babel-test-message "(fn [x & 7] 8)"))
 
 (expect "Syntax problems with (fn [& 7] 8):
-???"
+& must be followed by exactly one name, but is followed by 7 instead."
 (log/babel-test-message "(fn [& 7] 8)"))
 
 (expect "Syntax problems with (fn [&] 8):
@@ -268,9 +272,10 @@ Parameter vector must consist of names, but 5, 7 are not names."
 (log/babel-test-message "(fn [5 & 7] 8)"))
 
 (expect "Syntax problems with (fn [x & [5]] 2 3):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by [5] instead."
 (log/babel-test-message "(fn [x & [5]] 2 3)"))
 
+;; FAILS - 2/8/20
 (expect "Syntax problems with (fn [[x] & [5]] 2 3):
 & must be followed by exactly one name, but is followed by [5] instead."
 (log/babel-test-message "(fn [[x] & [5]] 2 3)"))
