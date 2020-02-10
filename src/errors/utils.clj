@@ -114,6 +114,18 @@
                 (if (= 1 (count not-names))
                     (str not-names-printed " is not a name.")
                     (str not-names-printed " are not names."))))))
+(defn clause-single-spec
+  [prob value]
+  (let [clause (first (:in prob))
+        val (:val prob)
+        before-n (take clause value)
+        named? (symbol? (first value))
+        has-vector? (some vector? before-n)]
+        (if has-vector? "fn needs a vector of parameters and a body, but has something else instead."
+                         (str "The issue is in the "
+                              (d/position-0-based->word (if named? (dec clause) clause))
+                              " clause.\n"
+                              val " cannot be outside of a function body."))))
 
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
