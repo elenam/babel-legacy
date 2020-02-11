@@ -15,6 +15,23 @@
 ;;;;;;;;;;;;; Predicates for handling fn ;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn same-position
+  "Takes two spec problems and returns true if their 'in' is exactly the same
+   and false otherwise"
+  [p1 p2]
+  (= (:in p1) (:in p2)))
+
+(defn- v-prefix=?
+  "Returns true if one vector is a prefix of the other one or
+  the two are exactly the same"
+  [v1 v2]
+  (and (<= (count v1) (count v2)) (every? #{true} (map = v1 v2))))
+
+(defn- v-prefix?
+  "Returns true if one vector is a strict prefix of the other one"
+  [v1 v2]
+  (and (< (count v1) (count v2)) (every? #{true} (map = v1 v2))))
+
 (defn fn-named?
   "Takes a value of a failing spec and returns true if the fn has a name
   and false otherwise."
@@ -39,15 +56,36 @@
 
 (defn key-vals-match
   "Takes a map of keys and values and returns a function that matches
-  a spec prblem based on these key/vals."
+  a spec problem based on these key/vals."
   [m]
   (fn [p] (= m (sp/select-one (sp/submap (keys m)) p))))
+
+(defn key-vals-match-by-prefix
+  "Takes a map of keys and values and returns a function that matches
+  a spec problem with given keys whose values are either exactly
+  equal to given values or start with a given vector."
+  [m]
+  ;; split both m & p into vector/non-vector values, check vectors using prefix=?, check non-vectors by =
+  (let [not-vector? (complement vector?)
+        f-vector (sp/filterer #(vector? (second %)))
+        f-not-vector (sp/filterer #(not-vector? (second %)))
+        [m-vect m-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) m)]
+        (fn [p] (let
+          [[p-vect p-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) (sp/select-one (sp/submap (keys m)) p))]
+           (and (= m-not-vect p-not-vect) (every? true? (map v-prefix=? m-vect p-vect)))))))
 
 (defn get-match
   "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
   a vector of matching spec problems."
   [grouped-probs m]
   (sp/select [sp/MAP-VALS sp/ALL (key-vals-match m)] grouped-probs))
+
+(defn get-match-by-prefix
+  "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
+  a vector of spec problems with given keys whose values are either exactly
+  equal to given values or start with a given vector."
+  [grouped-probs m]
+  (sp/select [sp/MAP-VALS sp/ALL (key-vals-match-by-prefix m)] grouped-probs))
 
 (defn has-match?
   "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
@@ -114,6 +152,8 @@
                 (if (= 1 (count not-names))
                     (str not-names-printed " is not a name.")
                     (str not-names-printed " are not names."))))))
+
+;;;; TO_DO: combine the two functions below!!!!
 (defn clause-single-spec
   [prob value]
   (let [clause (first (:in prob))
@@ -125,7 +165,20 @@
                          (str "The issue is in the "
                               (d/position-0-based->word (if named? (dec clause) clause))
                               " clause.\n"
-                              val " cannot be outside of a function body."))))
+                              (d/print-macro-arg val) " cannot be outside of a function body."))))
+
+(defn clause-single-spec-param
+  [prob value]
+  (let [val (:val prob)
+        clause (first (:in prob))
+        before-n (take clause value)
+        named? (symbol? (first value))
+        has-vector? (some vector? before-n)]
+        (if has-vector? "fn needs a vector of parameters and a body, but has something else instead."
+                         (str "The issue is in the "
+                              (d/position-0-based->word (if named? (dec clause) clause))
+                              " clause.\n"
+                              "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead."))))
 
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
@@ -163,24 +216,6 @@
   "Sorts spec-failures according to cmp-spec."
   [probs]
   (sort cmp-spec probs))
-
-;; TODO: generalize to multiple args?
-(defn same-position
-  "Takes two spec problems and returns true if their 'in' is exactly the same
-   and false otherwise"
-  [p1 p2]
-  (= (:in p1) (:in p2)))
-
-(defn- v-prefix=?
-  "Returns true if one vector is a prefix of the other one or
-  the two are exactly the same"
-  [v1 v2]
-  (and (<= (count v1) (count v2)) (every? #{true} (map = v1 v2))))
-
-(defn- v-prefix?
-  "Returns true if one vector is a strict prefix of the other one"
-  [v1 v2]
-  (and (< (count v1) (count v2)) (every? #{true} (map = v1 v2))))
 
 
 (defn prefix-position

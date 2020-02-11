@@ -304,7 +304,7 @@
                                     (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                     value))
-            (u/has-every-match? probs-grouped
+             (u/has-every-match? probs-grouped
                  [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
                   {:reason "Insufficient input", :path [:fn-tail :arity-n :params]}])
                  (str error-name (u/parameters-not-names
@@ -320,14 +320,20 @@
                                      (first (u/get-match probs-grouped
                                                   {:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}))
                                      value))
-             (and (= n 1) (u/has-match? probs-grouped
+              (and (= n 1) (u/has-match? probs-grouped
                               {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))
                                :path  [:fn-tail :arity-n]}))
-                  (str error-name (u/clause-single-spec
+                   (str error-name (u/clause-single-spec
                                      (first (u/get-match probs-grouped
                                                    {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))
                                                     :path  [:fn-tail :arity-n]}))
-                                      value))                         
+                                      value))
+              (and (= n 1) (u/has-match? probs-grouped
+                              {:path  [:fn-tail :arity-n :params] :pred 'clojure.core/vector?}))
+                    (str error-name (u/clause-single-spec-param
+                                      (first (u/get-match probs-grouped
+                                                          {:path  [:fn-tail :arity-n :params] :pred 'clojure.core/vector?}))
+                                                          value))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              :else (str error-name "Placeholder for a message for fn"))))
 
