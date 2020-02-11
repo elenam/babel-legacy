@@ -188,7 +188,7 @@
                  (str clause-str
                       "Parameter vector must consist of names, but " (not-names->str val))
               (and (= pred 'clojure.core/vector?) (vector? clause-val))
-                 (str clause-str "A function clause must be included in parentheses, but was given " (d/print-macro-arg clause-val "[" "]") " instead.")
+                 (str clause-str "A function clause must be enclosed in parentheses, but is a vector " (d/print-macro-arg clause-val "[" "]") " instead.")
               (= pred 'clojure.core/vector?)
                  (str clause-str
                       "A function definition requires a vector of parameters, but was given " val-str " instead.")
