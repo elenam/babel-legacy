@@ -279,7 +279,7 @@
        has-amp? (u/fn-has-amp? value in)
        depth (if (seq? (:in (first probs-sorted))) (count (:in (first probs-sorted))) 0)
        clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
-       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" clause-if-needed)]
+       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" #_clause-if-needed)]
        (cond (and (= n 1) ((u/key-vals-match {:reason "Insufficient input", :path [:fn-tail]}) (first problems)))
                   (str error-name "fn is missing a vector of parameters.")
              (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
@@ -288,7 +288,7 @@
                   [{:pred 'clojure.core/vector?}
                    {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))}])
                    (str error-name (u/missing-vector-message probs-grouped value))
-             (u/all-match? probs-grouped {:reason "Extra input"}) ;; THIS INCLUDES THE CASE OF n=1, do we want it?
+             (and (> n 1) (u/all-match? probs-grouped {:reason "Extra input"}))
                   (str error-name (u/process-nested-error probs-grouped))
              (u/has-every-match? probs-grouped
                   [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
@@ -321,21 +321,8 @@
                                                   {:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}))
                                      value))
               (and (= n 1) (u/has-match-by-prefix? probs-grouped {:path [:fn-tail :arity-n]}))
-                   (str error-name "New case!")
-              ; (and (= n 1) (u/has-match? probs-grouped
-              ;                 {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))
-              ;                  :path  [:fn-tail :arity-n]}))
-              ;      (str error-name (u/clause-single-spec
-              ;                        (first (u/get-match probs-grouped
-              ;                                      {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))
-              ;                                       :path  [:fn-tail :arity-n]}))
-              ;                         value))
-              ; (and (= n 1) (u/has-match? probs-grouped
-              ;                 {:path  [:fn-tail :arity-n :params] :pred 'clojure.core/vector?}))
-              ;       (str error-name (u/clause-single-spec-param
-              ;                         (first (u/get-match probs-grouped
-              ;                                             {:path  [:fn-tail :arity-n :params] :pred 'clojure.core/vector?}))
-              ;                                             value))
+                   (str error-name (u/clause-single-spec (first problems) ; n=1, so there is only one prob
+                                                         value))
              (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              :else (str error-name "Placeholder for a message for fn"))))
 

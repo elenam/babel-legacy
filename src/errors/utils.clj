@@ -136,6 +136,21 @@
             ;; Perhaps should report the failing argument
             "fn is missing a vector of parameters or it is misplaced.")))
 
+(defn- not-names->seq
+  [val]
+  (cond
+    (seq? val) (filter #(not (symbol? %)) val)
+    (nil? val) '(nil)
+    :else '()))
+
+(defn- not-names->str
+  [val]
+  (let [s (not-names->seq val)
+        names-str (s/join ", " (map #(if (nil? %) "nil" (d/print-macro-arg %)) s))]
+        (if (= 1 (count s))
+            (str names-str " is not a name.")
+            (str names-str " are not names."))))
+
 (defn parameters-not-names
   [prob value]
   (let [val (:val prob)
@@ -146,45 +161,39 @@
         not-names-before-amp (filter #(not (symbol? %)) before-amp)
         count-after-amp (dec (count amp-and-after))
         length-issue-after-amp? (not= count-after-amp 1)
-        not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))
-        not-names (if (seq? val) (filter #(not (symbol? %)) val) (if (nil? val) '(nil) '()))
-        not-names-printed (s/join ", " (map #(if (nil? %) "nil" (d/print-macro-arg %)) not-names))]
+        not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
         (cond
           (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
                 (str "& must be followed by exactly one name, but is followed by "
                      (d/print-macro-arg (rest amp-and-after))
                      " instead.")
           :else (str "Parameter vector must consist of names, but "
-                (if (= 1 (count not-names))
-                    (str not-names-printed " is not a name.")
-                    (str not-names-printed " are not names."))))))
+                (not-names->str val)))))
 
-;;;; TO_DO: combine the two functions below!!!!
 (defn clause-single-spec
   [prob value]
-  (let [clause (first (:in prob))
-        val (:val prob)
-        before-n (take clause value)
+  (let [{:keys [reason val pred in path]} prob
+        clause-n (first in)
+        before-n (take clause-n value)
+        clause-val (nth value clause-n)
         named? (symbol? (first value))
-        has-vector? (some vector? before-n)]
-        (if has-vector? "fn needs a vector of parameters and a body, but has something else instead."
-                         (str "The issue is in the "
-                              (d/position-0-based->word (if named? (dec clause) clause))
-                              " clause.\n"
-                              (d/print-macro-arg val) " cannot be outside of a function body."))))
-
-(defn clause-single-spec-param
-  [prob value]
-  (let [val (:val prob)
-        clause (first (:in prob))
-        before-n (take clause value)
-        named? (symbol? (first value))
-        has-vector? (some vector? before-n)]
-        (if has-vector? "fn needs a vector of parameters and a body, but has something else instead."
-                         (str "The issue is in the "
-                              (d/position-0-based->word (if named? (dec clause) clause))
-                              " clause.\n"
-                              "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead."))))
+        has-vector? (some vector? before-n)
+        clause-to-report (if named? (dec clause-n) clause-n)
+        clause-str (if (> clause-to-report 0)
+                       (str "The issue is in the " (d/position-0-based->word clause-to-report) " clause.\n")
+                       "")
+        val-str (d/print-macro-arg val)]
+        (cond has-vector? "fn needs a vector of parameters and a body, but has something else instead."
+              (= "Extra input" reason) ;; TODO ADD handling of &
+                 (str clause-str
+                      "Parameter vector must consist of names, but " (not-names->str val))
+              (and (= pred 'clojure.core/vector?) (vector? clause-val))
+                 (str clause-str "A function clause must be included in parentheses, but was given " (d/print-macro-arg clause-val "[" "]") " instead.")
+              (= pred 'clojure.core/vector?)
+                 (str clause-str
+                      "A function definition requires a vector of parameters, but was given " val-str " instead.")
+              :else (str clause-str
+                         val-str " cannot be outside of a function body."))))
 
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
@@ -197,7 +206,7 @@
   "Takes a vector of maps and returns it with an extra key/val pair added to each entry:
   :n and the index in the original vector.
    For instance, given [{:a 1} {:b 0} {:c 5}] it returns
-   []{:a 1, :n 0} {:b 0, :n 1} {:c 5, :n 2}].
+   [{:a 1, :n 0} {:b 0, :n 1} {:c 5, :n 2}].
    Helpful for subsequent sorting since it preserves the index in the original vector."
   [v-maps]
   (mapv #(assoc %1 :n %2) v-maps (range)))
