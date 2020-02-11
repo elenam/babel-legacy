@@ -47,7 +47,6 @@
        (or (and named? (> n 2) (every? seq? (rest value)))
            (and (not named?) (> n 1) (every? seq? value)))))
 
-;; Need to change so that it checks the clause corresponding to the error
 (defn fn-has-amp?
   "Takes a value of a failing spec and the 'in' index and returns true if the
   value at the index has & in it and false otherwise"
@@ -72,7 +71,7 @@
         [m-vect m-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) m)]
         (fn [p] (let
           [[p-vect p-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) (sp/select-one (sp/submap (keys m)) p))]
-           (and (= m-not-vect p-not-vect) (every? true? (map v-prefix=? m-vect p-vect)))))))
+           (and (= m-not-vect p-not-vect) (every? true? (map #(v-prefix=? (second %1) (second %2)) m-vect p-vect)))))))
 
 (defn get-match
   "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
@@ -92,6 +91,13 @@
   true if any matches were found and false otherwise."
   [grouped-probs m]
   (not (empty? (get-match grouped-probs m))))
+
+(defn has-match-by-prefix?
+  "Takes spec failures grouped by 'in' and a map of key/val pairs and returns
+  true if there is a vector of spec problems with given keys whose values are
+  either exactly equal to given values or start with a given vector."
+  [grouped-probs m]
+  (not (empty? (get-match-by-prefix grouped-probs m))))
 
 (defn has-every-match?
   "Takes spec failures grouped by 'in' and a sequence of maps of key/val pairs
