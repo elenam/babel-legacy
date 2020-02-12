@@ -300,12 +300,12 @@ The issue is in the second clause.
 (log/babel-test-message "(fn ([x & y] 2 3) 5)"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [5]):
-The problem is in the second clause.
+The issue is in the second clause.
 A function clause must be enclosed in parentheses, but is a vector [5] instead."
 (log/babel-test-message "(fn ([x & y] 2 3) [5])"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) [x]):
-The problem is in the second clause.
+The issue is in the second clause.
 A function clause must be enclosed in parentheses, but is a vector [x] instead."
 (log/babel-test-message "(fn ([x & y] 2 3) [x])"))
 
@@ -318,6 +318,16 @@ A function clause must be enclosed in parentheses, but is a vector [#(+ %1)] ins
 The issue is in the second clause.
 A function definition requires a vector of parameters, but was given x instead."
 (log/babel-test-message "(fn ([x & y] 2 3) (x 3))"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) '(x 3)):
+The issue is in the second clause.
+'(x 3) cannot be outside of a function body."
+(log/babel-test-message "(fn ([x & y] 2 3) '(x 3))"))
+
+(expect "Syntax problems with (fn ([x & y] 2 3) #(+ %1)):
+The issue is in the second clause.
+#(+ %1) cannot be outside of a function body."
+(log/babel-test-message "(fn ([x & y] 2 3) #(+ %))"))
 
 (expect "Syntax problems with (fn ([x & y] 2 3) ([5] 3)):
 The issue is in the second clause.
@@ -380,7 +390,7 @@ The issue is in the second clause.
 
 (expect "Syntax problems with (fn ([x & y] 2 3) #(+ %1 %1)):
 The issue is in the second clause.
-???"
+#(+ %1 %1) cannot be outside of a function body."
 (log/babel-test-message "(fn ([x & y] 2 3) #(+ % %))"))
 
 (expect "Syntax problems with (fn ([x] 2 3) ([2 & x] 3)):

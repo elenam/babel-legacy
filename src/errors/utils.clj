@@ -69,8 +69,9 @@
         f-vector (sp/filterer #(vector? (second %)))
         f-not-vector (sp/filterer #(not-vector? (second %)))
         [m-vect m-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) m)]
-        (fn [p] (let
-          [[p-vect p-not-vect] (sp/select (sp/multi-path f-vector f-not-vector) (sp/select-one (sp/submap (keys m)) p))]
+        (fn [p] (let [[p-vect p-not-vect] (sp/select
+                                              (sp/multi-path f-vector f-not-vector)
+                                              (sp/select-one (sp/submap (keys m)) p))]
            (and (= m-not-vect p-not-vect) (every? true? (map #(v-prefix=? (second %1) (second %2)) m-vect p-vect)))))))
 
 (defn get-match
@@ -203,6 +204,10 @@
                       "A function clause must be enclosed in parentheses, but is a vector "
                       (d/print-macro-arg clause-val "[" "]")
                       " instead.")
+              (and (= pred 'clojure.core/vector?) (#{"fn*" "quote"} (str val)))
+                 (str clause-str
+                      (d/print-macro-arg clause-val)
+                      " cannot be outside of a function body.")
               (= pred 'clojure.core/vector?)
                  (str clause-str
                       "A function definition requires a vector of parameters, but was given "

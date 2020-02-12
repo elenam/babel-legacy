@@ -264,21 +264,7 @@
   (let [n (count problems)
        val-str (d/print-macro-arg value)
        probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
-       probs-sorted (u/sort-by-clause probs-labeled)
        probs-grouped (group-by :in probs-labeled)
-       [prob1 prob2 & probs] probs-sorted
-       [pred1 pred2 & preds] (map :pred probs-sorted)
-       [val1 val2 & vals] (map :val probs-sorted)
-       ins (map :in probs-sorted)
-       [reason1 reason2 & reasons] (map :reason probs-sorted)
-       str-val1 (d/print-macro-arg val1)
-       str-val2 (if val2 (d/print-macro-arg val2) "")
-       named? (u/fn-named? value)
-       multi-arity? (u/fn-multi-arity? value)
-       in (u/clause-number ins)
-       has-amp? (u/fn-has-amp? value in)
-       depth (if (seq? (:in (first probs-sorted))) (count (:in (first probs-sorted))) 0)
-       clause-if-needed (if multi-arity? (str "The issue is in " (d/position-0-based->word (if named? (dec in) in)) " clause.\n") "")
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" #_clause-if-needed)]
        (cond (and (= n 1) ((u/key-vals-match {:reason "Insufficient input", :path [:fn-tail]}) (first problems)))
                   (str error-name "fn is missing a vector of parameters.")
@@ -323,7 +309,7 @@
               (and (= n 1) (u/has-match-by-prefix? probs-grouped {:path [:fn-tail :arity-n]}))
                    (str error-name (u/clause-single-spec (first problems) ; n=1, so there is only one prob
                                                          value))
-             (and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
+             ;(and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
              :else (str error-name "Placeholder for a message for fn"))))
 
 
