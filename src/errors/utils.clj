@@ -233,40 +233,6 @@
   [v-maps]
   (mapv #(assoc %1 :n %2) v-maps (range)))
 
-(defn cmp-spec
-  "A comparison function for two spec fails. Compares first by the arity clause,
-  then by depth (in both cases higher values first), then by the position in
-  the 'problems' vector (higher numbers last, i.e. preserving the given order)."
-  [p1 p2]
-  (let [in1 (:in p1)
-        in2 (:in p2)
-        clause1 (or (first in1) -1)
-        clause2 (or (first in2) -1)
-        depth1 (if (sequential? in1) (count in1) 0)
-        depth2 (if (sequential? in2) (count in2) 0)]
-        (cond
-          (not (= depth1 depth2)) (- depth2 depth1) ; Depth first, as it is more precise.
-          (not (= clause1 clause2)) (- clause2 clause1)
-          :else (- (:n p1) (:n p2)))))
-
-(defn sort-by-clause
-  "Sorts spec-failures according to cmp-spec."
-  [probs]
-  (sort cmp-spec probs))
-
-
-(defn prefix-position
-  "Takes two spec problems and returns true if the 'in' of the first one is a
-   proper prefix of the second one and false otherwise."
-  [p1 p2]
-  (let [in1 (:in p1)
-        in2 (:in p2)]
-       (v-prefix? in1 in2)))
-
-(defn arity-n?
-  [{:keys [path]}]
-  (v-prefix=? [:fn-tail :arity-n :params] path))
-
 ;; Can be used to tell whether a clause is falsely identified,
 ;; in particular confused with a function call.
 (defn clause?
@@ -288,14 +254,6 @@
   (let [vector-fails (filter #(and (pred-vector? (:pred %))
                                    (v-prefix=? [:fn-tail :arity-1 :params] (:path %))) probs)]
        (first vector-fails)))
-
-(defn multi-clause
-  [probs]
-  (let [vector-probs (pick-vector-fail probs)
-        val (:val vector-probs)]
-       (cond (clause? val) (str "Detected multi-clause fn; issue with " (d/print-macro-arg val))
-             (#{"fn*" "quote"} (str (first val))) (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
-             :else (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))))
 
 (defn process-nested-error
   "Takes grouped problems of a spec with all 'Extra input' conditions, returns a message based
