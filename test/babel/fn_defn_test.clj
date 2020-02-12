@@ -326,17 +326,17 @@ Parameter vector must consist of names, but 5 is not a name."
 
 (expect "Syntax problems with (fn ([x & y] 2 3) ([& x y] 3)):
 The issue is in the second clause.
-???"
+& must be followed by exactly one name, but is followed by x y instead."
 (log/babel-test-message "(fn ([x & y] 2 3) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn ([x] 2 3) ([& x y] 3)):
 The issue is in the second clause.
-???"
+& must be followed by exactly one name, but is followed by x y instead."
 (log/babel-test-message "(fn ([x] 2 3) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn a ([x] 2 3) ([] 8) ([& x y] 3)):
 The issue is in the third clause.
-???"
+& must be followed by exactly one name, but is followed by x y instead."
 (log/babel-test-message "(fn a ([x] 2 3) ([] 8) ([& x y] 3))"))
 
 (expect "Syntax problems with (fn ([x 5] 2 3) ([x y] 3)):
@@ -351,9 +351,10 @@ Parameter vector must consist of names, but 6, 7 are not names."
 
 (expect "Syntax problems with (fn ([x] 5) ([x & y z] 8)):
 The issue is in the second clause.
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed by y z instead."
 (log/babel-test-message "(fn ([x] 5) ([x & y z] 8))"))
 
+;; THIS STILL FAILS - Feb 11
 (expect "Syntax problems with (fn [x u [& z y]] 8):
 & must be followed by exactly one name, but is followed by something else instead."
 (log/babel-test-message "(fn [x u [& z y]] 8)"))
@@ -381,6 +382,22 @@ The issue is in the second clause.
 The issue is in the second clause.
 ???"
 (log/babel-test-message "(fn ([x & y] 2 3) #(+ % %))"))
+
+(expect "Syntax problems with (fn ([x] 2 3) ([2 & x] 3)):
+The issue is in the second clause.
+Parameter vector must consist of names, but 2 is not a name."
+(log/babel-test-message "(fn ([x] 2 3) ([2 & x] 3))"))
+
+(expect "Syntax problems with (fn a ([x] 2 3) ([2 & 7] 3)):
+The issue is in the second clause.
+Parameter vector must consist of names, but 2, 7 are not names."
+(log/babel-test-message "(fn a ([x] 2 3) ([2 & 7] 3))"))
+
+;; Doesn't report the clause
+(expect "Syntax problems with (fn a ([x] 2 3) ([x &] 3)):
+The issue is in the second clause.
+fn is missing a name after &."
+(log/babel-test-message "(fn a ([x] 2 3) ([x &] 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;

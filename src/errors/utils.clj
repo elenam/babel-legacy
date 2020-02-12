@@ -151,21 +151,26 @@
             (str names-str " is not a name.")
             (str names-str " are not names."))))
 
-(defn parameters-not-names
-  [prob value]
-  (let [val (:val prob)
-        [n1 _] (:in prob)
-        val-in (nth value n1)
+(defn- ampersand-issues
+  [value in]
+  (let [val-in (first (sp/select [(apply sp/nthpath (drop-last in))] value))
         [before-amp amp-and-after] (split-with (complement #{'&}) val-in)
         has-amp? (not (empty? amp-and-after))
         not-names-before-amp (filter #(not (symbol? %)) before-amp)
         count-after-amp (dec (count amp-and-after))
         length-issue-after-amp? (not= count-after-amp 1)
         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
-        (cond
-          (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
+        (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
+            (rest amp-and-after)
+            '())))
+
+(defn parameters-not-names
+  [prob value]
+  (let [{:keys [val in]} prob
+        amp-issues (ampersand-issues value in)]
+        (cond (not (empty? amp-issues))
                 (str "& must be followed by exactly one name, but is followed by "
-                     (d/print-macro-arg (rest amp-and-after))
+                     (d/print-macro-arg amp-issues)
                      " instead.")
           :else (str "Parameter vector must consist of names, but "
                 (not-names->str val)))))
@@ -182,18 +187,30 @@
         clause-str (if (> clause-to-report 0)
                        (str "The issue is in the " (d/position-0-based->word clause-to-report) " clause.\n")
                        "")
-        val-str (d/print-macro-arg val)]
+        amp-issues (ampersand-issues value in)]
         (cond has-vector? "fn needs a vector of parameters and a body, but has something else instead."
-              (= "Extra input" reason) ;; TODO ADD handling of &
+              (and (= "Extra input" reason) (not (empty? amp-issues)))
+                  (str clause-str
+                       "& must be followed by exactly one name, but is followed by "
+                       (d/print-macro-arg amp-issues)
+                       " instead.")
+              (= "Extra input" reason)
                  (str clause-str
-                      "Parameter vector must consist of names, but " (not-names->str val))
+                      "Parameter vector must consist of names, but "
+                      (not-names->str val))
               (and (= pred 'clojure.core/vector?) (vector? clause-val))
-                 (str clause-str "A function clause must be enclosed in parentheses, but is a vector " (d/print-macro-arg clause-val "[" "]") " instead.")
+                 (str clause-str
+                      "A function clause must be enclosed in parentheses, but is a vector "
+                      (d/print-macro-arg clause-val "[" "]")
+                      " instead.")
               (= pred 'clojure.core/vector?)
                  (str clause-str
-                      "A function definition requires a vector of parameters, but was given " val-str " instead.")
+                      "A function definition requires a vector of parameters, but was given "
+                      (d/print-macro-arg val)
+                      " instead.")
               :else (str clause-str
-                         val-str " cannot be outside of a function body."))))
+                         (d/print-macro-arg val)
+                         " cannot be outside of a function body."))))
 
 (defn clause-number
   "Takes a vector of failed 'in' entries from a spec error and returns the max one.
