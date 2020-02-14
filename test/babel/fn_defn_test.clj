@@ -445,6 +445,30 @@ Missing a function name, given '(7 8) instead."
 Missing a function name, given nil instead."
 (log/babel-test-message "(defn nil 7)"))
 
+(expect "Syntax problems with (defn a [x &] 7):
+defn is missing a name after &."
+(log/babel-test-message "(defn a [x &] 7)"))
+
+(expect "Syntax problems with (defn a [&] 7):
+defn is missing a name after &."
+(log/babel-test-message "(defn a [&] 7)"))
+
+(expect "Syntax problems with (defn a [x 3 y z] 7):
+Parameter vector must consist of names, but 3 is not a name."
+(log/babel-test-message "(defn a [x 3 y z] 7)"))
+
+(expect "Syntax problems with (defn a [x 3 y #(+ 7 %1)] 7):
+Parameter vector must consist of names, but 3, #(+ 7 %1) are not names."
+(log/babel-test-message "(defn a [x 3 y #(+ 7 %)] 7)"))
+
+(expect "Syntax problems with (defn a [x & y z] 7):
+& must be followed by exactly one name, but is followed by y z instead."
+(log/babel-test-message "(defn a [x & y z] 7)"))
+
+(expect "Syntax problems with (defn- a [x & y z] 7):
+& must be followed by exactly one name, but is followed by y z instead."
+(log/babel-test-message "(defn- a [x & y z] 7)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -267,9 +267,18 @@
         probs-grouped (group-by :in probs-labeled)
         error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
         (cond (u/has-match? probs-grouped {:path [:fn-name]})
-              (str error-name  "Missing a function name, given "
-                               (let [val (:val (first problems))] (if (nil? val) "nil" (d/print-macro-arg val)))
-                               " instead.")
+                   (str error-name  "Missing a function name, given "
+                                    (let [val (:val (first problems))] (if (nil? val) "nil" (d/print-macro-arg val)))
+                                    " instead.")
+              (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
+                   (str error-name fn-name " is missing a name after &.")
+              (u/has-every-match? probs-grouped
+                   [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :bodies :params]}])
+                   (str error-name (u/parameters-not-names
+                                     (first (u/get-match probs-grouped
+                                                 {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
+                                      value))
               :else "Placeholder message for defn")))
 
 (defn- fn-macros
