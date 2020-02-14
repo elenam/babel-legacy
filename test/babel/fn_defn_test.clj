@@ -359,6 +359,14 @@ The issue is in the second clause.
 Parameter vector must consist of names, but 6, 7 are not names."
 (log/babel-test-message "(fn ([x] 5) ([6 & 7] 8))"))
 
+(expect "Syntax problems with (fn ([x {6 7}])):
+Parameter vector must consist of names, but {6 7} is not a name."
+(log/babel-test-message "(fn ([x {6 7}]))"))
+
+(expect "Syntax problems with (fn ([[x] #(+ %3 %2)]) (8 9)):
+Parameter vector must consist of names, but #(+ %3 %2) is not a name."
+(log/babel-test-message "(fn ([[x] #(+ %3 %2)]) (8 9))"))
+
 (expect "Syntax problems with (fn ([x] 5) ([x & y z] 8)):
 The issue is in the second clause.
 & must be followed by exactly one name, but is followed by y z instead."
@@ -366,7 +374,7 @@ The issue is in the second clause.
 
 ;; THIS STILL FAILS - Feb 11
 (expect "Syntax problems with (fn [x u [& z y]] 8):
-& must be followed by exactly one name, but is followed by something else instead."
+& must be followed by exactly one name, but is followed z y instead."
 (log/babel-test-message "(fn [x u [& z y]] 8)"))
 
 (expect "Syntax problems with (fn [x & u [z y]] 8):
@@ -408,6 +416,34 @@ Parameter vector must consist of names, but 2, 7 are not names."
 The issue is in the second clause.
 fn is missing a name after &."
 (log/babel-test-message "(fn a ([x] 2 3) ([x &] 3))"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; defn missing name ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect "Syntax problems with (defn 4 5):
+Missing a function name, given 4 instead."
+(log/babel-test-message "(defn 4 5)"))
+
+(expect "Syntax problems with (defn [x y] 7):
+Missing a function name, given [x y] instead."
+(log/babel-test-message "(defn [x y] 7)"))
+
+(expect "Syntax problems with (defn {7 8} 7):
+Missing a function name, given {7 8} instead."
+(log/babel-test-message "(defn {7 8} 7)"))
+
+(expect "Syntax problems with (defn #(even? %1) #(odd? %1)):
+Missing a function name, given #(even? %1) instead."
+(log/babel-test-message "(defn #(even? %) #(odd? %))"))
+
+(expect "Syntax problems with (defn '(7 8) 7):
+Missing a function name, given '(7 8) instead."
+(log/babel-test-message "(defn '(7 8) 7)"))
+
+(expect "Syntax problems with (defn nil 7):
+Missing a function name, given nil instead."
+(log/babel-test-message "(defn nil 7)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;

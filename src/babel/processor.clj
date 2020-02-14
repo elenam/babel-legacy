@@ -258,14 +258,28 @@
         "):\n"
         (process-paths-macro problems)))
 
+(defn- defn-macros
+  "Takes parts of the spec message for defn and defn- and returns an error message as a string"
+  [fn-name value problems]
+  (let [n (count problems)
+        val-str (d/print-macro-arg value)
+        probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
+        probs-grouped (group-by :in probs-labeled)
+        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
+        (cond (u/has-match? probs-grouped {:path [:fn-name]})
+              (str error-name  "Missing a function name, given "
+                               (let [val (:val (first problems))] (if (nil? val) "nil" (d/print-macro-arg val)))
+                               " instead.")
+              :else "Placeholder message for defn")))
+
 (defn- fn-macros
-  "Takes parts of the spec message for fn and defn and returns an error message as a string"
+  "Takes parts of the spec message for fn and returns an error message as a string"
   [fn-name value problems]
   (let [n (count problems)
        val-str (d/print-macro-arg value)
        probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
        probs-grouped (group-by :in probs-labeled)
-       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n" #_clause-if-needed)]
+       error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
        (cond (and (= n 1) ((u/key-vals-match {:reason "Insufficient input", :path [:fn-tail]}) (first problems)))
                   (str error-name "fn is missing a vector of parameters.")
              (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
@@ -290,6 +304,14 @@
                                     (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                     value))
+              ;; multi-arity case, first clause
+             (u/has-every-match? probs-grouped
+                 [{:reason "Extra input", :path [:fn-tail :arity-n :params]}
+                  {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}])
+                 (str error-name (u/parameters-not-names
+                                   (first (u/get-match probs-grouped
+                                                {:reason "Extra input", :path [:fn-tail :arity-n :params]}))
+                                   value))
              (u/has-every-match? probs-grouped
                  [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
                   {:reason "Insufficient input", :path [:fn-tail :arity-n :params]}])
@@ -309,8 +331,8 @@
               (and (= n 1) (u/has-match-by-prefix? probs-grouped {:path [:fn-tail :arity-n]}))
                    (str error-name (u/clause-single-spec (first problems) ; n=1, so there is only one prob
                                                          value))
-             ;(and (not (= "Extra input" reason1 reason2)) (u/arity-n? prob1) (not has-amp?)) (str error-name (u/multi-clause probs-sorted))
-             :else (str error-name "Placeholder for a message for fn"))))
+
+              :else (str error-name "Placeholder for a message for fn"))))
 
 
 (defn spec-macro-message
@@ -326,7 +348,8 @@
         n (count problems)]
         ;; If there is no value, I need to get the exc type and the messages from the second of via
         ;; and pass it to processing.
-        (cond (#{"fn" "defn"} fn-name) (fn-macros fn-name value problems)
+        (cond (#{"fn"} fn-name) (fn-macros fn-name value problems)
+              (#{"defn" "defn-"} fn-name) (defn-macros fn-name value problems)
               (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
