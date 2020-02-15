@@ -56,15 +56,15 @@ A function definition requires a vector of parameters, but was given '([]) inste
 (log/babel-test-message "(fn a '([]))"))
 
 (expect "Syntax problems with (fn a b []):
-fn is missing a vector of parameters or it is misplaced."
+The function definition is missing a vector of parameters or it is misplaced."
 (log/babel-test-message "(fn a b [])"))
 
 (expect "Syntax problems with (fn 4 []):
-fn is missing a vector of parameters or it is misplaced."
+The function definition is missing a vector of parameters or it is misplaced."
 (log/babel-test-message "(fn 4 [])"))
 
 (expect "Syntax problems with (fn a #(= %5) [] #\"hi\" ['(8 9)]):
-fn is missing a vector of parameters or it is misplaced."
+The function definition is missing a vector of parameters or it is misplaced."
 (log/babel-test-message "(fn a #(= %5) [] #\"hi\" ['(8 9)])"))
 
 (expect "Syntax problems with (fn &):
@@ -482,7 +482,38 @@ Function parameters must be a vector of names, but [x [6]] & was given instead."
 
 (expect "Syntax problems with (defn a [(count 5)]):
 Parameter vector must consist of names, but (count 5) is not a name."
-(log/babel-test-message " (defn a [(count 5)])"))
+(log/babel-test-message "(defn a [(count 5)])"))
+
+(expect "Syntax problems with (defn a 7):
+A function definition requires a vector of parameters, but was given 7 instead."
+(log/babel-test-message "(defn a 7)"))
+
+(expect "Syntax problems with (defn a #\"abc\" 1 2 3):
+A function definition requires a vector of parameters, but was given #\"abc\" instead."
+(log/babel-test-message "(defn a #\"abc\" 1 2 3)"))
+
+(expect "Syntax problems with (defn a (count 6)):
+A function definition requires a vector of parameters, but was given (count 6) instead."
+(log/babel-test-message "(defn a (count 6))"))
+
+(expect "Syntax problems with (defn a b [x]):
+The function definition is missing a vector of parameters or it is misplaced."
+(log/babel-test-message "(defn a b [x])"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; defn special cases with a string or a map ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Special case because "abc" is allowed as a doc-string
+(expect "Syntax problems with (defn a \"abc\"):
+???"
+(log/babel-test-message "(defn a \"abc\")"))
+
+;; Special case because {x y} is allowed as a pre-, post-
+;; conditions map
+(expect "Syntax problems with (defn a {x y}):
+???"
+(log/babel-test-message "(defn a {x y})"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;

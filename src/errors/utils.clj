@@ -171,7 +171,7 @@
                 (str "A function definition requires a vector of parameters, but was given "
                      (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
                 ;; Perhaps should report the failing argument
-                "fn is missing a vector of parameters or it is misplaced."))
+                "The function definition is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
 
 (defn missing-vector-message-seq
@@ -185,7 +185,7 @@
                 (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
                 (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))
             ;; Perhaps should report the failing argument
-            "fn is missing a vector of parameters or it is misplaced.")))
+            "The function definition is missing a vector of parameters or it is misplaced.")))
 
 (defn parameters-not-names
   [prob value]

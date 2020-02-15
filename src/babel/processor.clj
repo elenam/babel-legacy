@@ -270,11 +270,22 @@
                    (str error-name  (u/missing-name (:val (first problems))))
               (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
                    (str error-name fn-name " is missing a name after &.")
+              (u/has-every-match? probs-grouped
+                   [{:pred 'clojure.core/vector?}
+                    {:pred '(clojure.core/fn [%] (clojure.core/or (clojure.core/nil? %) (clojure.core/sequential? %)))}])
+                   (str error-name (u/missing-vector-message probs-grouped value))
               (and (> n 1) (u/all-match? probs-grouped {:reason "Extra input"}))
                    (str error-name (u/process-nested-error probs-grouped))
               (u/has-every-match? probs-grouped
-                   [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                  [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :bodies :params]}])
+                  (str error-name (u/missing-vector-message-seq
+                                    (first (u/get-match probs-grouped
+                                                 {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}))
+                                       value))
+              (u/has-every-match? probs-grouped
+                   [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :bodies :params]}])
                    (str error-name (u/parameters-not-names
                                      (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
