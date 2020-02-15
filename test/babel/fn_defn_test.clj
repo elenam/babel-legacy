@@ -115,6 +115,10 @@ Parameter vector must consist of names, but {a :a 5 6} is not a name."
 Parameter vector must consist of names, but nil is not a name."
 (log/babel-test-message "(fn a [nil])"))
 
+(expect "Syntax problems with (fn a [(count 5)]):
+Parameter vector must consist of names, but (count 5) is not a name."
+(log/babel-test-message "(fn a [(count 5)])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: nested parameter vector errors ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -231,7 +235,6 @@ Fails let spec; might be fixed in spec2."
 & must be followed by exactly one name, but is followed by #(+ %1) instead."
 (log/babel-test-message "(fn [x & #(+ %)] 8)"))
 
-;; This is insufficient input, need to determine that it has &
 (expect "Syntax problems with (fn [x &] 8):
 fn is missing a name after &."
 (log/babel-test-message "(fn [x &] 8)"))
@@ -421,6 +424,10 @@ fn is missing a name after &."
 ;;;;;;;;;;;;; defn missing name ;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(expect "Syntax problems with (defn):
+Missing a function name."
+(log/babel-test-message "(defn)"))
+
 (expect "Syntax problems with (defn 4 5):
 Missing a function name, given 4 instead."
 (log/babel-test-message "(defn 4 5)"))
@@ -468,6 +475,14 @@ Parameter vector must consist of names, but 3, #(+ 7 %1) are not names."
 (expect "Syntax problems with (defn- a [x & y z] 7):
 & must be followed by exactly one name, but is followed by y z instead."
 (log/babel-test-message "(defn- a [x & y z] 7)"))
+
+(expect "Syntax problems with (defn a [[x [6]] &] 7):
+Function parameters must be a vector of names, but [x [6]] & was given instead."
+(log/babel-test-message "(defn a [[x [6]] &] 7)"))
+
+(expect "Syntax problems with (defn a [(count 5)]):
+Parameter vector must consist of names, but (count 5) is not a name."
+(log/babel-test-message " (defn a [(count 5)])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;

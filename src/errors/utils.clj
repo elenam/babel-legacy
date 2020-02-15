@@ -121,10 +121,17 @@
     (nil? val) '(nil)
     :else '()))
 
+(defn- print-with-nil-and-seq
+  [val]
+  (cond
+    (nil? val) "nil"
+    (and (seq? val) (not (#{"fn*" "quote"} (str (first val))))) (d/print-macro-arg val "(" ")")
+    :else (d/print-macro-arg val)))
+
 (defn- not-names->str
   [val]
   (let [s (not-names->seq val)
-        names-str (s/join ", " (map #(if (nil? %) "nil" (d/print-macro-arg %)) s))]
+        names-str (s/join ", " (map print-with-nil-and-seq s))]
         (if (= 1 (count s))
             (str names-str " is not a name.")
             (str names-str " are not names."))))
@@ -141,6 +148,15 @@
         (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
             (rest amp-and-after)
             '())))
+
+(defn missing-name
+  "Takes a value that's reported when defn is missing a name,
+   returns the message string with the printed value."
+  [val]
+  (str "Missing a function name"
+       (cond (nil? val) ", given nil instead."
+             (= val '()) "."
+             :else (str ", given " (d/print-macro-arg val) " instead."))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; Handling specific spec cases ;;;;;;;;;;;;;;;
