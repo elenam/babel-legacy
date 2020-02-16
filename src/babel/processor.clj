@@ -268,6 +268,10 @@
         error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
         (cond (u/has-match? probs-grouped {:path [:fn-name]})
                    (str error-name  (u/missing-name (:val (first problems))))
+              ;; Special case for defn since a string could be a doc-string and a map
+              ;; could be a pre/post-conditions map:
+              (and (= n 1) (u/has-match? probs-grouped {:path [:fn-tail] :reason "Insufficient input"}))
+                   (str error-name fn-name " is missing a vector of parameters.")
               (u/has-match? probs-grouped {:reason "Insufficient input", :pred :clojure.core.specs.alpha/binding-form})
                    (str error-name fn-name " is missing a name after &.")
               (u/has-every-match? probs-grouped

@@ -165,13 +165,22 @@
 (defn missing-vector-message
   [grouped-probs value]
   (if (= 1 (count grouped-probs))
-      (let [no-vectors? (empty? (filter vector? value))
-            val (:val (first (first (vals grouped-probs))))] ; replace by specter?
-            (if no-vectors?
-                (str "A function definition requires a vector of parameters, but was given "
-                     (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
+      (let [{:keys [val in pred]} (first (second (first grouped-probs)))
+            clause-n (first in)
+            before-n (take clause-n value)
+            named? (symbol? (first value))
+            start-clause (if named? 1 0)
+            no-vectors? (empty? (filter vector? value))]
+            (cond
+               (and (= pred 'clojure.core/vector?) (> clause-n start-clause))
+                    (str "A function definition requires a vector of parameters, but was given "
+                          (d/print-macro-arg (seq (sp/select-one (sp/srange start-clause (inc clause-n)) value)))
+                          " instead.")
+               no-vectors?
+                    (str "A function definition requires a vector of parameters, but was given "
+                         (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
                 ;; Perhaps should report the failing argument
-                "The function definition is missing a vector of parameters or it is misplaced."))
+                :else "The function definition is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
 
 (defn missing-vector-message-seq
@@ -205,7 +214,9 @@
         before-n (take clause-n value)
         clause-val (nth value clause-n)
         named? (symbol? (first value))
+        start-clause (if named? 1 0)
         has-vector? (some vector? before-n)
+        multi-clause? (every? sequential? (drop start-clause before-n))
         clause-to-report (if named? (dec clause-n) clause-n)
         clause-str (if (> clause-to-report 0)
                        (str "The issue is in the " (d/position-0-based->word clause-to-report) " clause.\n")
@@ -230,6 +241,11 @@
                  (str clause-str
                       (d/print-macro-arg clause-val)
                       " cannot be outside of a function body.")
+              (and (= pred 'clojure.core/vector?) (> clause-n start-clause) (not multi-clause?))
+                 (str clause-str
+                      "A function definition requires a vector of parameters, but was given "
+                      (d/print-macro-arg (sp/select-one (sp/srange start-clause (inc clause-n)) value))
+                      " instead.")
               (= pred 'clojure.core/vector?)
                  (str clause-str
                       "A function definition requires a vector of parameters, but was given "

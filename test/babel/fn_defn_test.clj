@@ -506,14 +506,22 @@ The function definition is missing a vector of parameters or it is misplaced."
 
 ;; Special case because "abc" is allowed as a doc-string
 (expect "Syntax problems with (defn a \"abc\"):
-???"
+defn is missing a vector of parameters."
 (log/babel-test-message "(defn a \"abc\")"))
 
 ;; Special case because {x y} is allowed as a pre-, post-
 ;; conditions map
 (expect "Syntax problems with (defn a {x y}):
-???"
+defn is missing a vector of parameters."
 (log/babel-test-message "(defn a {x y})"))
+
+(expect "Syntax problems with (defn a \"doc string\" 7):
+A function definition requires a vector of parameters, but was given \"doc string\" 7 instead."
+(log/babel-test-message "(defn a \"doc string\" 7)"))
+
+(expect "Syntax problems with (defn a {:pre x} {:a :m} 7):
+A function definition requires a vector of parameters, but was given {:pre x} {:a :m} instead."
+(log/babel-test-message "(defn a {:pre x} {:a :m} 7)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
