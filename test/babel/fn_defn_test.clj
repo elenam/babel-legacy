@@ -523,6 +523,22 @@ A function definition requires a vector of parameters, but was given \"doc strin
 A function definition requires a vector of parameters, but was given {:pre x} {:a :m} instead."
 (log/babel-test-message "(defn a {:pre x} {:a :m} 7)"))
 
+(expect "Syntax problems with (defn a [x & [5]] 2 3):
+& must be followed by exactly one name, but is followed by [5] instead."
+(log/babel-test-message "(defn a [x & [5]] 2 3)"))
+
+(expect "Syntax problems with (defn a [& 7] 8):
+& must be followed by exactly one name, but is followed by 7 instead."
+(log/babel-test-message "(defn a [& 7] 8)"))
+
+(expect "Syntax problems with (defn a \"doc string\" [x & 7] 8):
+& must be followed by exactly one name, but is followed by 7 instead."
+(log/babel-test-message "(defn a \"doc string\" [x & 7] 8)"))
+
+(expect "Syntax problems with (defn a {:pre x} [x & 7] 8):
+& must be followed by exactly one name, but is followed by 7 instead."
+(log/babel-test-message "(defn a {:pre x} [x & 7] 8)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

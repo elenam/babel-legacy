@@ -294,6 +294,15 @@
                                      (first (u/get-match probs-grouped
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                       value))
+              (u/has-every-match? probs-grouped
+                   [{:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}
+                    {:path [:fn-tail :arity-1 :params :var-params :var-form :seq-destructure]}
+                    {:path [:fn-tail :arity-1 :params :var-params :var-form :map-destructure]}
+                    {:pred 'clojure.core/vector?, :path [:fn-tail :arity-n :bodies :params]}])
+                  (str error-name (u/parameters-not-names
+                                     (first (u/get-match probs-grouped
+                                                  {:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}))
+                                     value))
               :else "Placeholder message for defn")))
 
 (defn- fn-macros
@@ -367,10 +376,8 @@
         fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
         fn-name (if (= (str fn-name-match) "clojure.core/fn") "fn" (d/get-function-name fn-name-match))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
-        val-str (d/print-macro-arg value) ; need to be consistent between val and value
+        val-str (d/print-macro-arg args) ; args is present in cases when there is no value (e.g. multi-arity defn)
         n (count problems)]
-        ;; If there is no value, I need to get the exc type and the messages from the second of via
-        ;; and pass it to processing.
         (cond (#{"fn"} fn-name) (fn-macros fn-name value problems)
               (#{"defn" "defn-"} fn-name) (defn-macros fn-name value problems)
               (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
