@@ -51,6 +51,10 @@ A function definition requires a vector of parameters, but was given {x y} inste
 A function definition requires a vector of parameters, but was given '(x y) instead."
 (log/babel-test-message "(fn '(x y))"))
 
+(expect "Syntax problems with (fn \\a 5):
+A function definition requires a vector of parameters, but was given \\a instead."
+(log/babel-test-message "(fn \\a 5)"))
+
 (expect "Syntax problems with (fn a '([])):
 A function definition requires a vector of parameters, but was given '([]) instead."
 (log/babel-test-message "(fn a '([]))"))

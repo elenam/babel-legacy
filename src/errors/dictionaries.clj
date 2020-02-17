@@ -320,6 +320,7 @@
    (cond
      (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
      (string? val) (str "\"" val "\"")
+     (char? val) (str "\\" val)
      (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
      (nil? val) "nil"
      (and (symbol? val) (= "quote" (str val))) "'"
