@@ -268,6 +268,10 @@
         error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
         (cond (u/has-match? probs-grouped {:path [:fn-name]})
                    (str error-name  (u/missing-name (:val (first problems))))
+              ;; Multi-arity defn fails with a non-informtive spec failure
+              (= n 0) (str error-name
+                           "Unexpected element(s) outside of the first clause: "
+                           (d/print-macro-arg (rest (drop-while #(not (seq? %)) value))))
               ;; Special case for defn since a string could be a doc-string and a map
               ;; could be a pre/post-conditions map:
               (and (= n 1) (u/has-match? probs-grouped {:path [:fn-tail] :reason "Insufficient input"}))
@@ -378,8 +382,8 @@
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg args) ; args is present in cases when there is no value (e.g. multi-arity defn)
         n (count problems)]
-        (cond (#{"fn"} fn-name) (fn-macros fn-name value problems)
-              (#{"defn" "defn-"} fn-name) (defn-macros fn-name value problems)
+        (cond (#{"fn"} fn-name) (fn-macros fn-name args problems)
+              (#{"defn" "defn-"} fn-name) (defn-macros fn-name args problems)
               (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")

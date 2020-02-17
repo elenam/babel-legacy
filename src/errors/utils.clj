@@ -110,6 +110,13 @@
   [grouped-probs m]
   (= (get-match grouped-probs m) (sp/select [sp/MAP-VALS sp/ALL] grouped-probs)))
 
+(defn doesnt-have-keys?
+  "Takes a spec failure and sequence of keys and returns
+  true if none of these keys are present in the spec
+  and false otherwise."
+  [prob ks]
+  (= [] (sp/select [sp/MAP-KEYS (into #{} ks)] prob)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; Various utils for handling specs ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

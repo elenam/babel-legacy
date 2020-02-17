@@ -539,6 +539,22 @@ A function definition requires a vector of parameters, but was given {:pre x} {:
 & must be followed by exactly one name, but is followed by 7 instead."
 (log/babel-test-message "(defn a {:pre x} [x & 7] 8)"))
 
+(expect "Syntax problems with (defn f {} ([+] 5 6) 7):
+Unexpected element(s) outside of the first clause: 7"
+(log/babel-test-message "(defn f {} ([+] 5 6) 7)"))
+
+(expect "Syntax problems with (defn f \"doc string\" ([x] 5 6) #{8} 8):
+Unexpected element(s) outside of the first clause: #{8} 8"
+(log/babel-test-message "(defn f \"doc string\" ([x] 5 6) #{8} 8)"))
+
+(expect "Syntax problems with (defn f \"doc string\" ([x] 5 6) #{8} (count '())):
+Unexpected element(s) outside of the first clause: #{8} (count '())"
+(log/babel-test-message "(defn f \"doc string\" ([x] 5 6) #{8} (count '()))"))
+
+(expect "Syntax problems with (defn f ([x] 6) ([9] 0)):
+Unexpected element(s) outside of the first clause: ([9] 0)"
+(log/babel-test-message "(defn f ([x] 6) ([9] 0))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
