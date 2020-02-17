@@ -344,7 +344,7 @@
    {:key :compiler-exception-same-arity
    :class "RuntimeException"
    :match (beginandend "Can't have 2 overloads with same arity")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The fn definition has two cases with the same number of arguments; only one case is allowed.\n"))}
+   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The function definition has two cases with the same number of arguments; only one case is allowed.\n"))}
 
     {:key :compiler-exception-recur-tail
     ;This error message needs to be improved

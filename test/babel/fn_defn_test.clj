@@ -565,11 +565,14 @@ Unexpected element(s) outside of the first clause: ([9] 0)"
 (expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"
 (log/babel-test-message "(fn [{a :a x}] [a x])"))
 
-(expect #"The fn definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
+(expect #"The function definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
 (log/babel-test-message "(fn ([x] 2 3) ([y] 3))"))
 
-(expect #"The fn definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
+(expect #"The function definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
 (log/babel-test-message "(fn ([x] 2 3) ([y] 3) ([x] 8))"))
+
+(expect #"The function definition has two cases with the same number of arguments; only one case is allowed\.(.*)"
+(log/babel-test-message "(defn f ([x] 2 3) ([y] 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; fn valid definitions (maps) ;;;;;;;;
