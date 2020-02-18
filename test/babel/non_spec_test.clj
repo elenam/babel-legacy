@@ -143,6 +143,9 @@
 (expect #"The 'case' input (\S+) didn't match any of the options."
 (log/babel-test-message "(case #(+ % 1))"))
 
+(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)There is no constructor for the class clojure.lang.ArityException with this number and type of arguments."
+(log/babel-test-message "(clojure.lang.ArityException. \"hello\")"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; IllegalStateException ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

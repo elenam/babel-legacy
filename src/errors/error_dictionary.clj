@@ -127,6 +127,11 @@
                                                           " doesn't work on "
                                                           (get-type (nth matches 2)) ".\n"))}
 
+    {:key :no-ctor-found
+    :class "IllegalArgumentException"
+    :match (beginandend #"No matching ctor found for class (.+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is no constructor for the class " (nth matches 1) " with this number and type of arguments.\n"))}
+
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################
