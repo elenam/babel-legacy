@@ -170,6 +170,9 @@
 
 (expect "Wrong number of args (2) passed to: f" (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
 
+;; Via CompilerException, probably because of inlining:
+(expect #"(?s)Syntax error \(ArityException\) compiling at \(:(\d+):(\d+)\)\.(.*)Wrong number of args (2) passed to: int" (log/babel-test-message "(int 4 5)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;; ClassCastException ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -182,15 +182,15 @@
           :arg-two (s/cat :collection (s/nilable coll?) :collection (s/nilable coll?) :value any?))))
 (stest/instrument `clojure.core/get-in)
 
-(s/fdef clojure.core/var-get
+#_(s/fdef clojure.core/var-get
   :args (s/and ::b-length-one
     (s/or :arg-one (s/cat :value var?))))
-(stest/instrument `clojure.core/var-get)
+#_(stest/instrument `clojure.core/var-get)
 
-(s/fdef clojure.core/future-cancel
+#_(s/fdef clojure.core/future-cancel
   :args (s/and ::b-length-one
     (s/or :arg-one (s/cat :future future?))))
-(stest/instrument `clojure.core/future-cancel)
+#_(stest/instrument `clojure.core/future-cancel)
 
 ; (s/fdef clojure.core/->>
 ;   :args (s/and ::b-length-greater-zero
@@ -328,12 +328,12 @@
 
 (s/fdef clojure.core/comp
   :args (s/and ::b-length-greater-zero
-            (s/cat :function (s/* any?))))
+               (s/cat :function (s/* any?))))
 (stest/instrument `clojure.core/comp)
 
 (s/fdef clojure.core/int
   :args (s/and ::b-length-one
-      (s/or :arg-one (s/alt :number number? :char char?))))
+               (s/or :number number? :char char?)))
 (stest/instrument `clojure.core/int)
 
 (s/def ::innervector (s/cat :symbol symbol? :b (s/* (s/cat :key keyword :symbol-or-collection (s/or :symbol symbol?
