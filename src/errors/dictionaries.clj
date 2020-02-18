@@ -272,7 +272,7 @@
   when given an anonymous function."
   [s]
   (cond (string? s) ["a string " (str "\"" s "\"")]
-        (nil? s) ["nil " "nil"]
+        (nil? s) ["" "nil"]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         :else (let [t (get-dictionary-type s)]
                    (cond

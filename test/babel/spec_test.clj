@@ -72,6 +72,8 @@
 
 (expect "The first argument of (contains? (1 2 3) 9) was expected to be a collection but is a list (1 2 3) instead." (log/babel-test-message "(contains? '(1 2 3) 9)"))
 
+(expect "The first argument of (take nil []) was expected to be a number but is nil instead." (log/babel-test-message "(take nil [])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
