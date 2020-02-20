@@ -78,7 +78,7 @@
   be nil) and the original repl error as :original. Also adds the code
   itself as :code"
   [code]
-  (let [modified-msg (get-error-parts (trap-response code))]
+  (let [modified-msg {:message "placeholder" :other (trap-response code)} #_(get-error-parts (trap-response code))]
     (if (:log? @counter)
       (let [original-msg (get-original-error)
             all-info (assoc modified-msg :original original-msg :code code)
@@ -91,7 +91,7 @@
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
   [code]
-  (:message (get-all-info code)))
+  (str (:modified (get-all-info code))))
 
 ;;calls add-l from html-log
 (defn add-log

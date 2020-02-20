@@ -80,8 +80,12 @@
 ;; Running (setup-exc) in repl does the trick.
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
-    (reset! track {:e % :message (record-message %)}) ; for debugging - and possibly for logging
-    (clojure.main/repl-caught (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
-                                                    "" (processor/process-message %)))))))
-    ;(clojure.repl/pst % 3))))
+    (let [modified (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
+                                                    "" (processor/process-message %)))
+          _ (reset! track {:e % :message (record-message %) :modified modified})] ; for debugging - and possibly for logging
+    ;(clojure.main/repl-caught
+    (pr modified))))
+                              ;#_(prn "Printing stack trace will go here, maybe")
+  #_(set! nrepl.middleware.print/*print-fn* (fn [val writer] (.write writer (str "I see " val)))))
+
 (defn reset-track [](reset! track {}))
