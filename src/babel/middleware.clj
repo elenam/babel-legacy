@@ -6,7 +6,8 @@
             [nrepl.middleware]
             [nrepl.middleware.caught]
             [clojure.repl]
-            [clojure.main :as cm :refer [ex-str ex-triage]])
+            [clojure.main :as cm :refer [ex-str ex-triage]]
+            [clojure.string :as s :refer [trim]])
   (:import nrepl.transport.Transport)
   (:gen-class))
 
@@ -80,12 +81,11 @@
 ;; Running (setup-exc) in repl does the trick.
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
-    (let [modified (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
+    (let [exc (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
                                                     "" (processor/process-message %)))
-          _ (reset! track {:e % :message (record-message %) :modified modified})] ; for debugging - and possibly for logging
-    ;(clojure.main/repl-caught
-    (pr modified))))
+          modified (s/trim (:message (first (:via (Throwable->map exc)))))
+          _ (reset! track {:message (record-message %) :modified modified})] ; for logging
+    (println modified)))))
                               ;#_(prn "Printing stack trace will go here, maybe")
-  #_(set! nrepl.middleware.print/*print-fn* (fn [val writer] (.write writer (str "I see " val)))))
 
 (defn reset-track [](reset! track {}))

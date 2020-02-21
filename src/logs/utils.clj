@@ -42,18 +42,28 @@
         message (if-not (nil? msg) (s/trim msg))]
       {:type type :at at :message (or message err-response) :line line :in in}))
 
-(defn get-original-error
-  ""
+; (defn get-original-error
+;   ""
+;   []
+    ; (with-open [conn (repl/connect :port server-port)]
+    ;     (-> (repl/client conn 1000)
+    ;         (repl/message {:op :eval :code "(:message (deref babel.middleware/track))"})
+    ;         doall
+    ;         first
+    ;         :value)))
+
+(defn get-tracked-errors
   []
-    (with-open [conn (repl/connect :port server-port)]
-        (-> (repl/client conn 1000)
-            (repl/message {:op :eval :code "(:message (deref babel.middleware/track))"})
-            doall
-            first
-            :value)))
+  (with-open [conn (repl/connect :port server-port)]
+      (-> (repl/client conn 1000)
+          (repl/message {:op :eval :code "(deref babel.middleware/track)"})
+          doall
+          first
+          :value ; returns a string, not a map
+          read-string)))
 
 (defn reset-error-tracking
-  ""
+  "Resets the atom used for tracking errors."
   []
     (with-open [conn (repl/connect :port server-port)]
         (-> (repl/client conn 1000)
@@ -66,11 +76,12 @@
   (swap! counter assoc :log? b))
 
 (defn write-log
+  "Writes the log files."
   [info]
-  (let [{:keys [message original code]} info
+  (let [{:keys [modified original code]} info
         _ (swap! counter update-in [:total] inc)
         _ (swap! counter update-in [:partial] inc)]
-    (write-html code (:total @counter) (:partial @counter) message original)))
+    (write-html code (:total @counter) (:partial @counter) modified original)))
 
 (defn get-all-info
   "Executes code and returns a map with the error part of the response
@@ -78,14 +89,13 @@
   be nil) and the original repl error as :original. Also adds the code
   itself as :code"
   [code]
-  (let [modified-msg {:message "placeholder" :other (trap-response code)} #_(get-error-parts (trap-response code))]
-    (if (:log? @counter)
-      (let [original-msg (get-original-error)
-            all-info (assoc modified-msg :original original-msg :code code)
+  (let [_ (trap-response code)]
+    (when (:log? @counter)
+      (let [{:keys [message modified]} (get-tracked-errors)
+            all-info (assoc {} :original message :modified modified :code code)
             _ (reset-error-tracking)
             _ (when (:log? @counter) (write-log all-info))]
-            all-info)
-      modified-msg)))
+            all-info))))
 
 (defn babel-test-message
   "Takes code as a string and returns the error message corresponding to the code
@@ -100,8 +110,9 @@
   (when (:log? @counter)
       (add-l file-name)))
 
-      ;;start of txt and html test log, including preset up
+;;start of txt and html test log, including preset up
 (defn start-log
+  ""
   []
   (when (:log? @counter)
     (do
