@@ -83,7 +83,7 @@
   (set! nrepl.middleware.caught/*caught-fn* #(do
     (let [exc (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
                                                     "" (processor/process-message %)))
-          modified (s/trim (:message (first (:via (Throwable->map exc)))))
+          modified (s/trim (:message (last (:via (Throwable->map exc)))))
           _ (reset! track {:message (record-message %) :modified modified})] ; for logging
     (println modified)))))
                               ;#_(prn "Printing stack trace will go here, maybe")

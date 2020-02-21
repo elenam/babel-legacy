@@ -101,7 +101,7 @@
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
   [code]
-  (str (:modified (get-all-info code))))
+  (:modified (get-all-info code)))
 
 ;;calls add-l from html-log
 (defn add-log
