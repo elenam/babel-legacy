@@ -196,6 +196,7 @@
          "original error: nil\n\n\n")))
 
 ;;saves the content into the txt log file
+;; TODO make consistent with the html log!
 (defn save-log
   [inp-code total modified original]
   (spit "./log/last_test.txt" (log-content
@@ -228,18 +229,18 @@
 
 (defn- replace-newlines
   [str]
-  (if str (s/replace (s/replace str "\\r\\n" "<br />") "\\n" "<br />") ""))
+  (if str (s/replace (s/replace str "\r\n" "<br />") "\n" "<br />") ""))
 
 ;;write html content
 (defn write-html
   [inp-code total partial modified original]
-  (let [orig-html (replace-newlines original)
-        orig-no-quot-marks (if-not (= orig-html "") (subs orig-html 1 (dec (count orig-html))) "")]
+  (let [orig-html (if (= original "") "nil" (replace-newlines original))
+        modified-html (if (= modified "") "nil" (replace-newlines modified))]
+        ;orig-no-quot-marks (if-not (= orig-html "") (subs orig-html 1 (dec (count orig-html))) "")]
   (spit (str "./log/history/" current-time ".html") (html-content
                                                       inp-code
                                                       total
                                                       partial
-                                                      modified
-                                                      ;; TODO: handle better!!!!
-                                                      (if (= original "nil") "nil" orig-no-quot-marks))
+                                                      modified-html
+                                                      orig-html)
                                                       :append true)))
