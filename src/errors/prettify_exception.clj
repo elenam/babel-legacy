@@ -122,7 +122,7 @@
         wrongvaltype (str/replace (str (type wrongval)) #"class " "")]
   (if (nil? (re-matches #"b-length(.*)" shouldbe))
       (if (nil? (re-matches #"b-(.*)" shouldbe))
-          (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.\n")
+          (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.")
           (str (process-another functname (arg-str location) shouldbe)))
       (str functname " can only take " (process-length shouldbe) "; received " (number-arg (str (count wrongval))) ".\n"))))
 

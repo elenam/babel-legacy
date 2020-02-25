@@ -142,7 +142,7 @@
            (stringify path)
            " but is "
            print-type print-val
-           " instead.\n"))))
+           " instead."))))
 
 (defn unknown-spec
   "determines if the spec function is ours or someone's else"

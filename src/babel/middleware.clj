@@ -37,7 +37,8 @@
   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" msg)]
        (clojure.lang.ArityException. (Integer/parseInt howmany) (d/get-function-name fname))))
 
-(defn make-exception [exc msg]
+(defn make-exception
+  [exc msg]
   (let [exc-class (class exc)
         {:keys [via data]} (Throwable->map exc)
         msg-arr (to-array [msg])]
@@ -77,15 +78,28 @@
   [e]
   (cm/ex-str (cm/ex-triage (Throwable->map e))))
 
+(defn- modify-message
+  [exc]
+  (let [exc-class (class exc)
+        {:keys [via data]} (Throwable->map exc)
+        msg-lookup (processor/process-message exc)
+        exc-info? (= clojure.lang.ExceptionInfo exc-class)
+        compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)
+        type2 (:type (second via))
+        has-lisp-reader-exc? (if type2 (= (resolve (:type (second via))) clojure.lang.LispReader$ReaderException) nil)
+        return-lookup? (or (and exc-info? has-lisp-reader-exc?)
+                           (and (not exc-info?) (not compiler-exc?)))
+        spec-message? (and exc-info? (= 1 (count via)))]
+        (cond spec-message? (processor/spec-message data)
+              return-lookup? msg-lookup
+              :else (s/trim (:message (last (:via (Throwable->map (make-exception exc (processor/process-message exc))))))))))
+
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
 (defn setup-exc []
   (set! nrepl.middleware.caught/*caught-fn* #(do
-    (let [exc (make-exception % (if (and (= clojure.lang.ExceptionInfo (class %)) (= 1 (count (:via (Throwable->map %)))))
-                                                    "" (processor/process-message %)))
-          modified (s/trim (:message (last (:via (Throwable->map exc)))))
+    (let [modified (modify-message %)
           _ (reset! track {:message (record-message %) :modified modified})] ; for logging
     (println modified)))))
-                              ;#_(prn "Printing stack trace will go here, maybe")
 
 (defn reset-track [](reset! track {}))
