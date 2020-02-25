@@ -82,7 +82,6 @@
   [exc]
   (let [exc-class (class exc)
         {:keys [via data]} (Throwable->map exc)
-        msg-lookup (processor/process-message exc)
         exc-info? (= clojure.lang.ExceptionInfo exc-class)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)
         type2 (:type (second via))
@@ -91,7 +90,7 @@
                            (and (not exc-info?) (not compiler-exc?)))
         spec-message? (and exc-info? (= 1 (count via)))]
         (cond spec-message? (processor/spec-message data)
-              return-lookup? msg-lookup
+              return-lookup? (processor/process-message exc)
               :else (s/trim (:message (last (:via (Throwable->map (make-exception exc (processor/process-message exc))))))))))
 
 ;; I don't seem to be able to bind this var in middleware.

@@ -180,18 +180,18 @@
 
 (defn spec-message
  "uses babel-spec-message"
- [exception]
- (let [{problem-list :clojure.spec.alpha/problems} exception
+ [data]
+ (let [{problem-list :clojure.spec.alpha/problems} data
        {:keys [pred]} (-> problem-list
                           filter-extra-spec-errors
                           first)]
  (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred)))
-     (babel-spec-message exception)
-     (unknown-spec exception))))
+     (babel-spec-message data)
+     (unknown-spec data))))
 
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
-;; name. Negativr positions are later discarded
+;; name. Negative positions are later discarded
 (def macro-predicates {#'clojure.core/simple-symbol? [0 " a name"],
   #'clojure.core/vector? [1 " a vector"], #'clojure.core/map? [2 " a hashmap"],
   #'clojure.core/qualified-keyword? [-1 " a keyword"],
