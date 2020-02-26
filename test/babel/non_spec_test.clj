@@ -27,7 +27,7 @@
 (expect #"(?s)Tried to divide by zero(.*)"
 (log/babel-test-message "(/ 70 0)"))
 
-(expect #"(?s)Tried to divide by zero(.*)" 
+(expect #"(?s)Tried to divide by zero(.*)"
 (log/babel-test-message "(/ 70 8 0)"))
 
 
@@ -47,7 +47,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 3-argument usage of 'into' has a transducer as its second argument. {} is a function
 ;; so it passes the type check, but throws a null pointer exception when applied.
-(expect #"(?s)An attempt to access a non-existing object (NullPointerException)\.(.*)"
+(expect #"(?s)An attempt to access a non-existing object \(NullPointerException\)\.(.*)"
 (log/babel-test-message "(into [] {} \"a\")"))
 
 
@@ -117,7 +117,7 @@
 (log/babel-test-message "(nil 5)"))
 
 ;; Eventually will need to fix the arg printing in this:
-(expect "You cannot call nil as a function. The expression was: (nil even? #(inc %1)"
+(expect "You cannot call nil as a function. The expression was: (nil even? #(inc %1))"
 (log/babel-test-message "(nil even? #(inc %))"))
 
 (expect #"(?s)You have duplicated the key 1, you cannot use the same key in a hashmap twice\.(.*)"
@@ -185,7 +185,8 @@
 (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
 
 ;; Via CompilerException, probably because of inlining:
-(expect #"(?s)Syntax error \(ArityException\) compiling at \(:(\d+):(\d+)\)\.(.*)Wrong number of args (2) passed to: int" (log/babel-test-message "(int 4 5)"))
+(expect "Wrong number of args (2) passed to: int"
+(log/babel-test-message "(int 4 5)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;; ClassCastException ;;;;;;;;;;;;;;;;;;;;;;;
@@ -237,4 +238,5 @@
 (expect nil (log/babel-test-message "(compare nil nil)"))
 
 ;; Lazy sequences aren't evaluated, give a class cast exception instead
-(expect "Expected a number, but a sequence was given instead." (log/babel-test-message "(take (range) (range))"))
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
+(log/babel-test-message "(take (range) (range))"))

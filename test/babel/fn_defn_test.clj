@@ -563,7 +563,7 @@ Unexpected element(s) outside of the first clause: ([9] 0)"
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Syntax error compiling at (.*)Name x is undefined\."
+(expect "Name x is undefined."
 (log/babel-test-message "(fn [{a x}] [a])"))
 
 (expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"

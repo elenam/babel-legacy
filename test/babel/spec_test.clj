@@ -131,32 +131,32 @@
 ;;;;;;;;;;;;;;Lazy Sequence;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Expected a number, but a sequence was given instead."
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
 (log/babel-test-message "(drop (range 20) (range 20))"))
 
-(expect "Expected a number, but a sequence was given instead."
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
 (log/babel-test-message "(rand (range))"))
 
-(expect "Expected a number, but a sequence was given instead."
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
 (log/babel-test-message "(rand-int (range 20))"))
 
-(expect "Expected a number, but a sequence was given instead."
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
 (log/babel-test-message "(mod (range 5) (range 10))"))
 
 ;; This is actually not a lazy sequence, it's a class cast exception on a call to > since > isn't specced
-(expect "Expected a number, but a character was given instead."
+(expect #"(?s)Expected a number, but a character was given instead\.(.*)"
 (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
-(expect "The function contains? doesn't work on a sequence."
+(expect #"(?s)The function contains\? doesn't work on a sequence\.(.*)"
 (log/babel-test-message "(contains? (range) 2)"))
 
-(expect "The function contains? doesn't work on a sequence."
+(expect #"(?s)The function contains\? doesn't work on a sequence\.(.*)"
 (log/babel-test-message "(contains? (drop 3 '(1 2 3)) 1)"))
 
-(expect "The function contains? doesn't work on a sequence."
+(expect #"(?s)The function contains\? doesn't work on a sequence\.(.*)"
 (log/babel-test-message "(contains? (seq [1 2 3]) 9)"))
 
-(expect "The function contains? doesn't work on a string."
+(expect #"(?s)The function contains\? doesn't work on a string\.(.*)"
 (log/babel-test-message "(contains?\"a\" (range))"))
 
 ;; This test will go away once the spec for max is fixed, will need to replace it by a function with custom-made

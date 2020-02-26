@@ -202,5 +202,5 @@ In place of 7 the following are allowed: a name or a vector or a hashmap"
 ;;;;;;;;;;;;;;Nested Error;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Expected a number, but a function was given instead."
+(expect #"(?s)Expected a number, but a function was given instead\.(.*)"
 (log/babel-test-message "(let [g (+ #(* %1 3) 2)] 7)"))
