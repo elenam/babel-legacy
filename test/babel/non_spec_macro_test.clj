@@ -27,16 +27,16 @@
 ;;;;;;;;;;;;;IllegalArgumentException;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Loop requires a vector for its binding\.(.*)"
+(expect "Loop requires a vector for its binding."
 (log/babel-test-message "(loop x 5 (+ x 5))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Parameters for cond must come in pairs, but one of them does not have a match\.(.*)"
+(expect "Parameters for cond must come in pairs, but one of them does not have a match."
 (log/babel-test-message "(cond 4 5 6)"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Parameters for cond must come in pairs, but one of them does not have a match\.(.*)"
+(expect "Parameters for cond must come in pairs, but one of them does not have a match."
 (log/babel-test-message "(cond 4)"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)when-some requires a vector for its binding\.(.*)"
+(expect "when-some requires a vector for its binding."
 (log/babel-test-message "(when-some 8)"))
 
 (expect #"when-some requires exactly two elements in its vector, but a different number was given\.(.*)"
@@ -48,11 +48,11 @@
 (expect #"if-some requires exactly two elements in its vector, but a different number was given\.(.*)"
 (log/babel-test-message "(if-some [4 7 8] 9)"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)when-first requires a vector for its binding\.(.*)"
+(expect "when-first requires a vector for its binding."
 (log/babel-test-message "(when-first 1 1 1)"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected two arguments but was given one argument\.(.*)"
+(expect "Recur expected two arguments but was given one argument."
 (log/babel-test-message "(fn [x y] (recur 5))"))
 
-(expect #"(?s)Syntax error \(IllegalArgumentException\) compiling at \(:(\d+):(\d+)\)\.(.*)Recur expected no arguments but was given one argument\.(.*)"
+(expect "Recur expected no arguments but was given one argument."
 (log/babel-test-message "(fn [] (recur 5))"))
