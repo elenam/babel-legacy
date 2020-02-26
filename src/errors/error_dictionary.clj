@@ -167,13 +167,13 @@
     {:key :wrong-number-of-args-passed-to-user-defined-one-arg
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+) ")
+    :match (beginandend "Wrong number of args \\(1\\) passed to: (\\S+)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 1))) :arg " cannot be called with one argument.\n"))}
 
     {:key :wrong-number-of-args-passed-to-user-defined-other
     ;we may want to find a way to make this less general
     :class "ArityException"
-    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*) ")
+    :match (beginandend "Wrong number of args \\((\\S*)\\) passed to: (\\S*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes (check-function-name (get-function-name (nth matches 2))) :arg " cannot be called with " (number-arg (nth matches 1)) :arg ".\n"))}
 
     ;#####################

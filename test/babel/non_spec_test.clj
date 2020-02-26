@@ -164,28 +164,26 @@
 ;;;;;;;;;;;;;;;;;;;;; ArityException ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; TODO: change the wording of this error!!!
-
-(expect "Wrong number of args (1) passed to: hello"
+(expect #"(?s)The function hello cannot be called with one argument\.(.*)"
 (log/babel-test-message "(defn hello [x y] (* x y)) (hello 1)"))
 
-(expect "Wrong number of args (0) passed to: hello"
+(expect #"(?s)The function hello cannot be called with no arguments\.(.*)"
 (log/babel-test-message "(defn hello [x y] (* x y)) (hello)"))
 
-(expect "Wrong number of args (3) passed to: hello"
+(expect #"(?s)The function hello cannot be called with three arguments\.(.*)"
 (log/babel-test-message "(defn hello [x y] (* x y)) (hello 1 2 3)"))
 
-(expect "Wrong number of args (1) passed to: anonymous function"
+(expect "Wrong number of args (1) passed to: anonymous function FIX"
 (log/babel-test-message "(map #(7) [0])"))
 
-(expect "Wrong number of args (2) passed to: anonymous function"
+(expect "Wrong number of args (2) passed to: anonymous function FIX"
 (log/babel-test-message "(map #(+ %1) [9] [0])"))
 
-(expect "Wrong number of args (2) passed to: f"
+(expect #"(?s)The function f cannot be called with two arguments\.(.*)"
 (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
 
 ;; Via CompilerException, probably because of inlining:
-(expect "Wrong number of args (2) passed to: int"
+(expect "Wrong number of args (2) passed to: int FIX"
 (log/babel-test-message "(int 4 5)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

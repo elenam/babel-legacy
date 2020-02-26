@@ -43,13 +43,6 @@
         {:keys [via data]} (Throwable->map exc)
         msg-arr (to-array [msg])]
        (cond
-         (and (= clojure.lang.ExceptionInfo exc-class) (= 1 (count via)))
-             (Exception. (processor/spec-message data)) ;; repl doesn't use the message of ExceptionInfo; we need to replace the exception type
-         (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.LispReader$ReaderException))
-             (clojure.lang.LispReader$ReaderException.
-               (:clojure.error/line (:data (second via)))
-               (:clojure.error/column (:data (second via)))
-               (clojure.lang.Reflector/invokeConstructor (resolve (:type (last via))) msg-arr))
           (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.ArityException))
               (process-arity-exception (:message (second via)))
           (= clojure.lang.ExceptionInfo exc-class)
