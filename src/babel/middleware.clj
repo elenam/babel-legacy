@@ -63,8 +63,6 @@
                                                                                  (str (:type (last via))
                                                                                   " "
                                                                                   (:message (last via))))))])))))
-          (= clojure.lang.ArityException exc-class)
-              (process-arity-exception (.getMessage exc))
           :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))
 
 (defn- record-message
@@ -74,16 +72,14 @@
 (defn- modify-message
   [exc]
   (let [exc-class (class exc)
-        {:keys [via data]} (Throwable->map exc)
+        {:keys [via data cause]} (Throwable->map exc)
+        [_ {:keys [type message]}] via ;; If type is bound, there is a nested exception
         exc-info? (= clojure.lang.ExceptionInfo exc-class)
-        compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)
-        type2 (:type (second via))
-        has-lisp-reader-exc? (if type2 (= (resolve (:type (second via))) clojure.lang.LispReader$ReaderException) nil)
-        return-lookup? (or (and exc-info? has-lisp-reader-exc?)
-                           (and (not exc-info?) (not compiler-exc?)))
-        spec-message? (and exc-info? (= 1 (count via)))]
-        (cond spec-message? (processor/spec-message data)
-              return-lookup? (processor/process-message exc)
+        compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)]
+        (cond (and exc-info? (not type)) (processor/spec-message data)
+              (not type) (processor/process-message exc)
+              (and type exc-info? (= (resolve type) clojure.lang.LispReader$ReaderException)) (processor/process-message exc)
+              (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
               :else (s/trim (:message (last (:via (Throwable->map (make-exception exc (processor/process-message exc))))))))))
 
 ;; I don't seem to be able to bind this var in middleware.

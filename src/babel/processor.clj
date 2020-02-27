@@ -25,6 +25,7 @@
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
+;; TODO: merge with the processing in middleware.clj
 (defn process-message
   "takes a Java Throwable object, and returns the adjusted message as a string."
   [err]
