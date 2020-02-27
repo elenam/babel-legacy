@@ -155,47 +155,54 @@ In place of '(1 2) the following are allowed: a name or a vector or a hashmap")
 In place of '(1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let ['(1 2) '(3 4)] #(+ %))"))
 
-(expect #"(?s)Syntax problems with \(let \['\(1 2\) '\(3 4\)\] '\(1 2 3 4\)\):(.*)In place of '\(1 2\) the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (let ['(1 2) '(3 4)] '(1 2 3 4)):
+In place of '(1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let ['(1 2) '(3 4)] '(1 2 3 4))"))
 
-(expect #"(?s)Syntax problems with \(let \[\(\+ 1 2\) \(\+ 1 2\)\] \[8\]\):(.*)In place of \+ 1 2 the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8]):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8])"))
 
-(expect #"(?s)Syntax problems with \(let \[\(\+ 1 2\) \(\+ 1 2\)\] \[8 #\(\+ %1\)\]\):(.*)In place of \+ 1 2 the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8 #(+ %1)]):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8 #(+ %)])"))
 
-(expect #"(?s)Syntax problems with \(let \[\(\+ 1 2\) \(\+ 1 2\)\] \"hello\"\):(.*)In place of \+ 1 2 the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\"):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\")"))
 
-(expect #"(?s)Syntax problems with \(let \[\(\+ 1 2\) \(\+ 1 2\)\] \"hello\" '\(8\)\):(.*)In place of \+ 1 2 the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\" '(8)):
+In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\" '(8))"))
 
-(expect #"(?s)Syntax problems with \(when-let \[7 8\]\):(.*)In place of 7 the following are allowed: a name or a vector or a hashmap(.*)"
+(expect (t/make-pattern "Syntax problems with (when-let [7 8]):
+In place of 7 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(when-let [7 8])"))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)if-let has too many parts here: \(if-let \[x false y true\] \"then\" \"else\"\) The extra parts are: y true(.*)"
+(expect (t/make-pattern "if-let has too many parts here: (if-let [x false y true] \"then\" \"else\") The extra parts are: y true")
 (log/babel-test-message "(if-let [x false y true] \"then\" \"else\")"))
 
-(expect #"(?s)if-let has too many parts here: \(if-let \[\[w n\] \(re-find #\"a(d\\\+)x\" \"aaa123xxx\"\)] \[w n\] :not-found :x\) The extra parts are: :x(.*)"
+(expect (t/make-pattern "if-let has too many parts here: (if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x) The extra parts are: :x")
 (log/babel-test-message "(if-let [[w n] (re-find #\"a(d+)x\" \"aaa123xxx\")] [w n] :not-found :x)"))
 
-(expect #"(?s)if-let has too many parts here: \(if-let \[a 8 #\(\+ %1\) #\(\+ %3\)\] 6 7\) The extra parts are: #\(\+ %1\) #\(\+ %3\)(.*)"
+(expect (t/make-pattern "if-let has too many parts here: (if-let [a 8 #(+ %1) #(+ %3)] 6 7) The extra parts are: #(+ %1) #(+ %3)")
 (log/babel-test-message "(if-let [a 8 #(+ %) #(+ %3)] 6 7)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Insufficient Input;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)when-let requires more parts than given here: \(when-let\)(.*)"
+(expect (t/make-pattern "when-let requires more parts than given here: (when-let)")
 (log/babel-test-message "(when-let)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Nested Error;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Expected a number, but a function was given instead\.(.*)"
+(expect (t/make-pattern "Expected a number, but a function was given instead.")
 (log/babel-test-message "(let [g (+ #(* %1 3) 2)] 7)"))

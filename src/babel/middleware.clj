@@ -47,8 +47,6 @@
               (process-arity-exception (:message (second via)))
           (= clojure.lang.ExceptionInfo exc-class)
               (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
-          (and (= clojure.lang.Compiler$CompilerException exc-class) (processor/macro-spec? exc))
-              (Exception. (processor/spec-macro-message exc))
           (= clojure.lang.Compiler$CompilerException exc-class)
               (clojure.lang.Compiler$CompilerException.
                 ""
