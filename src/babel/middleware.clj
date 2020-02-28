@@ -45,10 +45,8 @@
        (cond
           (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.ArityException))
               (process-arity-exception (:message (second via)))
-          (= clojure.lang.ExceptionInfo exc-class)
-              (clojure.lang.Reflector/invokeConstructor (resolve (:type (second via))) msg-arr)
-          (= clojure.lang.Compiler$CompilerException exc-class)
-              (clojure.lang.Compiler$CompilerException.
+          #_(= clojure.lang.Compiler$CompilerException exc-class)
+              #_(clojure.lang.Compiler$CompilerException.
                 ""
                 (:clojure.error/line (:data (first via)))
                 (:clojure.error/column (:data (first via)))
@@ -77,7 +75,9 @@
         (cond (and exc-info? (not type)) (processor/spec-message data)
               (not type) (processor/process-message exc)
               (and type exc-info? (= (resolve type) clojure.lang.LispReader$ReaderException)) (processor/process-message exc)
+              (and type exc-info?) (processor/process-message exc)
               (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
+              (and type compiler-exc?) (msg-o/get-all-text (:msg-info-obj (p-exc/process-errors (str type " " message))))
               :else (s/trim (:message (last (:via (Throwable->map (make-exception exc (processor/process-message exc))))))))))
 
 ;; I don't seem to be able to bind this var in middleware.

@@ -1,7 +1,8 @@
 (ns babel.non-spec-test
   (:require
    [expectations :refer :all]
-   [logs.utils :as log]))
+   [logs.utils :as log]
+   [babel.utils-for-testing :as t]))
 
 ;#########################################
 ;### Tests for errors that aren't      ###
@@ -62,25 +63,25 @@
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Too many arguments to def."
+(expect (t/make-pattern "Too many arguments to def.")
 (log/babel-test-message "(def 7 8 9)"))
 
-(expect "Name orange is undefined."
+(expect (t/make-pattern "Name orange is undefined.")
 (log/babel-test-message "(+ orange 3)"))
 
-(expect "Name kiwi is undefined."
+(expect (t/make-pattern "Name kiwi is undefined.")
 (log/babel-test-message "(kiwi)"))
 
-(expect "Name def is undefined."
+(expect (t/make-pattern "Name def is undefined.")
 (log/babel-test-message "def"))
 
-(expect "def must be followed by a name."
+(expect (t/make-pattern "def must be followed by a name.")
 (log/babel-test-message "(def 2 3)"))
 
-(expect "let is a macro and cannot be used by itself or passed to a function."
+(expect (t/make-pattern "let is a macro and cannot be used by itself or passed to a function.")
 (log/babel-test-message "(even? let)"))
 
-(expect "let is a macro and cannot be used by itself or passed to a function."
+(expect (t/make-pattern "let is a macro and cannot be used by itself or passed to a function.")
 (log/babel-test-message "let"))
 
 (expect #"(?s)Too few arguments to if\."
@@ -126,16 +127,16 @@
 (expect #"(?s)You have duplicated the key 1, you cannot use the same key in a hashmap twice\.(.*)"
 (log/babel-test-message "{1 0 (- 3 2) 8}"))
 
-(expect "Recur expected no arguments but was given one argument."
+(expect (t/make-pattern "Recur expected no arguments but was given one argument.")
 (log/babel-test-message "(loop [] (recur 5))"))
 
-(expect "Recur expected one argument but was given no arguments."
+(expect (t/make-pattern "Recur expected one argument but was given no arguments.")
 (log/babel-test-message "(loop [x 2] (recur))"))
 
-(expect "Recur expected two arguments but was given one argument."
+(expect (t/make-pattern "Recur expected two arguments but was given one argument.")
 (log/babel-test-message "(defn f[x y] (if x 1 (recur 2)))"))
 
-(expect "Recur expected one argument but was given two arguments."
+(expect (t/make-pattern "Recur expected one argument but was given two arguments.")
 (log/babel-test-message "(fn [x] (recur 2 3))"))
 
 (expect #"(?s)The 'case' input 13 didn't match any of the options\.(.*)"
@@ -150,7 +151,7 @@
 (expect #"(?s)The 'case' input (\S+) didn't match any of the options\.(.*)"
 (log/babel-test-message "(case #(+ % 1))"))
 
-(expect "There is no constructor for the class clojure.lang.ArityException with this number and type of arguments."
+(expect (t/make-pattern "There is no constructor for the class clojure.lang.ArityException with this number and type of arguments.")
 (log/babel-test-message "(clojure.lang.ArityException. \"hello\")"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,17 +174,17 @@
 (expect #"(?s)The function hello cannot be called with three arguments\.(.*)"
 (log/babel-test-message "(defn hello [x y] (* x y)) (hello 1 2 3)"))
 
-(expect "Wrong number of args (1) passed to: anonymous function FIX"
+(expect (t/make-pattern "This anonymous function cannot be called with one argument.")
 (log/babel-test-message "(map #(7) [0])"))
 
-(expect "Wrong number of args (2) passed to: anonymous function FIX"
+(expect (t/make-pattern "This anonymous function cannot be called with two arguments.")
 (log/babel-test-message "(map #(+ %1) [9] [0])"))
 
 (expect #"(?s)The function f cannot be called with two arguments\.(.*)"
 (log/babel-test-message "(defn f[x] (inc x)) (f 5 6)"))
 
 ;; Via CompilerException, probably because of inlining:
-(expect "Wrong number of args (2) passed to: int FIX"
+(expect (t/make-pattern "The function int cannot be called with two arguments.")
 (log/babel-test-message "(int 4 5)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
