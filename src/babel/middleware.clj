@@ -50,7 +50,6 @@
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)]
         (cond (and exc-info? (not type)) (processor/spec-message data)
               (not type) (processor/process-message exc)
-              (and type exc-info? (= (resolve type) clojure.lang.LispReader$ReaderException)) (processor/process-message exc)
               (and type exc-info?) (processor/process-message exc)
               (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
               (and type compiler-exc?) (msg-o/get-all-text (:msg-info-obj (p-exc/process-errors (str type " " message))))
