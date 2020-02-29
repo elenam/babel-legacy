@@ -93,7 +93,7 @@ In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] (+ 1 2))"))
 
 (expect (t/make-pattern "Syntax problems with (let [[[3 4] [5 6]] y]):
-In place of [3 4] [5 6] the following are allowed: a name or a hashmap")
+In place of [[3 4] [5 6]] the following are allowed: a name or a hashmap")
 (log/babel-test-message "(let [[[3 4] [5 6]] y])"))
 
 (expect (t/make-pattern "Syntax problems with (let [5 x]):

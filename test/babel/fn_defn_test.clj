@@ -1,7 +1,8 @@
 (ns babel.fn-defn-test
   (:require
    [expectations :refer :all]
-   [logs.utils :as log]))
+   [logs.utils :as log]
+   [babel.utils-for-testing :as t]))
 
 ;#############################################
 ;### Tests for fn and defn (specced macros)###
@@ -563,7 +564,7 @@ Unexpected element(s) outside of the first clause: ([9] 0)"
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect "Name x is undefined."
+(expect (t/make-pattern "Name x is undefined.")
 (log/babel-test-message "(fn [{a x}] [a])"))
 
 (expect #"You have a key that's missing a value; a hashmap must consist of key/value pairs\.(.*)"

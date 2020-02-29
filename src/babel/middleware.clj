@@ -37,30 +37,6 @@
   (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" msg)]
        (clojure.lang.ArityException. (Integer/parseInt howmany) (d/get-function-name fname))))
 
-(defn make-exception
-  [exc msg]
-  (let [exc-class (class exc)
-        {:keys [via data]} (Throwable->map exc)
-        msg-arr (to-array [msg])]
-       (cond
-          (and (= clojure.lang.ExceptionInfo exc-class) (= (resolve (:type (second via))) clojure.lang.ArityException))
-              (process-arity-exception (:message (second via)))
-          #_(= clojure.lang.Compiler$CompilerException exc-class)
-              #_(clojure.lang.Compiler$CompilerException.
-                ""
-                (:clojure.error/line (:data (first via)))
-                (:clojure.error/column (:data (first via)))
-                (let [inner-exc-class (resolve (:type (last via)))]
-                     (if (= clojure.lang.ArityException inner-exc-class)
-                         (process-arity-exception (:message (last via)))
-                         (clojure.lang.Reflector/invokeConstructor inner-exc-class
-                                                                   (to-array [(msg-o/get-all-text
-                                                                              (:msg-info-obj (p-exc/process-errors
-                                                                                 (str (:type (last via))
-                                                                                  " "
-                                                                                  (:message (last via))))))])))))
-          :else (clojure.lang.Reflector/invokeConstructor exc-class msg-arr))))
-
 (defn- record-message
   [e]
   (cm/ex-str (cm/ex-triage (Throwable->map e))))
@@ -78,7 +54,7 @@
               (and type exc-info?) (processor/process-message exc)
               (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
               (and type compiler-exc?) (msg-o/get-all-text (:msg-info-obj (p-exc/process-errors (str type " " message))))
-              :else (s/trim (:message (last (:via (Throwable->map (make-exception exc (processor/process-message exc))))))))))
+              :else "This shouldn't happen")))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
