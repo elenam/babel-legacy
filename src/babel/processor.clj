@@ -25,40 +25,13 @@
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
-;; TODO: merge with the processing in middleware.clj
 (defn process-message
-  "takes a Java Throwable object, and returns the adjusted message as a string."
-  [err]
-  (let [errmap (Throwable->map err)
-        throwvia (:via errmap)
-        viacount (count throwvia)
-        errclass (str (:type (first throwvia)))
-        errdata (:data errmap)]
-    (if (and (= "clojure.lang.ExceptionInfo" errclass) (= viacount 1))
-        (p-exc/process-spec-errors (str (.getMessage err)) errdata true)
-        (if (= "clojure.lang.Compiler$CompilerException" errclass)
-        ;; TO-DO: refactor this function and get rid of its uses on ExceptionInfo
-          "";(p-exc/process-macro-errors err errclass (ex-data err))
-          (if (and (= "clojure.lang.ExceptionInfo" errclass) (> viacount 1))
-            (str
-              (->> throwvia
-                   reverse
-                   first
-                   :message
-                   (str (:type (first (reverse throwvia))) " ")
-                   p-exc/process-errors
-                   :msg-info-obj
-                   m-obj/get-all-text)
-              (p-exc/process-stacktrace err))
-            (str
-              (->> err
-                   .getMessage
-                   (str errclass " ")
-                   p-exc/process-errors
-                   :msg-info-obj
-                   m-obj/get-all-text)
-              (p-exc/process-stacktrace err)))))))
-
+  "Takes a type and a message and returns a string based on the match found in error
+  dictionary"
+  [t m]
+  (->> (p-exc/process-errors (str t " " m))
+       :msg-info-obj
+       m-obj/get-all-text))
 
 (defn macro-spec?
   "Takes an exception object. Returns a true value if it's a spec error for a macro,

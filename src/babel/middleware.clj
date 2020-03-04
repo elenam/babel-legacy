@@ -49,10 +49,10 @@
         exc-info? (= clojure.lang.ExceptionInfo exc-class)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)]
         (cond (and exc-info? (not type)) (processor/spec-message data)
-              (not type) (processor/process-message exc)
-              (and type exc-info?) (processor/process-message exc)
+              (not type) (processor/process-message exc-class cause)
+              (and type exc-info?) (processor/process-message type message)
               (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
-              (and type compiler-exc?) (msg-o/get-all-text (:msg-info-obj (p-exc/process-errors (str type " " message))))
+              (and type compiler-exc?) (processor/process-message type message)
               :else "This shouldn't happen")))
 
 ;; I don't seem to be able to bind this var in middleware.
