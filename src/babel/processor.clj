@@ -378,4 +378,9 @@
          source :clojure.error/source} (:data via1)]
        (str "In file " source " on line " line " at position " column)))
 
+ (defn location-function-spec
+   [data]
+   (let [{:keys [line file]} (:clojure.spec.test.alpha/caller data)]
+        (str "In file " file " on line " line)))
+
 (println "babel.processor loaded")
