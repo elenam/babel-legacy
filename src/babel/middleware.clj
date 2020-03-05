@@ -50,7 +50,8 @@
         exc-info? (= clojure.lang.ExceptionInfo exc-type)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
         (cond (and exc-info? (not nested?)) (processor/spec-message data)
-              (and nested? compiler-exc? (processor/macro-spec? cause via)) (processor/spec-macro-message exc)
+              (and nested? compiler-exc? (processor/macro-spec? cause via))
+                   (str (processor/spec-macro-message exc) (processor/location-macro-spec via))
               :else (processor/process-message type message))))
 
 ;; I don't seem to be able to bind this var in middleware.

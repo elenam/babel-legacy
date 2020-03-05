@@ -371,4 +371,11 @@
                    (let-macros fn-name value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
+(defn location-macro-spec
+  [[via1]]
+  (let [{line :clojure.error/line
+         column :clojure.error/column
+         source :clojure.error/source} (:data via1)]
+       (str "In file " source " on line " line " at position " column)))
+
 (println "babel.processor loaded")
