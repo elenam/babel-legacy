@@ -36,12 +36,9 @@
 (defn macro-spec?
   "Takes an exception object. Returns a true value if it's a spec error for a macro,
    a false value otherwise."
-  [exc]
-  (let [exc-map (Throwable->map exc)
-        {:keys [via cause]} exc-map]
-      (and (> (count via) 1)
-           (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
-           (re-matches #"Call to (.*) did not conform to spec." cause))))
+  [cause via]
+   (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
+        (re-matches #"Call to (.*) did not conform to spec." cause)))
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
@@ -67,7 +64,8 @@
       (or (->> (rest vector-of-keywords)
                (map #(spec-ref %))
                (filter #(not (nil? %)))
-               first) "unknown condition")))
+               first)
+           "unknown condition")))
 
 (defn has-alpha-nil?
   [{:keys [path]}]

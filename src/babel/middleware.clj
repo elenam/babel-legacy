@@ -43,17 +43,15 @@
 
 (defn- modify-message
   [exc]
-  (let [exc-class (class exc)
+  (let [exc-type (class exc)
         {:keys [via data cause]} (Throwable->map exc)
-        [_ {:keys [type message]}] via ;; If type is bound, there is a nested exception
-        exc-info? (= clojure.lang.ExceptionInfo exc-class)
-        compiler-exc? (= clojure.lang.Compiler$CompilerException exc-class)]
-        (cond (and exc-info? (not type)) (processor/spec-message data)
-              (not type) (processor/process-message exc-class cause)
-              (and type exc-info?) (processor/process-message type message)
-              (and type compiler-exc? (processor/macro-spec? exc)) (processor/spec-macro-message exc)
-              (and type compiler-exc?) (processor/process-message type message)
-              :else "This shouldn't happen")))
+        nested? (> (count via) 1)
+        {:keys [type message]} (last via)
+        exc-info? (= clojure.lang.ExceptionInfo exc-type)
+        compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
+        (cond (and exc-info? (not nested?)) (processor/spec-message data)
+              (and nested? compiler-exc? (processor/macro-spec? cause via)) (processor/spec-macro-message exc)
+              :else (processor/process-message type message))))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
