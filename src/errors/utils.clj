@@ -273,3 +273,18 @@
         prob (first less-nested-groups)
         val (:val prob)]
         (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
+
+;; ########################################################
+;; ########## Utils for getting error location ############
+;; ########################################################
+
+(defn get-line-info
+  "Takes a list of nested exceptions obained by 'via' and attempts to find
+   the line/column/source info. Returns a map (possibly partially) filled in
+   with this info. Non-found fields are mapped to nil."
+  [via]
+  (let [v (sp/select [sp/ALL :data (sp/submap [:clojure.error/line :clojure.error/column])] via)
+        {line :clojure.error/line
+         column :clojure.error/column
+         source :clojure.error/source} (sp/select-first [sp/ALL #(not (empty? %))] v)]
+        {:line line :column column :source source}))

@@ -44,17 +44,17 @@
 (defn- modify-message
   [exc]
   (let [exc-type (class exc)
-        {:keys [via data cause]} (Throwable->map exc)
+        {:keys [via data cause trace]} (Throwable->map exc)
         nested? (> (count via) 1)
         {:keys [type message]} (last via)
         exc-info? (= clojure.lang.ExceptionInfo exc-type)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
-        (cond (or (and exc-info? (not nested?))
+        (cond (and nested? compiler-exc? (processor/macro-spec? cause via))
+                   (str (processor/spec-macro-message exc) "\n" (processor/location-macro-spec via))
+              (or (and exc-info? (not nested?))
                   (and compiler-exc? (= clojure.lang.ExceptionInfo (resolve type))))
-                   (str (processor/spec-message data) "\n" (processor/location-function-spec data))
-              (and nested? compiler-exc? (processor/macro-spec? cause via))
-                   (str (processor/spec-macro-message exc) (processor/location-macro-spec via))
-              :else (processor/process-message type message))))
+                  (str (processor/spec-message data) "\n" (processor/location-function-spec data))
+              :else (str (processor/process-message type message) "\n" (processor/location-non-spec via trace)))))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
@@ -64,4 +64,4 @@
           _ (reset! track {:message (record-message %) :modified modified})] ; for logging
     (println modified)))))
 
-(defn reset-track [](reset! track {}))
+(defn reset-track [] (reset! track {}))

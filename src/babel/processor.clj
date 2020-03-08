@@ -372,6 +372,8 @@
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
 (defn location-macro-spec
+  "Takes the first element of via for a macro spec, returns a string
+   with the location of the error."
   [[via1]]
   (let [{line :clojure.error/line
          column :clojure.error/column
@@ -379,8 +381,16 @@
        (str "In file " source " on line " line " at position " column)))
 
  (defn location-function-spec
+   "Takes data of a function spec, returns a string with the location
+   of the error."
    [data]
    (let [{:keys [line file]} (:clojure.spec.test.alpha/caller data)]
         (str "In file " file " on line " line)))
+
+(defn location-non-spec
+  [via trace]
+  (let [{:keys [line file column]} (u/get-line-info via)
+        ]
+       (str "In file " file " on line " line " at position " column)))
 
 (println "babel.processor loaded")

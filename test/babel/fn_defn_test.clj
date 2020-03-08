@@ -2,6 +2,7 @@
   (:require
    [expectations :refer :all]
    [logs.utils :as log]
+   [babel.non-spec-test :refer [to-log?]]
    [babel.utils-for-testing :as t]))
 
 ;#############################################
@@ -10,9 +11,7 @@
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
 
-(def to-log? true)
-
-(expect #(not= % nil) (log/set-log to-log?))
+(expect #(not= % nil) (log/set-log babel.non-spec-test/to-log?))
 
 (expect nil (log/add-log
               (do
