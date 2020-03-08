@@ -375,22 +375,26 @@
   "Takes the first element of via for a macro spec, returns a string
    with the location of the error."
   [[via1]]
-  (let [{line :clojure.error/line
-         column :clojure.error/column
-         source :clojure.error/source} (:data via1)]
+  (let [{source :clojure.error/source
+         line :clojure.error/line
+         column :clojure.error/column} (:data via1)]
        (str "In file " source " on line " line " at position " column)))
 
  (defn location-function-spec
    "Takes data of a function spec, returns a string with the location
    of the error."
    [data]
-   (let [{:keys [line file]} (:clojure.spec.test.alpha/caller data)]
-        (str "In file " file " on line " line)))
+   (let [{:keys [source line]} (:clojure.spec.test.alpha/caller data)]
+        (str "In file " source " on line " line)))
 
+;; TODO: handle cases of missing file name or other info
 (defn location-non-spec
   [via trace]
-  (let [{:keys [line file column]} (u/get-line-info via)
-        ]
-       (str "In file " file " on line " line " at position " column)))
+  (let [{:keys [source line column]} (u/get-line-info via)
+        [s l c] (if (= nil source line column)
+                    (let [{:keys [source line]} (u/get-line-info-from-at via)]
+                          [source line nil])
+                    [source line column])]
+       (str "In file " s " on line " l " at position " c)))
 
 (println "babel.processor loaded")

@@ -111,14 +111,14 @@
 (log/babel-test-message "(hash-map :1 1, :2)"))
 
 ;; Might want to change the printing of CompilerException; definitely want to report the form (it's in the exception)
-(expect "You cannot call nil as a function. The expression was: (nil)"
+(expect (t/make-pattern "You cannot call nil as a function. The expression was: (nil)")
 (log/babel-test-message "(nil)"))
 
-(expect "You cannot call nil as a function. The expression was: (nil 5)"
+(expect (t/make-pattern "You cannot call nil as a function. The expression was: (nil 5)")
 (log/babel-test-message "(nil 5)"))
 
 ;; Eventually will need to fix the arg printing in this:
-(expect "You cannot call nil as a function. The expression was: (nil even? #(inc %1))"
+(expect (t/make-pattern "You cannot call nil as a function. The expression was: (nil even? #(inc %1))")
 (log/babel-test-message "(nil even? #(inc %))"))
 
 (expect #"(?s)You have duplicated the key 1, you cannot use the same key in a hashmap twice\.(.*)"

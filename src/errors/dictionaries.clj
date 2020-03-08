@@ -400,9 +400,3 @@
        (s/join " " (macro-args-rec val))))
   ([val open-sym close-sym]
    (str open-sym (s/join " " (macro-args-rec val)) close-sym)))
-
-(defn let-is-fn?
-  "Takes the stacktrace of a failed let spec and determines if it is the result
-  of compiling fn/defn"
-  [tr]
-  (filter #(= % 'clojure.lang.Compiler$FnExpr) (map first tr)))

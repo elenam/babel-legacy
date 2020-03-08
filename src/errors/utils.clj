@@ -275,12 +275,28 @@
         (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
 
 ;; ########################################################
+;; ######## Utils for stack trace processing ##############
+;; ########################################################
+
+(def excluded-ns #{"clojure.core" "clojure.string" "clojure.lang"
+                   "clojure.main"})
+
+(defn allowed-ns?
+  "Takes vector mapped to :at in the 'via' list of an exception
+   and returns true if its first element doesn't start
+   with any of the excluded namespaces and false otherwise"
+  [s]
+  (let [ns-element (str (first s))]
+       (every? #(not (s/starts-with? ns-element %)) excluded-ns)))
+
+;; ########################################################
 ;; ########## Utils for getting error location ############
 ;; ########################################################
 
 (defn get-line-info
-  "Takes a list of nested exceptions obained by 'via' and attempts to find
-   the line/column/source info. Returns a map (possibly partially) filled in
+  "Takes the 'via' list of nested exceptions and attempts to find
+   the line/column/source info given direrctly in via elements.
+   Returns a map (possibly partially) filled in
    with this info. Non-found fields are mapped to nil."
   [via]
   (let [v (sp/select [sp/ALL :data (sp/submap [:clojure.error/line :clojure.error/column])] via)
@@ -288,3 +304,11 @@
          column :clojure.error/column
          source :clojure.error/source} (sp/select-first [sp/ALL #(not (empty? %))] v)]
         {:line line :column column :source source}))
+
+(defn get-line-info-from-at
+  "Takes the 'via' list of nested exceptions and attempts to find
+   the line/source info in the 'at' looking for a first"
+  [via]
+  (let [all-at (sp/select [sp/ALL (sp/submap [:at]) sp/MAP-VALS] via)
+        [_ _ source line] (sp/select-first [sp/ALL allowed-ns?] all-at)]
+        {:line line :source source}))
