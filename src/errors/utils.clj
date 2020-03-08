@@ -282,12 +282,24 @@
                    "clojure.main"})
 
 (defn allowed-ns?
-  "Takes vector mapped to :at in the 'via' list of an exception
+  "Takes a stacktrace element of an exception
    and returns true if its first element doesn't start
-   with any of the excluded namespaces and false otherwise"
+   with any of the excluded namespaces, and false otherwise"
   [s]
   (let [ns-element (str (first s))]
        (every? #(not (s/starts-with? ns-element %)) excluded-ns)))
+
+(defn allowed-ns-invoke-static?
+  [s]
+  "Takes a stacktrace element of an exception
+   and returns true if its method is \"invokeStatic\"
+   and its first element doesn't start
+   with any of the excluded namespaces, and false otherwise"
+  (let [[ne m] s
+        ns-element (str ne)
+        method (str m)]
+        (and (= method "invokeStatic")
+             (every? #(not (s/starts-with? ns-element %)) excluded-ns))))
 
 ;; ########################################################
 ;; ########## Utils for getting error location ############
@@ -312,3 +324,10 @@
   (let [all-at (sp/select [sp/ALL (sp/submap [:at]) sp/MAP-VALS] via)
         [_ _ source line] (sp/select-first [sp/ALL allowed-ns?] all-at)]
         {:line line :source source}))
+
+(defn get-line-info-from-stacktrace
+  "Takes a stacktrace and returns the first element with invokeStatic
+   that's not in the excluded namespaces"
+  [tr]
+  (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
+       {:line line :source source}))

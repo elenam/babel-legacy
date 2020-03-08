@@ -391,10 +391,14 @@
 (defn location-non-spec
   [via trace]
   (let [{:keys [source line column]} (u/get-line-info via)
-        [s l c] (if (= nil source line column)
+        [s1 l1 c1] (if (= nil source line column)
                     (let [{:keys [source line]} (u/get-line-info-from-at via)]
                           [source line nil])
-                    [source line column])]
+                    [source line column])
+        [s l c] (if (= nil s1 l1 c1)
+                    (let [{:keys [source line]} (u/get-line-info-from-stacktrace trace)]
+                          [source line nil])
+                    [s1 l1 c1])]
        (str "In file " s " on line " l " at position " c)))
 
 (println "babel.processor loaded")
