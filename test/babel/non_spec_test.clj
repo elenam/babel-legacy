@@ -25,7 +25,8 @@
 ;;;;;;;;;;;;;;;;;ArithmeticExceptions;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect #"(?s)Tried to divide by zero(.*)"
+(expect (t/make-pattern #"(?s)Tried to divide by zero(.*)"
+                        #"In file (.+) on line (\d+)\.") ;; No position number in the exception
 (log/babel-test-message "(/ 70 0)"))
 
 (expect #"(?s)Tried to divide by zero(.*)"
@@ -63,19 +64,27 @@
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect (t/make-pattern "Too many arguments to def.")
+(expect (t/make-pattern "Too many arguments to def."
+                                         #"(.*)"
+                                         #"In file (.+) on line (\d+) at position (\d+)\.")
 (log/babel-test-message "(def 7 8 9)"))
 
-(expect (t/make-pattern "Name orange is undefined.")
+(expect (t/make-pattern "Name orange is undefined."
+                        #"(.*)"
+                        #"In file (.+) on line (\d+) at position (\d+)\.")
 (log/babel-test-message "(+ orange 3)"))
 
 (expect (t/make-pattern "Name kiwi is undefined.")
 (log/babel-test-message "(kiwi)"))
 
-(expect (t/make-pattern "Name def is undefined.")
+(expect (t/make-pattern "Name def is undefined."
+                        #"(.*)"
+                        #"In file (.+) on line (\d+) at position (\d+)\.")
 (log/babel-test-message "def"))
 
-(expect (t/make-pattern "def must be followed by a name.")
+(expect (t/make-pattern "def must be followed by a name."
+                        #"(.*)"
+                        #"In file (.+) on line (\d+) at position (\d+)\.")
 (log/babel-test-message "(def 2 3)"))
 
 (expect (t/make-pattern "let is a macro and cannot be used by itself or passed to a function.")
@@ -84,7 +93,9 @@
 (expect (t/make-pattern "let is a macro and cannot be used by itself or passed to a function.")
 (log/babel-test-message "let"))
 
-(expect #"(?s)Too few arguments to if\."
+(expect (t/make-pattern #"(?s)Too few arguments to if\."
+                        #"(.*)"
+                        #"In file (.+) on line (\d+) at position (\d+)\.")
 (log/babel-test-message "(if)"))
 
 (expect #"(?s)Too many arguments to if\."

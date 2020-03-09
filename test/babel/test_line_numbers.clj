@@ -22,6 +22,12 @@
 
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
-                        "In file sample1.clj on line 5")
+                        "In file sample1.clj on line 10.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                          (sample-test-files.sample1/div0-test)"))
+
+(expect (t/make-pattern "The second argument of (take 4 5) was expected to be a sequence but is a number 5 instead."
+                        #"(.*)"
+                        "In file sample1.clj on line 14.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/take-test)"))

@@ -279,7 +279,7 @@
 ;; ########################################################
 
 (def excluded-ns #{"clojure.core" "clojure.string" "clojure.lang"
-                   "clojure.main"})
+                   "clojure.main" "nrepl.middleware"})
 
 (defn allowed-ns?
   "Takes a stacktrace element of an exception
@@ -311,7 +311,9 @@
    Returns a map (possibly partially) filled in
    with this info. Non-found fields are mapped to nil."
   [via]
-  (let [v (sp/select [sp/ALL :data (sp/submap [:clojure.error/line :clojure.error/column])] via)
+  (let [v (sp/select [sp/ALL :data
+                             (sp/submap [:clojure.error/line :clojure.error/column :clojure.error/source])]
+                      via)
         {line :clojure.error/line
          column :clojure.error/column
          source :clojure.error/source} (sp/select-first [sp/ALL #(not (empty? %))] v)]
@@ -319,7 +321,10 @@
 
 (defn get-line-info-from-at
   "Takes the 'via' list of nested exceptions and attempts to find
-   the line/source info in the 'at' looking for a first"
+   the line/source info in the 'at' looking for a first occurence of
+   a non-excluded namespace.
+   Returns a map (possibly partially) filled in
+   with this info. Non-found fields are mapped to nil."
   [via]
   (let [all-at (sp/select [sp/ALL (sp/submap [:at]) sp/MAP-VALS] via)
         [_ _ source line] (sp/select-first [sp/ALL allowed-ns?] all-at)]
@@ -327,7 +332,9 @@
 
 (defn get-line-info-from-stacktrace
   "Takes a stacktrace and returns the first element with invokeStatic
-   that's not in the excluded namespaces"
+   that's not in the excluded namespaces.
+   Returns a map (possibly partially) filled in
+   with this info. Non-found fields are mapped to nil."
   [tr]
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
@@ -339,4 +346,7 @@
   (let [s (if source (str "In file " source  " ") "")
         l (if line (str "on line " line " ") "")
         c (if column (str "at position " column) "")]
-       (s/trim (s/capitalize (str s l c)))))
+        (-> (str s l c)
+             s/capitalize
+             s/trim
+             (str "."))))

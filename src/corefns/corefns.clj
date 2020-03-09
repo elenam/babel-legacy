@@ -153,7 +153,7 @@
 
 (s/fdef clojure.core/mod
   :args (s/and ::b-length-two
-               (s/cat :number ::number-or-lazy :number ::b-not-zero-or-lazy))) ;(fn [{:keys [a b]}] (not= b 0))))
+               (s/cat :number ::number-or-lazy :number ::b-not-zero-or-lazy)))
 (stest/instrument `clojure.core/mod)
 
 (s/fdef clojure.core/numerator
@@ -255,13 +255,14 @@
 
 (s/fdef clojure.core/take-while
   :args (s/and ::b-length-one-to-two
-    (s/or :arg-one (s/cat :function ::function-or-lazy)
-          :arg-two (s/cat :function ::function-or-lazy :collection (s/nilable seqable?)))))
+        (s/or :arg-one (s/cat :function ::function-or-lazy)
+              :arg-two (s/cat :function ::function-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/take-while)
 
 (s/fdef clojure.core/drop
   :args (s/and ::b-length-one-to-two
-    ::number-or-collection))
+        (s/or :arg-one (s/cat :number ::number-or-lazy)
+              :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/drop)
 
 (s/fdef clojure.core/drop-last

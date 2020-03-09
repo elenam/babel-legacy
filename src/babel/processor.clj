@@ -378,14 +378,15 @@
   (let [{source :clojure.error/source
          line :clojure.error/line
          column :clojure.error/column} (:data via1)]
-       (str "In file " source " on line " line " at position " column)))
+         (u/location->str {:source source :line line :column column})))
 
  (defn location-function-spec
    "Takes data of a function spec, returns a string with the location
    of the error."
    [data]
-   (let [{:keys [source line]} (:clojure.spec.test.alpha/caller data)]
-        (str "In file " source " on line " line)))
+   (let [{:keys [source file line]} (:clojure.spec.test.alpha/caller data)
+         src (or source file)]
+         (u/location->str {:source src :line line})))
 
 ;; TODO: handle cases of missing file name or other info
 (defn location-non-spec
@@ -393,8 +394,9 @@
    of the error as a string."
   [via trace]
   (let [loc-via (u/location->str (u/get-line-info via))
-        loc-at (if (= loc-via "") (u/location->str (u/get-line-info-from-at via)) loc-via)
-        loc (if (= loc-at "") (u/location->str (u/get-line-info-from-stacktrace trace)) loc-at)]
+        ;; The result of u/location->str always has a . at the end
+        loc-at (if (= loc-via ".") (u/location->str (u/get-line-info-from-at via)) loc-via)
+        loc (if (= loc-at ".") (u/location->str (u/get-line-info-from-stacktrace trace)) loc-at)]
         loc))
 
 (println "babel.processor loaded")
