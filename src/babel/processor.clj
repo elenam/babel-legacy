@@ -389,16 +389,12 @@
 
 ;; TODO: handle cases of missing file name or other info
 (defn location-non-spec
+  "Takes the via list of an exception and its stacktrace and returns the location
+   of the error as a string."
   [via trace]
-  (let [{:keys [source line column]} (u/get-line-info via)
-        [s1 l1 c1] (if (= nil source line column)
-                    (let [{:keys [source line]} (u/get-line-info-from-at via)]
-                          [source line nil])
-                    [source line column])
-        [s l c] (if (= nil s1 l1 c1)
-                    (let [{:keys [source line]} (u/get-line-info-from-stacktrace trace)]
-                          [source line nil])
-                    [s1 l1 c1])]
-       (str "In file " s " on line " l " at position " c)))
+  (let [loc-via (u/location->str (u/get-line-info via))
+        loc-at (if (= loc-via "") (u/location->str (u/get-line-info-from-at via)) loc-via)
+        loc (if (= loc-at "") (u/location->str (u/get-line-info-from-stacktrace trace)) loc-at)]
+        loc))
 
 (println "babel.processor loaded")

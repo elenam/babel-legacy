@@ -331,3 +331,12 @@
   [tr]
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
+
+(defn location->str
+  "Takes a map of :source, :line, :column. Returns the string to be
+   printed for error location"
+  [{:keys [source line column]}]
+  (let [s (if source (str "In file " source  " ") "")
+        l (if line (str "on line " line " ") "")
+        c (if column (str "at position " column) "")]
+  (s/capitalize (str s l c))))
