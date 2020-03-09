@@ -19,5 +19,5 @@
   and the pattrens of the regexes. Dot matches newlines."
   [& s]
   (re-pattern (str "(?s)"
-              (apply str (map s->pattern s))
-              "(.*)")))
+                   (apply str (map s->pattern s))
+                   "(.*)")))

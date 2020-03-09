@@ -339,4 +339,4 @@
   (let [s (if source (str "In file " source  " ") "")
         l (if line (str "on line " line " ") "")
         c (if column (str "at position " column) "")]
-  (s/capitalize (str s l c))))
+       (s/trim (s/capitalize (str s l c)))))

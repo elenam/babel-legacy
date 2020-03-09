@@ -30,8 +30,11 @@ fn is missing a vector of parameters.")
 fn is missing a vector of parameters.")
 (log/babel-test-message "(fn)"))
 
-(expect (t/make-pattern "Syntax problems with (fn 5 6):
-A function definition requires a vector of parameters, but was given 5 instead.")
+(expect (t/make-pattern
+"Syntax problems with (fn 5 6):
+A function definition requires a vector of parameters, but was given 5 instead."
+#"(.*)"
+#"In file (.+) on line (\d+) at position (\d+)")
 (log/babel-test-message "(fn 5 6)"))
 
 (expect (t/make-pattern "Syntax problems with (fn a 6):
