@@ -30,13 +30,6 @@
 (nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 
-;; For now we are just recreating ArityException. We would need to manually replace it by a processed exception
-(defn- process-arity-exception
-  "Takes a message from arity exception and forms a new exception"
-  [msg]
-  (let [[_ howmany fname] (re-matches #"Wrong number of args \((\S*)\) passed to: (\S*)" msg)]
-       (clojure.lang.ArityException. (Integer/parseInt howmany) (d/get-function-name fname))))
-
 (defn- record-message
   [e]
   (cm/ex-str (cm/ex-triage (Throwable->map e))))

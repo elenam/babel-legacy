@@ -22,12 +22,47 @@
 
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
-                        "In file sample1.clj on line 10.")
+                        "In file sample1.clj on line 12.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                          (sample-test-files.sample1/div0-test)"))
 
 (expect (t/make-pattern "The second argument of (take 4 5) was expected to be a sequence but is a number 5 instead."
                         #"(.*)"
-                        "In file sample1.clj on line 14.")
+                        "In file sample1.clj on line 16.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/take-test)"))
+
+(expect (t/make-pattern "The format of the number 8.5.1 is invalid."
+                        #"(.*)"
+                        #"In file fragment1.clj on line 7 at position 6.")
+(log/babel-test-message "(load-file \"src/sample_test_files/fragment1.clj\")"))
+
+(expect (t/make-pattern "Expected a number, but a sequence was given instead."
+                        #"(.*)"
+                        #"In file sample1.clj on line 24.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/take-lazy-test)"))
+
+(expect (t/make-pattern "The second argument of (map map map) was expected to be a sequence but is a function map instead."
+                        #"(.*)"
+                        #"In file sample1.clj on line 28.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/map-spec-test)"))
+
+(expect (t/make-pattern "Clojure ran out of memory, likely due to an infinite computation."
+                        #"(.*)"
+                        #"In file sample1.clj on line 32.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/out-of-memory-test)"))
+
+(expect (t/make-pattern "Expected a character, but a string was given instead."
+                        #"(.*)"
+                        #"In file sample1.clj on line 40.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/compare-char-test)"))
+
+(expect (t/make-pattern "The function f1 cannot be called with one argument."
+                        #"(.*)"
+                        #"In file sample1.clj on line 48.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/arity-defn-test)"))

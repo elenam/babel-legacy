@@ -279,7 +279,8 @@
 ;; ########################################################
 
 (def excluded-ns #{"clojure.core" "clojure.string" "clojure.lang"
-                   "clojure.main" "nrepl.middleware"})
+                   "clojure.main" "nrepl.middleware" "java.lang"
+                   "java.util"})
 
 (defn allowed-ns?
   "Takes a stacktrace element of an exception
@@ -316,8 +317,14 @@
                       via)
         {line :clojure.error/line
          column :clojure.error/column
-         source :clojure.error/source} (sp/select-first [sp/ALL #(not (empty? %))] v)]
-        {:line line :column column :source source}))
+         source :clojure.error/source} (sp/select-first [sp/ALL #(not (empty? %))] v)
+         phase (sp/select-first [:data :clojure.error/phase] (first via))]
+         (cond source
+                  {:source source :line line :column column}
+               (#{:read-source :print-eval-result} phase)
+                  {:source phase :line line :column column}
+               :else
+                  {:source nil :line line :column column})))
 
 (defn get-line-info-from-at
   "Takes the 'via' list of nested exceptions and attempts to find
@@ -339,14 +346,30 @@
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
 
+(defn- file-name
+  "Takes a file name that may be an absolute path as a string and returns
+   the file name without the path."
+  [f]
+  (->> f
+       clojure.java.io/file
+       .getName))
+
+;; TODO refactor when the wording is reasonably final
 (defn location->str
   "Takes a map of :source, :line, :column. Returns the string to be
    printed for error location"
   [{:keys [source line column]}]
-  (let [s (if source (str "In file " source  " ") "")
-        l (if line (str "on line " line " ") "")
+  (let [l (if line (str "on line " line " ") "")
         c (if column (str "at position " column) "")]
-        (-> (str s l c)
-             s/capitalize
-             s/trim
-             (str "."))))
+        (cond (= source :read-source) (-> (str "Found while reading position " column " of line " line " in a dynamic expression")
+                                          s/trim
+                                          (str "."))
+              (= source :print-eval-result) "Print eval phase"
+              source (-> (str "In file " (file-name source)  " " l c)
+                          s/trim
+                          (str "."))
+              (or line column) (-> (str l c " of a dynamic expression ")
+                                s/capitalize
+                                s/trim
+                                (str "."))
+              :else ".")))

@@ -237,9 +237,8 @@
 
 (s/fdef clojure.core/take
   :args (s/and ::b-length-one-to-two
-          (s/or :arg-one (s/nilable ::number-or-lazy)
-                :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))
-          ))
+          (s/or :arg-one (s/cat :number ::number-or-lazy)
+                :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?)))))
 (stest/instrument `clojure.core/take)
 
 (s/fdef clojure.core/take-nth
