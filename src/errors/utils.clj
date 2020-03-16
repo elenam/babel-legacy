@@ -354,22 +354,42 @@
        clojure.java.io/file
        .getName))
 
-;; TODO refactor when the wording is reasonably final
-(defn location->str
-  "Takes a map of :source, :line, :column. Returns the string to be
-   printed for error location"
-  [{:keys [source line column]}]
-  (let [l (if line (str "on line " line " ") "")
-        c (if column (str "at position " column) "")]
-        (cond (= source :read-source) (-> (str "Found while reading position " column " of line " line " in a dynamic expression")
-                                          s/trim
-                                          (str "."))
-              (= source :print-eval-result) "Print eval phase"
-              source (-> (str "In file " (file-name source)  " " l c)
-                          s/trim
-                          (str "."))
-              (or line column) (-> (str l c " of a dynamic expression ")
-                                s/capitalize
-                                s/trim
-                                (str "."))
-              :else ".")))
+(defn- location-format
+  [s]
+  (-> s
+      s/capitalize
+      s/trim
+      (str ".")))
+
+(defmulti location->str
+  (fn [{:keys [source]}] source))
+
+(defmethod location->str :read-source
+   [{:keys [line column]}]
+    (if (or line column)
+        (location-format (str "Found while reading position "
+                         column
+                         " of line "
+                         line
+                         " in a dynamic expression"))
+        "."))
+
+(defmethod location->str :print-eval-result [_] (location-format "Print eval phase"))
+
+;; Not sure this is the final one, but we might not need this case at all anyway
+(defmethod location->str nil
+   [{:keys [line column]}]
+   (if (or line column)
+       (location-format (str "Found while reading position "
+                        column
+                        " of line "
+                        line
+                        " in a dynamic expression"))
+       "."))
+
+(defmethod location->str :default
+   [{:keys [source line column]}]
+   (let [f (str "In file " (file-name source) " ")
+         l (if line (str "on line " line " ") "")
+         c (if column (str "at position " column) "")]
+        (location-format (str f l c))))
