@@ -201,7 +201,10 @@
   [[val probs]]
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
-           (str "In place of " (d/print-macro-arg val) " the following are allowed:" (print-failed-predicates probs) "\n")
+           (str "In place of "
+                (d/print-macro-arg val)
+                " the following are allowed:"
+                (print-failed-predicates probs) "\n")
            "")))
 
 (defn- process-paths-macro
@@ -388,7 +391,6 @@
          src (or source file)]
          (u/location->str {:source src :line line})))
 
-;; TODO: handle cases of missing file name or other info
 (defn location-non-spec
   "Takes the via list of an exception and its stacktrace and returns the location
    of the error as a string."

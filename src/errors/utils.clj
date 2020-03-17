@@ -346,18 +346,24 @@
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
 
+(defn- handle-temp-name
+  [f]
+  (if (re-matches #"form-init(\d+)\.clj" f)
+      "Clojure interactive session"
+      (str "file " f)))
+
 (defn- file-name
   "Takes a file name that may be an absolute path as a string and returns
    the file name without the path."
   [f]
   (->> f
        clojure.java.io/file
-       .getName))
+       .getName
+       handle-temp-name))
 
 (defn- location-format
   [s]
   (-> s
-      s/capitalize
       s/trim
       (str ".")))
 
@@ -376,7 +382,6 @@
 
 (defmethod location->str :print-eval-result [_] (location-format "Print eval phase"))
 
-;; Not sure this is the final one, but we might not need this case at all anyway
 (defmethod location->str nil
    [{:keys [line column]}]
    (if (or line column)
@@ -389,7 +394,7 @@
 
 (defmethod location->str :default
    [{:keys [source line column]}]
-   (let [f (str "In file " (file-name source) " ")
+   (let [f (str "In " (file-name source) " ")
          l (if line (str "on line " line " ") "")
          c (if column (str "at position " column) "")]
         (location-format (str f l c))))
