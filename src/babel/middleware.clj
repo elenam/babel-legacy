@@ -47,6 +47,8 @@
               (or (and exc-info? (not nested?))
                   (and compiler-exc? (= clojure.lang.ExceptionInfo (resolve type))))
                   (str (processor/spec-message data) "\n" (processor/location-function-spec data))
+              (and exc-info? (= clojure.lang.ExceptionInfo (resolve type)))
+                  (str (processor/spec-message data) "\n" "print eval phase spec")
               :else (str (processor/process-message type message) "\n" (processor/location-non-spec via trace)))))
 
 ;; I don't seem to be able to bind this var in middleware.

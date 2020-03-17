@@ -129,6 +129,18 @@
 (expect (t/make-pattern "The second argument of (contains? \"apple\" :a) was expected to be a number but is a keyword :a instead.")
 (log/babel-test-message "(contains? \"apple\" :a)"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec errors on functions invoked by higher order functions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect (t/make-pattern "The first argument of (even? s) was expected to be a number "
+                        "but is a character s instead.")
+(log/babel-test-message "(filter even? \"strawberry\")"))
+
+(expect (t/make-pattern "Wrong number of arguments, expected in (mod 0): the function mod "
+                        "expects two arguments but was given one arguments")
+(log/babel-test-message "(filter mod (range 5))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;Lazy Sequence;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -144,10 +156,6 @@
 
 (expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
 (log/babel-test-message "(mod (range 5) (range 10))"))
-
-;; This is actually not a lazy sequence, it's a class cast exception on a call to > since > isn't specced
-(expect #"(?s)Expected a number, but a character was given instead\.(.*)"
-(log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
 (expect #"(?s)The function contains\? doesn't work on a sequence\.(.*)"
 (log/babel-test-message "(contains? (range) 2)"))

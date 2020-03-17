@@ -241,6 +241,9 @@
 (expect #"(?s)Expected a function, but a number was given instead\.(.*)"
 (log/babel-test-message "(->> 4 5)"))
 
+(expect #"(?s)Expected a number, but a character was given instead\.(.*)"
+(log/babel-test-message "(map #(> % 5) \"strawberry\")"))
+
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
 (expect nil (log/babel-test-message "(compare nil 5)"))
