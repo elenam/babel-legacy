@@ -401,4 +401,13 @@
         loc (if (= loc-at ".") (u/location->str (u/get-line-info-from-stacktrace trace)) loc-at)]
         loc))
 
+(defn location-print-phase-spec
+  "Takes the data of a spec error for a print-eval phase and returns
+   the location of the error as a string."
+  [data]
+  (let [{:keys [var-scope]} (:clojure.spec.test.alpha/caller data)]
+        (str "Called from the function: "
+             (d/get-function-name (str var-scope))
+             "; location unknown.")))
+
 (println "babel.processor loaded")

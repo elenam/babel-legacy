@@ -46,3 +46,11 @@
 (defn arity-defn-test
   []
   (f1 2))
+
+(defn div-0-in-map-test
+  []
+  (map #(/ 6 %) (reverse (range 3))))
+
+(defn spec-in-filter-test
+  []
+  (filter even? "strawberry"))

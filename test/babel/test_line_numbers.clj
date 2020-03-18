@@ -66,3 +66,15 @@
                         #"In file sample1.clj on line 48.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/arity-defn-test)"))
+
+(expect (t/make-pattern "Tried to divide by zero"
+                        #"(.*)"
+                        #"In file sample1.clj on line 52.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/div-0-in-map-test)"))
+
+(expect (t/make-pattern "The first argument of (even? s) was expected to be a number but is a character s instead."
+                        #"(.*)"
+                        #"Called from the function filter; location unknown.")
+(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+                        (sample-test-files.sample1/spec-in-filter-test)"))
