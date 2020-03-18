@@ -405,9 +405,12 @@
   "Takes the data of a spec error for a print-eval phase and returns
    the location of the error as a string."
   [data]
-  (let [{:keys [var-scope]} (:clojure.spec.test.alpha/caller data)]
-        (str "Called from the function: "
-             (d/get-function-name (str var-scope))
-             "; location unknown.")))
+  (let [{:keys [var-scope]} (:clojure.spec.test.alpha/caller data)
+        fname (d/get-function-name (str var-scope))]
+        (if (= fname "anonymous function")
+            (str "Called from an anonymous function; location unknown")
+            (str "Called from the function: "
+                 fname
+                 "; location unknown."))))
 
 (println "babel.processor loaded")

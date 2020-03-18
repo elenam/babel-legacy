@@ -75,6 +75,6 @@
 
 (expect (t/make-pattern "The first argument of (even? s) was expected to be a number but is a character s instead."
                         #"(.*)"
-                        #"Called from the function filter; location unknown.")
+                        #"Called from the function: filter; location unknown.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/spec-in-filter-test)"))

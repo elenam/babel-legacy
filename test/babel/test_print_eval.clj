@@ -31,6 +31,11 @@
 (log/babel-test-message "(defn f [x] (lazy-seq (conj (even? x 7) [9 8])))
                         (let [z (f 6)] (conj 6 z))"))
 
+(expect (t/make-pattern "Wrong number of arguments, expected in (even? 0 7): the function even? expects one argument but was given two arguments"
+                        #"(.*)"
+                        "Called from an anonymous function; location unknown")
+(log/babel-test-message "(#(lazy-seq (conj (even? % 7) [9])) 0)"))
+
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
                         #"In function: take; location unknown.")

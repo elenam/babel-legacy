@@ -112,7 +112,10 @@
   "Takes a string as function name and returns a string \"anonymous function\"
    if it is an anonymous function, its name otherwise"
   [fname]
-  (if (or (= fname "fn") (re-matches #"fn_(.*)" fname) (re-matches #"fn-(.*)" fname))
+  (if (or (= fname "fn")
+          (re-matches #"fn_(.*)" fname)
+          (re-matches #"fn-(.*)" fname)
+          (re-matches #"eval(\d+)" fname))
     "anonymous function" fname))
 
 ;;; get-match-name: string -> string
