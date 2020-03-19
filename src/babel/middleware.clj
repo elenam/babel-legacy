@@ -40,6 +40,7 @@
         {:keys [via data cause trace]} (Throwable->map exc)
         nested? (> (count via) 1)
         {:keys [type message]} (last via)
+        phase (:clojure.error/phase (:data (first via)))
         exc-info? (= clojure.lang.ExceptionInfo exc-type)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
         (cond (and nested? compiler-exc? (processor/macro-spec? cause via))
@@ -49,7 +50,11 @@
                   (str (processor/spec-message data) "\n" (processor/location-function-spec data))
               (and exc-info? (= clojure.lang.ExceptionInfo (resolve type)))
                   (str (processor/spec-message data) "\n" (processor/location-print-phase-spec data))
-              :else (str (processor/process-message type message) "\n" (processor/location-non-spec via trace)))))
+              ;; Non-spec message in the print-eval phase:
+              (= phase :print-eval-result)
+                  (str (processor/process-message type message) "\n" (processor/location-print-phase via trace))
+              :else
+                  (str (processor/process-message type message) "\n" (processor/location-non-spec via trace)))))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.

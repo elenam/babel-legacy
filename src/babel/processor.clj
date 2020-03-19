@@ -413,4 +413,15 @@
                  fname
                  "; location unknown."))))
 
+(defn location-print-phase
+  ""
+  [via trace]
+  (let [f (->> via
+               last
+               :at
+               first
+               str)
+         [_ _ fname] (re-matches #"(.+)\$(.+)\$(.+)" f)]
+         (str "In function: " fname "; location unknown.")))
+
 (println "babel.processor loaded")

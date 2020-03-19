@@ -76,7 +76,9 @@
 (defn regex2? [regex] (instance? java.util.regex.Pattern regex))
 (s/def ::regex-or-lazy (s/alt :regex regex2? :lazy ::lazy))
 
-(s/def ::number-or-collection (s/alt :arg-one ::number-or-lazy :arg-two (s/cat :number ::number-or-lazy :collection (s/nilable seqable?))))
+(s/def ::number-or-collection (s/alt :arg-one ::number-or-lazy
+                                     :arg-two (s/cat :number ::number-or-lazy
+                                                     :collection (s/nilable seqable?))))
 
 ;##### Specs #####
 (s/fdef clojure.core/+ ;inline issue

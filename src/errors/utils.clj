@@ -321,7 +321,7 @@
          phase (sp/select-first [:data :clojure.error/phase] (first via))]
          (cond source
                   {:source source :line line :column column}
-               (#{:read-source :print-eval-result} phase)
+               (= :read-source phase)
                   {:source phase :line line :column column}
                :else
                   {:source nil :line line :column column})))
@@ -379,8 +379,6 @@
                          line
                          " in a dynamic expression"))
         "."))
-
-(defmethod location->str :print-eval-result [_] (location-format "Print eval phase"))
 
 (defmethod location->str nil
    [{:keys [line column]}]
