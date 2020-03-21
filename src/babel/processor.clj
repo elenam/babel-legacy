@@ -419,9 +419,9 @@
   (let [f (->> via
                last
                :at
-               first
-               str)
-         [_ _ fname] (re-matches #"(.+)\$(.+)\$(.+)" f)]
+               first)
+         f1 (u/get-name-from-tr-element f)
+         fname (or f1 (u/get-fname-from-stacktrace trace))]
          (str "In function: " fname "; location unknown.")))
 
 (println "babel.processor loaded")

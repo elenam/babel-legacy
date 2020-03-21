@@ -346,6 +346,23 @@
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
 
+(defn get-name-from-tr-element
+  "Takes a function name as it appears in a stack trace
+   and returns the actual function name"
+  [tr-fn]
+  (second (s/split (str tr-fn) #"\$")))
+
+(defn- calling-fn?
+  [tr-elt]
+  (not (s/starts-with? (str tr-elt) "clojure.lang")))
+
+(defn get-fname-from-stacktrace
+  "Takes the stacktrace and attempts to find the function name
+   in the first element that's not clojure.lang"
+   [tr]
+   (let [trace-fn (sp/select-first [sp/ALL (sp/nthpath 0) calling-fn?] tr)]
+        (get-name-from-tr-element trace-fn)))
+
 (defn- handle-temp-name
   [f]
   (if (re-matches #"form-init(\d+)\.clj" f)
