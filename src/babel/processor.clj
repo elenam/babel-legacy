@@ -414,7 +414,9 @@
                  "; location unknown."))))
 
 (defn location-print-phase
-  ""
+  "Takes the via and the trace of an exception and returns available
+   info about the error location, as a string.
+   Assumes that the phase of the exception is :print-eval-result"
   [via trace]
   (let [f (->> via
                last
@@ -422,6 +424,8 @@
                first)
          f1 (u/get-name-from-tr-element f)
          fname (or f1 (u/get-fname-from-stacktrace trace))]
-         (str "In function: " fname "; location unknown.")))
+         (if (= fname "anonymous function")
+             "In an anonymous function; location unknown"
+             (str "In function: " fname "; location unknown."))))
 
 (println "babel.processor loaded")

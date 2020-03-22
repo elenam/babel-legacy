@@ -361,7 +361,7 @@
    in the first element that's not clojure.lang"
    [tr]
    (let [trace-fn (sp/select-first [sp/ALL (sp/nthpath 0) calling-fn?] tr)]
-        (get-name-from-tr-element trace-fn)))
+        (d/fn-name-or-anonymous (get-name-from-tr-element trace-fn))))
 
 (defn- handle-temp-name
   [f]

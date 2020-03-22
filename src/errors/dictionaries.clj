@@ -107,16 +107,16 @@
                           (clojure.string/replace #"_GT_" ">")
                           (clojure.string/replace #"_STAR_" "*")))))
 
-;;; check-if-anonymous-function: string -> string
-(defn check-if-anonymous-function
+;;; fn-name-or-anonymous: string -> string
+(defn fn-name-or-anonymous
   "Takes a string as function name and returns a string \"anonymous function\"
    if it is an anonymous function, its name otherwise"
   [fname]
   (if (or (= fname "fn")
-          (re-matches #"fn_(.*)" fname)
-          (re-matches #"fn-(.*)" fname)
+          (re-matches #"fn_(.*)" fname) ;; underscore
+          (re-matches #"fn-(.*)" fname) ;; dash
           (re-matches #"eval(\d+)" fname))
-    "anonymous function" fname))
+      "anonymous function" fname))
 
 ;;; get-match-name: string -> string
 (defn get-match-name
@@ -129,7 +129,7 @@
                     ;; the last match is the function name we need:
                     (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
     (if matched
-      (check-if-anonymous-function (lookup-funct-name matched))
+      (fn-name-or-anonymous (lookup-funct-name matched))
       fname)))
 
 ;;; remove-inliner: string -> string
