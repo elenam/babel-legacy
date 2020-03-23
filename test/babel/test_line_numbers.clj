@@ -39,7 +39,7 @@
 
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
-                        #"In file sample1.clj on line 24.")
+                        "In function: take; location unknown.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/take-lazy-test)"))
 
@@ -69,12 +69,12 @@
 
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
-                        #"In file sample1.clj on line 52.")
+                        "In function: div_0_in_map_test; location unknown.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/div-0-in-map-test)"))
 
 (expect (t/make-pattern "The first argument of (even? s) was expected to be a number but is a character s instead."
                         #"(.*)"
-                        #"Called from the function: filter; location unknown.")
+                        #"Called from the function: filter; location unknown\.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/spec-in-filter-test)"))

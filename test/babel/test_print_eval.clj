@@ -28,7 +28,7 @@
 
 (expect (t/make-pattern "Wrong number of arguments, expected in (even? 0 7): the function even? expects one argument but was given two arguments"
                         #"(.*)"
-                        "Called from an anonymous function; location unknown")
+                        "Called from an anonymous function; location unknown.")
 (log/babel-test-message "(#(lazy-seq (conj (even? % 7) [9])) 0)"))
 
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
@@ -43,20 +43,20 @@
 
 (expect (t/make-pattern "Expected a function, but a number was given instead."
                         #"(.*)"
-                        "In function: keep-indexed; location unknown.")
+                        "In function: keep_indexed; location unknown.")
 (log/babel-test-message "(keep-indexed 7 [9 8])"))
 
 (expect (t/make-pattern "This anonymous function cannot be called with one argument."
                         #"(.*)"
-                        "Called from an anonymous function; location unknown.")
+                        "In an anonymous function; location unknown.")
 (log/babel-test-message "(lazy-seq (conj ((fn [x y] (+ x y)) 6) []))"))
 
 (expect (t/make-pattern "This anonymous function cannot be called with one argument."
                         #"(.*)"
-                        "Called from an anonymous function; location unknown.")
+                        "In an anonymous function; location unknown.")
 (log/babel-test-message "(lazy-seq (conj (#(+ %1 %2) 6) []))"))
 
 (expect (t/make-pattern "This anonymous function cannot be called with one argument."
                         #"(.*)"
-                        "Called from the function: map; location unknown.")
+                        "In function: map; location unknown.")
 (log/babel-test-message "(map #(7) [0])"))

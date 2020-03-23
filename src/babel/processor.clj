@@ -408,7 +408,7 @@
   (let [{:keys [var-scope]} (:clojure.spec.test.alpha/caller data)
         fname (d/get-function-name (str var-scope))]
         (if (= fname "anonymous function")
-            (str "Called from an anonymous function; location unknown")
+            (str "Called from an anonymous function; location unknown.")
             (str "Called from the function: "
                  fname
                  "; location unknown."))))
@@ -425,7 +425,7 @@
          f1 (u/get-name-from-tr-element f)
          fname (or f1 (u/get-fname-from-stacktrace trace))]
          (if (= fname "anonymous function")
-             "In an anonymous function; location unknown"
+             "In an anonymous function; location unknown."
              (str "In function: " fname "; location unknown."))))
 
 (println "babel.processor loaded")
