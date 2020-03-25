@@ -444,7 +444,8 @@
 ;; Encoded regexes for stacktrace filtering. For convenience
 ;; . is taken literally, but * denotes (.*)
 (def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
-    "nrepl.middleware.*"})
+    "nrepl.middleware.*" "clojure.core$eval*"
+    "clojure.spec.*" "clojure.core.protocols*"})
 
 (def excluded-ns-regex (map ns->regex excluded-ns-for-stacktrace))
 
