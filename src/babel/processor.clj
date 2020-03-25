@@ -430,6 +430,10 @@
 
 (defn print-stacktrace
   [exc]
-  (u/filter-stacktrace (:trace (Throwable->map exc))))
+  (->> exc
+       Throwable->map
+       :trace
+       u/filter-stacktrace
+       u/format-stacktrace))
 
 (println "babel.processor loaded")

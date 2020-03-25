@@ -457,3 +457,8 @@
 (defn filter-stacktrace
   [trace]
   (sp/select [sp/ALL trace-elt-included?] trace))
+
+(defn format-stacktrace
+  "Takes a (filtered) stacktrace, returns it as a string to be printed"
+  [trace]
+  (apply str (interpose "\n" trace)))
