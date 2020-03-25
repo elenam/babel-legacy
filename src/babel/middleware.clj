@@ -62,6 +62,7 @@
   (set! nrepl.middleware.caught/*caught-fn* #(do
     (let [modified (modify-message %)
           _ (reset! track {:message (record-message %) :modified modified})] ; for logging
-    (println modified)))))
+    (println modified)
+    (println (processor/print-stacktrace %))))))
 
 (defn reset-track [] (reset! track {}))

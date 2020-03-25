@@ -275,10 +275,10 @@
         (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
 
 ;; ########################################################
-;; ######## Utils for stack trace processing ##############
+;; ### Utils for getting location info from stacktrace ####
 ;; ########################################################
 
-(def excluded-ns #{"clojure.core" "clojure.string" "clojure.lang"
+(def excluded-ns-for-location #{"clojure.core" "clojure.string" "clojure.lang"
                    "clojure.main" "nrepl.middleware" "java.lang"
                    "java.util"})
 
@@ -288,7 +288,7 @@
    with any of the excluded namespaces, and false otherwise"
   [s]
   (let [ns-element (str (first s))]
-       (every? #(not (s/starts-with? ns-element %)) excluded-ns)))
+       (every? #(not (s/starts-with? ns-element %)) excluded-ns-for-location)))
 
 (defn allowed-ns-invoke-static?
   [s]
@@ -300,7 +300,7 @@
         ns-element (str ne)
         method (str m)]
         (and (= method "invokeStatic")
-             (every? #(not (s/starts-with? ns-element %)) excluded-ns))))
+             (every? #(not (s/starts-with? ns-element %)) excluded-ns-for-location))))
 
 ;; ########################################################
 ;; ########## Utils for getting error location ############
@@ -350,7 +350,10 @@
   "Takes a function name as it appears in a stack trace
    and returns the actual function name"
   [tr-fn]
-  (second (s/split (str tr-fn) #"\$")))
+  (-> tr-fn
+      str
+      (s/split #"\$")
+      second))
 
 (defn- calling-fn?
   [tr-elt]
@@ -413,3 +416,44 @@
          l (if line (str "on line " line " ") "")
          c (if column (str "at position " column) "")]
         (location-format (str f l c))))
+
+;; ########################################################
+;; ########## Utils for stacktrace processing #############
+;; ########################################################
+
+(defn- s->pattern
+  "Takes a string and returns a string that represents the corresponding
+   regex pattern: replaces * by (.*) and quotes all other strings."
+  [s]
+  (cond (= "*" s) "(.*)"
+        :else (java.util.regex.Pattern/quote s)))
+
+;; Might add more regex encoding later
+(defn- ns->regex
+  "Takes a string that describes a regex. Creates the corresponding
+   regex, replacing * by (.*), and . by \\."
+  [s]
+  (->> s
+       (into [])
+       (partition-by #(= % \*))
+       (map #(apply str %))
+       (map s->pattern)
+       (apply str)
+       re-pattern))
+
+;; Encoded regexes for stacktrace filtering. For convenience
+;; . is taken literally, but * denotes (.*)
+(def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
+    "nrepl.middleware.*"})
+
+(def excluded-ns-regex (map ns->regex excluded-ns-for-stacktrace))
+
+(defn- trace-elt-included?
+  "Takes a trace element and returns true if it is included into
+   a filtered stacktrace and false otherwise."
+  [tr-elt]
+  (not-any? #(re-matches % (str (first tr-elt))) excluded-ns-regex))
+
+(defn filter-stacktrace
+  [trace]
+  (sp/select [sp/ALL trace-elt-included?] trace))

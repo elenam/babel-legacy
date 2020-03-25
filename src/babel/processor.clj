@@ -428,4 +428,8 @@
              "In an anonymous function; location unknown."
              (str "In function: " fname "; location unknown."))))
 
+(defn print-stacktrace
+  [exc]
+  (u/filter-stacktrace (:trace (Throwable->map exc))))
+
 (println "babel.processor loaded")
