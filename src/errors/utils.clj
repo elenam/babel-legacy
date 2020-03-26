@@ -445,7 +445,8 @@
 ;; . is taken literally, but * denotes (.*)
 (def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
     "nrepl.middleware.*" "clojure.core$eval*"
-    "clojure.spec.*" "clojure.core.protocols*"})
+    "clojure.spec.*" "clojure.core.protocols*"
+    "clojure.core$transduce*"})
 
 (def excluded-ns-regex (map ns->regex excluded-ns-for-stacktrace))
 
@@ -462,4 +463,6 @@
 (defn format-stacktrace
   "Takes a (filtered) stacktrace, returns it as a string to be printed"
   [trace]
-  (apply str (interpose "\n" trace)))
+  ;(apply str (interpose "\n" trace)))
+  (apply str (interpose "\n" (sp/transform [sp/ALL (sp/nthpath 0)]
+                                           #(get-name-from-tr-element (str %)) trace))))
