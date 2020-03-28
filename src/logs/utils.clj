@@ -42,16 +42,6 @@
         message (if-not (nil? msg) (s/trim msg))]
       {:type type :at at :message (or message err-response) :line line :in in}))
 
-; (defn get-original-error
-;   ""
-;   []
-    ; (with-open [conn (repl/connect :port server-port)]
-    ;     (-> (repl/client conn 1000)
-    ;         (repl/message {:op :eval :code "(:message (deref babel.middleware/track))"})
-    ;         doall
-    ;         first
-    ;         :value)))
-
 (defn get-tracked-errors
   []
   (with-open [conn (repl/connect :port server-port)]
@@ -101,7 +91,10 @@
   "Takes code as a string and returns the error message corresponding to the code
    or nil if there was no error"
   [code]
-  (:modified (get-all-info code)))
+  (let [{:keys [modified trace]} (get-all-info code)]
+        (if modified
+            (str modified "\n" trace)
+            nil)))
 
 ;;calls add-l from html-log
 (defn add-log

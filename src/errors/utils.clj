@@ -346,6 +346,10 @@
   (let [[_ _ source line] (sp/select-first [sp/ALL allowed-ns-invoke-static?] tr)]
        {:line line :source source}))
 
+(defn- or-empty-str
+  [x]
+  (or x ""))
+
 (defn get-name-from-tr-element
   "Takes a function name as it appears in a stack trace
    and returns the actual function name"
@@ -353,7 +357,9 @@
   (-> tr-fn
       str
       (s/split #"\$")
-      second))
+      second
+      or-empty-str ; can't have a function literal or fn within a macro
+      d/fn-name-or-anonymous))
 
 (defn- calling-fn?
   [tr-elt]
@@ -364,7 +370,7 @@
    in the first element that's not clojure.lang"
    [tr]
    (let [trace-fn (sp/select-first [sp/ALL (sp/nthpath 0) calling-fn?] tr)]
-        (d/fn-name-or-anonymous (get-name-from-tr-element trace-fn))))
+        (get-name-from-tr-element trace-fn)))
 
 (defn- handle-temp-name
   [f]
@@ -446,7 +452,7 @@
 (def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
     "nrepl.middleware.*" "clojure.core$eval*"
     "clojure.spec.*" "clojure.core.protocols*"
-    "clojure.core$transduce*"})
+    "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"})
 
 (def excluded-ns-regex (map ns->regex excluded-ns-for-stacktrace))
 
@@ -463,6 +469,5 @@
 (defn format-stacktrace
   "Takes a (filtered) stacktrace, returns it as a string to be printed"
   [trace]
-  ;(apply str (interpose "\n" trace)))
   (apply str (interpose "\n" (sp/transform [sp/ALL (sp/nthpath 0)]
                                            #(get-name-from-tr-element (str %)) trace))))

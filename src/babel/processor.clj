@@ -423,7 +423,7 @@
                :at
                first)
          f1 (u/get-name-from-tr-element f)
-         fname (or f1 (u/get-fname-from-stacktrace trace))]
+         fname (if (= f1 "") (u/get-fname-from-stacktrace trace) f1)]
          (if (= fname "anonymous function")
              "In an anonymous function; location unknown."
              (str "In function: " fname "; location unknown."))))
