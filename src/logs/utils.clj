@@ -68,21 +68,21 @@
 (defn write-log
   "Writes the log files."
   [info]
-  (let [{:keys [modified original code]} info
+  (let [{:keys [modified original code trace]} info
         _ (swap! counter update-in [:total] inc)
         _ (swap! counter update-in [:partial] inc)]
-    (write-html code (:total @counter) (:partial @counter) modified original)))
+    (write-html code (:total @counter) (:partial @counter) (str modified "\n" trace) original)))
 
 (defn get-all-info
   "Executes code and returns a map with the error part of the response
   (separated into :type, :at, :message, :line, and :in fields - some may
-  be nil) and the original repl error as :original. Also adds the code
+  be nil) and the original repl error as :original :trace trace. Also adds the code
   itself as :code"
   [code]
   (let [_ (trap-response code)]
     (when (:log? @counter)
-      (let [{:keys [message modified]} (get-tracked-errors)
-            all-info (assoc {} :original message :modified modified :code code)
+      (let [{:keys [message modified trace]} (get-tracked-errors)
+            all-info (assoc {} :original message :modified modified :code code :trace trace)
             _ (reset-error-tracking)
             _ (when (:log? @counter) (write-log all-info))]
             all-info))))
