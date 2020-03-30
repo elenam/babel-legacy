@@ -452,9 +452,16 @@
 (def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
     "nrepl.middleware.*" "clojure.core$eval*"
     "clojure.spec.*" "clojure.core.protocols*"
-    "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"})
+    "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
+    "java.util.*"
+    ;; Our own:
+    "babel.processor*" "errors.*"})
 
-(def excluded-ns-regex (map ns->regex excluded-ns-for-stacktrace))
+(def excluded-ns-regex-from-strings (sp/transform [sp/ALL] ns->regex excluded-ns-for-stacktrace))
+
+(def excluded-ns-regex-explicit #{#"(.*)\$eval(\d*)"})
+
+(def excluded-ns-regex (clojure.set/union excluded-ns-regex-from-strings excluded-ns-regex-explicit))
 
 (defn- trace-elt-included?
   "Takes a trace element and returns true if it is included into
