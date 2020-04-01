@@ -449,10 +449,12 @@
 
 ;; Encoded regexes for stacktrace filtering. For convenience
 ;; . is taken literally, but * denotes (.*)
-(def excluded-ns-for-stacktrace #{"clojure.lang.*" "java.lang.*"
+(def excluded-ns-for-stacktrace #{"clojure.lang.*"
     "nrepl.middleware.*" "clojure.spec.*" "clojure.core.protocols*"
     "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
-    "java.util.*" "clojure.main$repl$*"
+    "clojure.main$repl$*"
+    ;; Java:
+    "java.lang.*" "java.util.*" "java.io.*"
     ;; Our own:
     "babel.processor*" "errors.*" "babel.middleware$interceptor*"})
 
@@ -487,7 +489,7 @@
    (and (= name1 name2)
         (= file1 file2)
         (= (str m1) "invokeStatic")
-        (= (str m2) "invoke")))
+        (or (= (str m2) "invoke") (= (str m2) "doInvoke"))))
 
 (defn remove-duplicates
   [trace]
