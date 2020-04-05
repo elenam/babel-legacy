@@ -175,6 +175,18 @@
 (expect #"(?s)The function contains\? doesn't work on a string\.(.*)"
 (log/babel-test-message "(contains?\"a\" (range))"))
 
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
+(log/babel-test-message "(+ (map #(/ 9 %) [9 0]))"))
+
+(expect #"(?s)Expected a number, but a sequence was given instead\.(.*)"
+(log/babel-test-message "(+ 2 (map #(/ 9 %) [9 0]))"))
+
+(expect #"(?s)Expected an integer number, but a sequence was given instead\.(.*)"
+(log/babel-test-message "(even? (map inc [0 9]))"))
+
+(expect #"(?s)Tried to divide by zero(.*)"
+(log/babel-test-message "(even? (map #(/ 9 %) [9 0]))"))
+
 ;; This test will go away once the spec for max is fixed, will need to replace it by a function with custom-made
 ;; spec
 (expect (t/make-pattern "The first argument of (max (9 0)) was expected to be a number but is a sequence (9 0) instead.")

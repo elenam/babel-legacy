@@ -358,7 +358,7 @@
       str
       (s/split #"\$")
       second
-      or-empty-str ; can't have a function literal or fn within a macro
+      or-empty-str 
       d/fn-name-or-anonymous))
 
 (defn- calling-fn?
@@ -453,6 +453,8 @@
     "nrepl.middleware.*" "clojure.spec.*" "clojure.core.protocols*"
     "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
     "clojure.main$repl$*"
+    ; map appears in the stacktrace of :print-eval-result errors:
+    "clojure.core$map$fn__*$fn__*"
     ;; Java:
     "java.lang.*" "java.util.*" "java.io.*"
     ;; Our own:
@@ -501,6 +503,7 @@
 
 (defn filter-stacktrace
   [trace]
+  ;; TODO: prefilter for :print-eval-result
   (let [[tr1 tr2] (split-with before-compiler? trace)]
        (->> (into (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-regex)] tr1)
                   (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-after-compiler)] tr2))

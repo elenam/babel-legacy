@@ -47,16 +47,6 @@
 (s/def ::b-length-one-to-three b-length1-to-3?)
 (s/def ::b-length-zero-to-three b-length0-to-3?)
 
-(s/def ::length-one-anything (s/and ::b-length-one (s/cat :any any?)))
-(s/def ::length-one-number (s/and ::b-length-one (s/cat :number number?)))
-(s/def ::length-greater-zero-number (s/and ::b-length-greater-zero (s/cat :number (s/+ number?))))
-#_(s/def ::b-not-greater-str-count b-not-greater-count)
-
-(s/def ::bindings-seq2 (s/and vector? ::binding-seq))
-(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/or :a (s/nilable coll?)
-                                                                              :b symbol?)))
-
-
 ;#########Lazy functions############
 (defn not-map? [coll] (and (coll? coll) (not (map? coll))))
 (s/def ::not-map not-map?)
@@ -80,9 +70,23 @@
                                      :arg-two (s/cat :number ::number-or-lazy
                                                      :collection (s/nilable seqable?))))
 
+;;; ###################### Length-with-lazy ##############################
+
+(s/def ::length-one-anything (s/and ::b-length-one (s/cat :any any?)))
+(s/def ::length-one-number (s/and ::b-length-one (s/cat :number ::number-or-lazy)))
+(s/def ::length-greater-zero-number (s/and ::b-length-greater-zero (s/cat :number (s/+ number?))))
+#_(s/def ::b-not-greater-str-count b-not-greater-count)
+
+(s/def ::bindings-seq2 (s/and vector? ::binding-seq))
+(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/or :a (s/nilable coll?)
+                                                                              :b symbol?)))
+
+
+
+
 ;##### Specs #####
 (s/fdef clojure.core/+ ;inline issue
-  :args (s/cat :number (s/* number?)))
+  :args (s/cat ::number-or-lazy (s/* ::number-or-lazy)))
 (stest/instrument `clojure.core/+)
 
 (s/fdef clojure.core/- ;inline issue
