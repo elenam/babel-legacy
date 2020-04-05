@@ -66,15 +66,6 @@
 (expect (t/make-pattern "The first argument of (reduce 4 \"strawberry\") was expected to be a function but is a number 4 instead.")
 (log/babel-test-message "(reduce 4 \"strawberry\")"))
 
-(expect (t/make-pattern "The first argument of (even? (0 1 2 3 4)) was expected to be a number but is a sequence (0 1 2 3 4) instead.")
-(log/babel-test-message "(even? (range 5))"))
-
-(expect (t/make-pattern "The first argument of (even? (0 1 2 3 4 5 6 7 8 9)) was expected to be a number but is a sequence (0 1 2 3 4 5 6 7 8 9) instead.")
-(log/babel-test-message "(even? (range 10))"))
-
-(expect (t/make-pattern "The first argument of (even? ((0 1 2 3 4 5 6 7 8 9) ...)) was expected to be a number but is a sequence ((0 1 2 3 4 5 6 7 8 9) ...) instead.")
-(log/babel-test-message "(even? (range 11))"))
-
 (expect (t/make-pattern "The first argument of (filter (1)) was expected to be a function but is a list (1) instead.")
 (log/babel-test-message "(filter '(1))"))
 
@@ -186,6 +177,19 @@
 
 (expect #"(?s)Tried to divide by zero(.*)"
 (log/babel-test-message "(even? (map #(/ 9 %) [9 0]))"))
+
+(expect (t/make-pattern "Expected an integer number, but a sequence (0 1 2 3 4) was given instead.")
+(log/babel-test-message "(even? (range 5))"))
+
+(expect (t/make-pattern "Expected an integer number, but a sequence (0 1 2 3 4 5 6 7 8 9) was given instead.")
+(log/babel-test-message "(even? (range 10))"))
+
+(expect (t/make-pattern "Expected an integer number, but a sequence (0 1 2 3 4 5 6 7 8 9 10) was given instead.")
+(log/babel-test-message "(even? (range 11))"))
+
+;; This is a strict function so it evaluates its arg. We replicate this behavior.
+(expect (t/make-pattern "Clojure ran out of memory, likely due to an infinite computation.")
+(log/babel-test-message "(even? (range))"))
 
 ;; This test will go away once the spec for max is fixed, will need to replace it by a function with custom-made
 ;; spec

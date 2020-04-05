@@ -129,10 +129,17 @@
     :match (beginandend #"No matching ctor found for class (.+)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is no constructor for the class " (nth matches 1) " with this number and type of arguments.\n"))}
 
-    {:key :illegal-arg-must-be-int
+    {:key :illegal-arg-must-be-int-lazy
     :class "IllegalArgumentException"
     :match (beginandend #"Argument must be an integer: clojure\.lang\.LazySeq(.*)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Expected an integer number, but a sequence was given instead.\n"))}
+
+    {:key :illegal-arg-must-be-int-seq
+    :class "IllegalArgumentException"
+    :match (beginandend #"Argument must be an integer: (.*)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "Expected an integer number, but a sequence "
+                                                            (nth matches 1) " was given instead.\n"))}
+
 
   ;;(beginandend #"Call to (.*)/(.*) did not conform to spec:(.*)In: (.*) val: (.*) fails spec: :clojure\.core\.specs\.alpha/local-name (.*) predicate: simple-symbol\?")
    ;########################

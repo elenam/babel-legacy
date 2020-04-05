@@ -60,5 +60,5 @@
 
 (expect (t/make-pattern "Recur can only occur as a tail call: no operations can be done on its result."
                         #"(.*)"
-                        "In Clojure interactive session on line 1 at position 18.")
+                        "In Clojure interactive session on line 1 at position 46.")
 (log/babel-test-message "(loop [x 1] (+ 1 (recur (#(+ %1 %2) 5))))"))
