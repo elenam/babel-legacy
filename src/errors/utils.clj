@@ -358,8 +358,9 @@
       str
       (s/split #"\$")
       second
-      or-empty-str 
-      d/fn-name-or-anonymous))
+      or-empty-str
+      d/fn-name-or-anonymous
+      d/lookup-funct-name))
 
 (defn- calling-fn?
   [tr-elt]
