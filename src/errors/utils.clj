@@ -453,7 +453,7 @@
 (def excluded-ns-for-stacktrace #{"clojure.lang.*"
     "nrepl.middleware.*" "clojure.spec.*" "clojure.core.protocols*"
     "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
-    "clojure.main$repl$*"
+    "clojure.main$repl$*" "clojure.core$cast"
     ; map appears in the stacktrace of :print-eval-result errors:
     "clojure.core$map$fn__*$fn__*"
     ;; Java:
@@ -489,22 +489,26 @@
    (i.e. have the same name, the same file, and differ only in invoke
    vs invokeStatic and possibly in a line number)"
    [[name1 m1 file1 _] [name2 m2 file2 _]]
-   (and (= name1 name2)
-        (= file1 file2)
-        (= (str m1) "invokeStatic")
-        (or (= (str m2) "invoke") (= (str m2) "doInvoke"))))
+   (let [n1 (str name1)
+         n2 (str name2)]
+         (and (or (s/starts-with? n1 n2) (s/starts-with? n2 n1))
+              (= file1 file2)
+              (not= m1 m2))))
 
 (defn remove-duplicates
+  "Takes the stack trace and removes multiple different references to
+   the same function: "
   [trace]
-  (loop [tr trace result []]
-        (cond (<= (count tr) 1) result
-              (duplicates? (first tr) (second tr))
-                  (recur (drop 2 tr) (conj result (first tr)))
-              :else (recur (rest tr) (conj result (first tr))))))
+  (if (empty? trace)
+      []
+      (loop [tr (rest trace) result [(first trace)]]
+            (cond (= (count tr) 0) result
+                  (duplicates? (first tr) (last result))
+                      (recur (rest tr) result)
+                  :else (recur (rest tr) (conj result (first tr)))))))
 
 (defn filter-stacktrace
   [trace]
-  ;; TODO: prefilter for :print-eval-result
   (let [[tr1 tr2] (split-with before-compiler? trace)]
        (->> (into (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-regex)] tr1)
                   (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-after-compiler)] tr2))
@@ -513,5 +517,8 @@
 (defn format-stacktrace
   "Takes a (filtered) stacktrace, returns it as a string to be printed"
   [trace]
-  (apply str (interpose "\n" (sp/transform [sp/ALL (sp/nthpath 0)]
-                                           #(get-name-from-tr-element (str %)) trace))))
+  (->> trace
+      (sp/transform [sp/ALL (sp/collect sp/FIRST)]
+                    #(into [(get-name-from-tr-element (str (first %1)))] %2))
+      (interpose "\n")
+      (apply str)))
