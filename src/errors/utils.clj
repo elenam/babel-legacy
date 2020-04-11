@@ -350,6 +350,11 @@
   [x]
   (or x ""))
 
+(defn- fn-name-trim
+  [f]
+  (let [[_ name _] (re-matches #"(\w*)__(.+)" f)]
+       (or name f)))
+
 (defn get-name-from-tr-element
   "Takes a function name as it appears in a stack trace
    and returns the actual function name"
@@ -360,7 +365,17 @@
       second
       or-empty-str
       d/fn-name-or-anonymous
+      fn-name-trim
       d/lookup-funct-name))
+
+(defn get-namespace-from-tr-element
+  "Takes a function name as it appears in a stack trace
+   and returns its namespace"
+  [tr-fn]
+  (-> tr-fn
+      (s/split #"\$")
+      first
+      or-empty-str))
 
 (defn- calling-fn?
   [tr-elt]
@@ -497,7 +512,8 @@
 
 (defn remove-duplicates
   "Takes the stack trace and removes multiple different references to
-   the same function: "
+   the same function in a row. Keeps the exact same references to preserve stacktrace
+   for infinite recursion."
   [trace]
   (if (empty? trace)
       []
@@ -514,11 +530,32 @@
                   (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-after-compiler)] tr2))
              remove-duplicates)))
 
+(defn- format-tr-element
+  "Takes a stack trace element with the function name and the namespace
+   already extracted and all fields passed as strings.
+   Returns the string as it will be printed to the user."
+  [[name nspace method file line]]
+  (cond (and (= "anonymous function" name) (= "Clojure interactive session" file))
+             (str "[An anonymous function called dynamically]")
+        (= name "anonymous function")
+             (str "[An anonymous function called in " file " on line " line "]")
+        (= name "repl")
+             (str "[Clojure interactive session (repl)]")
+        (= "Clojure interactive session" file)
+             (str "[" name "(ns:" nspace ") called dynamically]")
+        :else (str "[" name " (ns:" nspace ") called in " file " on line " line "]")))
+
 (defn format-stacktrace
   "Takes a (filtered) stacktrace, returns it as a string to be printed"
   [trace]
   (->> trace
       (sp/transform [sp/ALL (sp/collect sp/FIRST)]
-                    #(into [(get-name-from-tr-element (str (first %1)))] %2))
+                    #(into [(first %1)] %2))
+      (sp/transform [sp/ALL sp/ALL] str)
+      (sp/multi-transform [sp/ALL (sp/multi-path [(sp/nthpath 0) (sp/terminal get-name-from-tr-element)]
+                                                 [(sp/nthpath 1) (sp/terminal get-namespace-from-tr-element)]
+                                                 [(sp/nthpath 3) (sp/terminal handle-temp-name)])])
+      (sp/transform [sp/ALL] format-tr-element)
       (interpose "\n")
-      (apply str)))
+      (apply str)
+      (str "Call sequence:\n")))
