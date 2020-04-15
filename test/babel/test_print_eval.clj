@@ -31,9 +31,11 @@
                         "Called from an anonymous function; location unknown.")
 (log/babel-test-message "(#(lazy-seq (conj (even? % 7) [9])) 0)"))
 
+;; Since we are reporting clojure.lang.Numbers function, we get isPos
+;; instead of take. 
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
-                        "In function: take; location unknown.")
+                        "In function: isPos; location unknown.")
 (log/babel-test-message "(take (range) (range))"))
 
 (expect (t/make-pattern "Expected a function, but a sequence was given instead."

@@ -379,7 +379,7 @@
 
 (defn- calling-fn?
   [tr-elt]
-  (let [tr-s (str tr-elt)]
+  (let [tr-s (str (first tr-elt))]
        (or (not (s/starts-with? tr-s "clojure.lang"))
            (s/starts-with? tr-s "clojure.lang.Numbers"))))
 
