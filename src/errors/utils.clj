@@ -379,14 +379,18 @@
 
 (defn- calling-fn?
   [tr-elt]
-  (not (s/starts-with? (str tr-elt) "clojure.lang")))
+  (let [tr-s (str tr-elt)]
+       (or (not (s/starts-with? tr-s "clojure.lang"))
+           (s/starts-with? tr-s "clojure.lang.Numbers"))))
 
 (defn get-fname-from-stacktrace
   "Takes the stacktrace and attempts to find the function name
    in the first element that's not clojure.lang"
    [tr]
-   (let [trace-fn (sp/select-first [sp/ALL (sp/nthpath 0) calling-fn?] tr)]
-        (get-name-from-tr-element trace-fn)))
+   (let [tr1 (sp/select-first [sp/ALL calling-fn?] tr)]
+        (if (= (str (first tr1)) "clojure.lang.Numbers")
+            (str (second tr1))
+            (get-name-from-tr-element (first tr1)))))
 
 (defn- handle-temp-name
   [f]
@@ -465,7 +469,7 @@
 
 ;; Encoded regexes for stacktrace filtering. For convenience
 ;; . is taken literally, but * denotes (.*)
-(def excluded-ns-for-stacktrace #{"clojure.lang.*"
+(def excluded-ns-for-stacktrace #{
     "nrepl.middleware.*" "clojure.spec.*" "clojure.core.protocols*"
     "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
     "clojure.main$repl$*" "clojure.core$cast"
@@ -478,7 +482,11 @@
 
 (def excluded-ns-regex-from-strings (sp/transform [sp/ALL] ns->regex excluded-ns-for-stacktrace))
 
-(def excluded-ns-regex-explicit #{#"(.*)\$eval(\d+)" #"clojure\.core\$fn__(\d+)"})
+(def excluded-ns-regex-explicit #{#"(.*)\$eval(\d+)" #"clojure\.core\$fn__(\d+)"
+                                  ;; Excluding all Clojure.lang except clojue.lang.Numbers,
+                                  ;; in two steps for easier understanding:
+                                  ;; those that don't start with "N" and those that start with "Na":
+                                  #"clojure\.lang\.[^\\N](.*)" #"clojure\.lang\.Na(.*)"})
 
 (def excluded-ns-regex (clojure.set/union excluded-ns-regex-from-strings
                                           excluded-ns-regex-explicit))
@@ -503,12 +511,12 @@
   "Takes two stacktrace elements, returns true if they are duplicates
    (i.e. have the same name, the same file, and differ only in invoke
    vs invokeStatic and possibly in a line number)"
-   [[name1 m1 file1 _] [name2 m2 file2 _]]
+   [[name1 m1 file1 line1] [name2 m2 file2 line2]]
    (let [n1 (str name1)
          n2 (str name2)]
          (and (or (s/starts-with? n1 n2) (s/starts-with? n2 n1))
               (= file1 file2)
-              (not= m1 m2))))
+              (or (not= m1 m2) (not= line1 line2)))))
 
 (defn remove-duplicates
   "Takes the stack trace and removes multiple different references to
@@ -543,6 +551,10 @@
              (str "[Clojure interactive session (repl)]")
         (= "Clojure interactive session" file)
              (str "[" name "(ns:" nspace ") called dynamically]")
+        (= "clojure.lang.Numbers" nspace)
+             ;; For clojure.lang.Numbers the function name is in the method part,
+             ;; e.g. [clojure.lang.Numbers inc "Numbers.java" 137]
+             (str "[" method " (ns:" nspace ") called in " file " on line " line "]")
         :else (str "[" name " (ns:" nspace ") called in " file " on line " line "]")))
 
 (defn format-stacktrace

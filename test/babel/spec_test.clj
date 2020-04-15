@@ -131,6 +131,9 @@
                         "expects two arguments but was given one arguments")
 (log/babel-test-message "(filter mod (range 5))"))
 
+(expect (t/make-pattern "The first argument of (even? f) was expected to be a number but is a function f instead.")
+(log/babel-test-message "(defn f [x] 8) (even? f)"))
+
 (expect (t/make-pattern "Wrong number of arguments, expected in (even? 6 7): the function even? expects one argument but was given two arguments"
                         #"(.*)"
                         #"In Clojure interactive session on line 1.")
