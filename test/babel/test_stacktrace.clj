@@ -60,6 +60,7 @@
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
                         "Call sequence:\n"
+                        "[add (ns:clojure.lang.Numbers) called in file Numbers.java on line 153]\n"
                         "[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(+ 2 (map #(/ 9 %) [9 0]))"))
@@ -81,7 +82,6 @@
                         "[An anonymous function called dynamically]\n"
                         "[map (ns:clojure.core) called in file core.clj on line 2753]\n"
                         "[str (ns:clojure.core) called in file core.clj on line 553]\n"
-                        "[str (ns:clojure.core) called in file core.clj on line 555]\n"
                         "[even? (ns:clojure.core) called in file core.clj on line 1391]\n"
                         "[Clojure interactive session (repl)]"
                         #"(\s*)")
@@ -96,7 +96,7 @@
                         "Call sequence:\n"
                         "[f (ns:sample_test_files.sample2) called in file sample2.clj on line 9]\n"
                         "[g (ns:sample_test_files.sample2) called in file sample2.clj on line 11]\n"
-                        "[Clojure interactive session (repl)]\n"
+                        "[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample2.clj\")
                          (sample-test-files.sample2/g {} map)"))

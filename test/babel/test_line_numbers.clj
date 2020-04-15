@@ -34,42 +34,42 @@
 
 (expect (t/make-pattern "The format of the number 8.5.1 is invalid."
                         #"(.*)"
-                        #"In file fragment1.clj on line 7 at position 6.")
+                        "In file fragment1.clj on line 7 at position 6.")
 (log/babel-test-message "(load-file \"src/sample_test_files/fragment1.clj\")"))
 
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
-                        "In function: take; location unknown.")
+                        "In function: isPos; location unknown.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/take-lazy-test)"))
 
 (expect (t/make-pattern "The second argument of (map map map) was expected to be a sequence but is a function map instead."
                         #"(.*)"
-                        #"In file sample1.clj on line 28.")
+                        "In file sample1.clj on line 28.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/map-spec-test)"))
 
 (expect (t/make-pattern "Clojure ran out of memory, likely due to an infinite computation."
                         #"(.*)"
-                        #"In file sample1.clj on line 32.")
+                        "In file sample1.clj on line 32.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/out-of-memory-test)"))
 
 (expect (t/make-pattern "Expected a character, but a string was given instead."
                         #"(.*)"
-                        #"In file sample1.clj on line 40.")
+                        "In file sample1.clj on line 40.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/compare-char-test)"))
 
 (expect (t/make-pattern "The function f1 cannot be called with one argument."
                         #"(.*)"
-                        #"In file sample1.clj on line 48.")
+                        "In file sample1.clj on line 48.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/arity-defn-test)"))
 
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
-                        "In function: div_0_in_map_test; location unknown.")
+                        "In function: divide; location unknown.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/div-0-in-map-test)"))
 
