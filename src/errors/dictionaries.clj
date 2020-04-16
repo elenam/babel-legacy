@@ -1,6 +1,7 @@
 (ns errors.dictionaries
   (:require [errors.messageobj :as m-obj]
             [clojure.string :as s]
+            [com.rpl.specter :as sp]
             [corefns.corefns :as cf]))
 
 ;;; A dictionary of known types and their user-friendly representations.
@@ -68,15 +69,20 @@
                     [clojure.lang.IPersistentCollection "a collection"]
                     [clojure.lang.IFn "a function"]])
 
+(defn- lookup-general-type
+  [t]
+  (sp/select-first [sp/ALL #(isa? t (first %)) (sp/nthpath 1)] general-types))
+
 ;; The best approximation of a type t not listed in the type-dictionary (as a string)
 ;;; best-approximation: type -> string
-(defn best-approximation [t]
+(defn best-approximation
   "returns a string representation of a type t not listed in the type-dictionary for user-friendly error messages"
-  (let [first-attempt (resolve (symbol t))
-        attempt (if (= (type first-attempt) clojure.lang.Var) (type (var-get first-attempt)) first-attempt)
-        type1 (or attempt (clojure.lang.RT/loadClassForName (str "clojure.lang." t))) ;; may need to add clojure.lang. for some types.
-        matched-type (if type1 (first (filter #(isa? type1 (first %)) general-types)))]
-    (if matched-type (second matched-type) (str "unrecognized type " t))))
+  [t]
+  (let [t1 (resolve (symbol t))
+        t2 (if (= (type t1) clojure.lang.Var) (type (var-get t1)) t1)
+        t3 (or t2 (clojure.lang.RT/loadClassForName (str "clojure.lang." t))) ;; may need to add clojure.lang. for some types.
+        matched-type (lookup-general-type t3)]
+    (or matched-type (str "unrecognized type " t))))
 
 ;;; get-type: type -> string
 (defn get-type
@@ -213,10 +219,10 @@
   "check-function-name takes a string and converts it into a new string
   that has \" function \" added to the end if it is not
   anonymous function"
-  [n]
+  [f-name]
   (cond
-    (= n "anonymous function") "This anonymous function"
-    :else (str "The function " n)))
+    (= f-name "anonymous function") "This anonymous function"
+    :else (str "The function " f-name)))
 
 (defn beginandend
   "beginandend puts (?s) at the beginning of a string and (.*) at the end
