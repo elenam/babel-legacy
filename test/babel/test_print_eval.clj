@@ -19,20 +19,20 @@
                 (def file-name "this file")
                 (:file (meta #'file-name)))))
 
-(expect (t/make-pattern "Wrong number of arguments, expected in (even? 5 7): "
-                        "the function even? expects one argument but was given two arguments"
+(expect (t/make-pattern "Wrong number of arguments in (even? 5 7): "
+                        "the function even? expects one argument but was given two arguments."
                         #"(.*)"
                         "Called from the function: f; location unknown.")
 (log/babel-test-message "(defn f [x] (lazy-seq (conj (even? x 7) [9 8])))
                         (f 5)"))
 
-(expect (t/make-pattern "Wrong number of arguments, expected in (even? 0 7): the function even? expects one argument but was given two arguments"
+(expect (t/make-pattern "Wrong number of arguments in (even? 0 7): the function even? expects one argument but was given two arguments."
                         #"(.*)"
                         "Called from an anonymous function; location unknown.")
 (log/babel-test-message "(#(lazy-seq (conj (even? % 7) [9])) 0)"))
 
 ;; Since we are reporting clojure.lang.Numbers function, we get isPos
-;; instead of take. 
+;; instead of take.
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
                         "In function: isPos; location unknown.")

@@ -93,7 +93,7 @@
         arg-number (first in)
         [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-      (str "Wrong number of arguments, expected in ("
+      (str "Wrong number of arguments in ("
            fn-name
            " "
            function-args-val
@@ -103,7 +103,7 @@
            (length-ref (keyword (d/get-function-name (str (first via)))))
            " but was given "
            (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))
-           " arguments")
+           (if (= (count val) 1) " argument." " arguments."))
       (str "The "
            (d/arg-str arg-number)
            " of ("
