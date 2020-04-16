@@ -473,6 +473,7 @@
     "nrepl.middleware.*" "clojure.spec.*" "clojure.core.protocols*"
     "clojure.core$transduce*" "*.reflect.*" "clojure.core$read"
     "clojure.main$repl$*" "clojure.core$cast"
+    "clojure.core$print_sequential" "clojure.core$pr_on"
     ; map appears in the stacktrace of :print-eval-result errors:
     "clojure.core$map$fn__*$fn__*"
     ;; Java:
