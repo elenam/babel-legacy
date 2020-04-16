@@ -64,6 +64,6 @@
           trace (processor/print-stacktrace %)
           _ (reset! track {:message (record-message %) :modified modified :trace trace})] ; for logging
     (println modified)
-    (println trace)))))
+    (if (not= trace "") (println trace))))))
 
 (defn reset-track [] (reset! track {}))

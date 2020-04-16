@@ -399,7 +399,7 @@
         ;; The result of u/location->str always has a . at the end
         loc-at (if (= loc-via ".") (u/location->str (u/get-line-info-from-at via)) loc-via)
         loc (if (= loc-at ".") (u/location->str (u/get-line-info-from-stacktrace trace)) loc-at)]
-        loc))
+        (if (= loc ".") "" loc)))
 
 (defn location-print-phase-spec
   "Takes the data of a spec error for a print-eval phase and returns

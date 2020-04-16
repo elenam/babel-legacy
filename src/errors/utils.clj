@@ -557,6 +557,10 @@
              (str "[" method " (ns:" nspace ") called in " file " on line " line "]")
         :else (str "[" name " (ns:" nspace ") called in " file " on line " line "]")))
 
+(defn- stacktr-or-empty
+  [s]
+  (if (= s "") "" (str "Call sequence:\n" s)))
+
 (defn format-stacktrace
   "Takes a (filtered) stacktrace, returns it as a string to be printed"
   [trace]
@@ -570,4 +574,4 @@
       (sp/transform [sp/ALL] format-tr-element)
       (interpose "\n")
       (apply str)
-      (str "Call sequence:\n")))
+      stacktr-or-empty))
