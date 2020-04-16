@@ -198,6 +198,18 @@
 (expect (t/make-pattern "The function int cannot be called with two arguments.")
 (log/babel-test-message "(int 4 5)"))
 
+(expect (t/make-pattern "A vector cannot be called with two arguments.")
+(log/babel-test-message "([0] 8 9)"))
+
+(expect (t/make-pattern "A map cannot be called with three arguments.")
+(log/babel-test-message "({9 6} 8 7 9)"))
+
+(expect (t/make-pattern "A map cannot be called with no arguments.")
+(log/babel-test-message "({9 6})"))
+
+(expect (t/make-pattern "A set cannot be called with no arguments.")
+(log/babel-test-message "(#{9 6})"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;; ClassCastException ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

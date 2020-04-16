@@ -58,7 +58,7 @@
 ;; That's why it's a vector, not a hashmap.
 ;; USE CAUTION WHEN ADDING NEW TYPES!
 
-(def general-types [[Number "a number"]
+(def general-types [[java.lang.Number "a number"]
                     [clojure.lang.IPersistentVector "a vector"]
                     [clojure.lang.IPersistentList "a list"]
                     [clojure.lang.IPersistentSet "a set"]
@@ -105,13 +105,14 @@
 	returns the original"
   [fname]
   (let [lookup ((keyword fname) predefined-names)]
-    (if lookup lookup (-> fname
-                          (clojure.string/replace #"_QMARK_" "?")
-                          (clojure.string/replace #"_BANG_" "!")
-                          (clojure.string/replace #"_EQ_" "=")
-                          (clojure.string/replace #"_LT_" "<")
-                          (clojure.string/replace #"_GT_" ">")
-                          (clojure.string/replace #"_STAR_" "*")))))
+    (or lookup
+        (-> fname
+            (s/replace #"_QMARK_" "?")
+            (s/replace #"_BANG_" "!")
+            (s/replace #"_EQ_" "=")
+            (s/replace #"_LT_" "<")
+            (s/replace #"_GT_" ">")
+            (s/replace #"_STAR_" "*")))))
 
 ;;; fn-name-or-anonymous: string -> string
 (defn fn-name-or-anonymous
@@ -220,9 +221,17 @@
   that has \" function \" added to the end if it is not
   anonymous function"
   [f-name]
-  (cond
-    (= f-name "anonymous function") "This anonymous function"
-    :else (str "The function " f-name)))
+  (let [gen-type-lookup (->> f-name
+                             (str "clojure.lang.")
+                             read-string
+                             resolve
+                             lookup-general-type)]
+        (cond
+          (= f-name "anonymous function")
+             "This anonymous function"
+          (and gen-type-lookup (not= gen-type-lookup "a function"))
+              (str (s/capitalize gen-type-lookup)) ;; For vectors and such used as function
+          :else (str "The function " f-name))))
 
 (defn beginandend
   "beginandend puts (?s) at the beginning of a string and (.*) at the end
