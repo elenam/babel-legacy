@@ -165,6 +165,18 @@
 (expect (t/make-pattern "There is no constructor for the class clojure.lang.ArityException with this number and type of arguments.")
 (log/babel-test-message "(clojure.lang.ArityException. \"hello\")"))
 
+(expect (t/make-pattern "There is no method indexOf with three arguments or with this type of argument(s) in the class java.lang.String.")
+(log/babel-test-message "(.indexOf \"abc\" 9 0 8)"))
+
+(expect (t/make-pattern "There is no method indexOf with no arguments or a field indexOf in the class java.lang.String.")
+(log/babel-test-message "(.indexOf \"abc\")"))
+
+(expect (t/make-pattern "There is no method index with one argument or with this type of argument(s) in the class java.lang.String.")
+(log/babel-test-message "(.index \"abc\" 7)"))
+
+(expect (t/make-pattern "There is no method stuff with one argument or with this type of argument(s) in the class java.lang.Math.")
+(log/babel-test-message "(Math/stuff 7)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; IllegalStateException ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

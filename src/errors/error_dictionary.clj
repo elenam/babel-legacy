@@ -129,6 +129,17 @@
     :match (beginandend #"No matching ctor found for class (.+)")
     :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is no constructor for the class " (nth matches 1) " with this number and type of arguments.\n"))}
 
+    {:key :no-method-found
+    :class "IllegalArgumentException"
+    :match (beginandend #"No matching method (.+) found taking (\d+) args for class (.+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is no method " (nth matches 1) " with " (number-arg (nth matches 2)) " or with this type of argument(s) in the class " (nth matches 3) ".\n"))}
+
+    ;; Note: could be a field or a method call with no args
+    {:key :no-field-found
+    :class "IllegalArgumentException"
+    :match (beginandend #"No matching field found: (.+) for class (.+)")
+    :make-msg-info-obj (fn [matches] (make-msg-info-hashes "There is no method " (nth matches 1) " with no arguments or a field " (nth matches 1) " in the class " (nth matches 2) ".\n"))}
+
     {:key :illegal-arg-must-be-int-lazy
     :class "IllegalArgumentException"
     :match (beginandend #"Argument must be an integer: clojure\.lang\.LazySeq(.*)")
