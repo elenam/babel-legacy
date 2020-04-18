@@ -181,7 +181,7 @@
 (log/babel-test-message "(.compareTo true false true)"))
 
 (expect (t/make-pattern "There is no method digit with no arguments or a field digit for a character (java.lang.Character).")
-(log/babel-test-message "(.digit \n)"))
+(log/babel-test-message "(.digit \\n)"))
 
 (expect (t/make-pattern "There is no method stuff with two arguments or with this type of argument(s) for a number (java.lang.Long).")
 (log/babel-test-message "(.stuff 7 8 9)"))
