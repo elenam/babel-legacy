@@ -165,17 +165,29 @@
 (expect (t/make-pattern "There is no constructor for the class clojure.lang.ArityException with this number and type of arguments.")
 (log/babel-test-message "(clojure.lang.ArityException. \"hello\")"))
 
-(expect (t/make-pattern "There is no method indexOf with three arguments or with this type of argument(s) in the class java.lang.String.")
-(log/babel-test-message "(.indexOf \"abc\" 9 0 8)"))
+(expect (t/make-pattern "There is no method indexOf with three arguments or with this type of argument(s) for a string (java.lang.String).")
+(log/babel-test-message "(.indexOf \"abc\" 1 2 3)"))
 
-(expect (t/make-pattern "There is no method indexOf with no arguments or a field indexOf in the class java.lang.String.")
+(expect (t/make-pattern "There is no method indexOf with no arguments or a field indexOf for a string (java.lang.String).")
 (log/babel-test-message "(.indexOf \"abc\")"))
 
-(expect (t/make-pattern "There is no method index with one argument or with this type of argument(s) in the class java.lang.String.")
+(expect (t/make-pattern "There is no method index with one argument or with this type of argument(s) for a string (java.lang.String).")
 (log/babel-test-message "(.index \"abc\" 7)"))
 
 (expect (t/make-pattern "There is no method stuff with one argument or with this type of argument(s) in the class java.lang.Math.")
 (log/babel-test-message "(Math/stuff 7)"))
+
+(expect (t/make-pattern "There is no method compareTo with two arguments or with this type of argument(s) in the class java.lang.Boolean.")
+(log/babel-test-message "(.compareTo true false true)"))
+
+(expect (t/make-pattern "There is no method digit with no arguments or a field digit for a character (java.lang.Character).")
+(log/babel-test-message "(.digit \n)"))
+
+(expect (t/make-pattern "There is no method stuff with two arguments or with this type of argument(s) for a number (java.lang.Long).")
+(log/babel-test-message "(.stuff 7 8 9)"))
+
+(expect (t/make-pattern "There is no method stuff with two arguments or with this type of argument(s) for a number (java.lang.Double).")
+(log/babel-test-message "(.stuff 7.7 8 9)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; IllegalStateException ;;;;;;;;;;;;;;;;;;;;;;;

@@ -418,3 +418,19 @@
        (s/join " " (macro-args-rec val))))
   ([val open-sym close-sym]
    (str open-sym (s/join " " (macro-args-rec val)) close-sym)))
+
+;; Note that, while this has an overlap with general-types, I prefer
+;; to keep it separate since it's used for a different purpose.
+(def class-lookup [[java.lang.Number "a number"]
+                   [java.lang.String "a string"]
+                   [java.lang.Character "a character"]])
+
+(defn get-common-class
+  "Takes a class name from a missing method error message and looks
+   up some common classes, reurning a string to include into the error message."
+  [c]
+  (let [t (resolve (symbol c))
+        name (sp/select-first [sp/ALL #(isa? t (first %)) (sp/nthpath 1)] class-lookup)]
+       (if name
+           (str " for " name " (" c ")")
+           (str " in the class " c))))
