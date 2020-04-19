@@ -72,8 +72,11 @@
         message (or m "") ; m can be nil
         entry (get-match e-class message)
         msg-info-obj (or (msg-from-matched-entry entry message) (make-msg-info-hashes "No message detected"))]
-    {:exception-class e-class
-     :msg-info-obj  msg-info-obj}))
+        (if (= java.lang.String (type msg-info-obj))
+            {:exception-class e-class  ;; Temporary fix for transitioning to strings from msg-info-objects
+             :msg-info-obj  (make-msg-info-hashes msg-info-obj)}
+            {:exception-class e-class
+             :msg-info-obj  msg-info-obj})))
 
 (defn process-length
   [ex-str]
