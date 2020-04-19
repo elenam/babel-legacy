@@ -29,7 +29,7 @@
   "Takes a type and a message and returns a string based on the match found in error
   dictionary"
   [t m]
-  (->> (p-exc/process-errors (str t " " m))
+  (->> (p-exc/process-errors t m)
        :msg-info-obj
        m-obj/get-all-text))
 
@@ -374,6 +374,10 @@
                    (let-macros fn-name value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;; Location and stacktrace ;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn location-macro-spec
   "Takes the first element of via for a macro spec, returns a string
    with the location of the error."
@@ -429,6 +433,8 @@
              (str "In function: " fname "; location unknown."))))
 
 (defn print-stacktrace
+  "Takes an exception and returns its filtered and formatted stacktrace
+   as a string (with newlines)"
   [exc]
   (->> exc
        Throwable->map

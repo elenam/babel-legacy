@@ -64,26 +64,13 @@
   [msg-obj]
   (reduce #(str %1 (:msg %2)) "" msg-obj)) ;; replace by join?
 
-(defn get-exception-class-and-rest
-  "returns a vector containing the class and then the message without the class marking"
-  [ex-str]
-  (let [compiler-exc (re-matches #"(?s)CompilerException (\S*): (.*)" ex-str) ; first we check if it is a compiler exception
-        matches (or compiler-exc (re-matches #"(?s)(\S*) (.*)" ex-str))
-        e-class (second matches)
-        qual-name (nth (re-matches #"(\w+)\.(\w+)\.(.*)" e-class) 3)
-        e-class1 (or qual-name e-class)
-        rest (apply str (drop 2 matches))]
-    [e-class1 rest]))
-
 (defn process-errors
   "Takes a message from an exception as a string and returns a message object,
   to be displayed by the repl or IDE"
-  [ex-str]
-  (let [parsing (get-exception-class-and-rest ex-str)
-        e-class (first parsing)
-        message (second parsing)
+  [t m]
+  (let [e-class (nth (re-matches #"(\w+)\.(\w+)\.(.*)" (str t)) 3)
+        message (or m "") ; m can be nil
         entry (get-match e-class message)
-        ;msg-info-obj (make-msg-info-hashes ex-str "\n" e-class " & " message "\n")]
         msg-info-obj (or (msg-from-matched-entry entry message) (make-msg-info-hashes "No message detected"))]
     {:exception-class e-class
      :msg-info-obj  msg-info-obj}))
