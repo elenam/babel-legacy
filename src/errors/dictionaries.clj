@@ -283,6 +283,7 @@
   [s]
   (cond (string? s) ["a string " (str "\"" s "\"")]
         (nil? s) ["" "nil"]
+        (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         :else (let [t (get-dictionary-type s)]
                    (cond

@@ -83,6 +83,14 @@
 (expect (t/make-pattern "The first argument of (take nil []) was expected to be a number but is nil instead.")
 (log/babel-test-message "(take nil [])"))
 
+(expect (t/make-pattern "The first argument of (split [#\"\\*\"] \"ab * 9 * l\") was expected to be a string "
+                        "but is a vector [#\"\\*\"] instead.")
+(log/babel-test-message "(clojure.string/split [#\"\\*\"] \"ab * 9 * l\")"))
+
+(expect (t/make-pattern "The first argument of (split #\"\\*\" \"ab * 9 * l\") was expected to be a string "
+                        "but is a regular expression pattern #\"\\*\" instead.")
+(log/babel-test-message "(clojure.string/split #\"\\*\" \"ab * 9 * l\")"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
