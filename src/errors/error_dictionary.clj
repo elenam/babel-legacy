@@ -251,8 +251,9 @@
   {:key :compiler-exception-cannot-resolve-symbol
    :class "RuntimeException"
    :match (beginandend "Unable to resolve symbol: (.+) in this context")
-   :make-msg-info-obj (fn [matches] (str (change-if (nth matches 1))
-                                         ".\n"))}
+   :make-msg-info-obj (fn [matches] (str "Name "
+                                         (nth matches 1)
+                                         " is undefined.\n"))}
 
 ;;
    ;############################
