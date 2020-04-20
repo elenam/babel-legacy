@@ -154,8 +154,9 @@
   (remove-inliner (get-match-name fname)))
 
 ;;; get-macro-name: string -> string
-(defn get-macro-name [mname]
+(defn get-macro-name
   "extract a macro name from a qualified name"
+  [mname]
   (nth (re-matches #"(.*)/(.*)" mname) 2))
 
 (defn position-0-based->word
@@ -238,11 +239,6 @@
   [x]
   (re-pattern (str "(?s)" x "(.*)")))
 
-(defn get-spec-text
-  "return the string that failed a given spec from a spec error"
-  [full-error]
-  (nth (re-matches (beginandend #"(.*):args \((.*)\)}, compiling(.*)") full-error) 2))
-
 (defn get-dictionary-type
   [x]
   "get-dictionary-type takes an object and returns its general type.
@@ -254,13 +250,6 @@
           (clojure.string/replace #"class " "")
           get-type
           (str " "))))
-
-(defn check-divide
-  "check-divide takes a string and returns either \"/\" or n
-   this is only used for / because / is removed from the resulting
-   error message so this adds it back in."
-  [n]
-  (if (= n "") "/" n))
 
 (defn- is-specced-fn?
   "Takes a value and returns true if it is a specced functions
