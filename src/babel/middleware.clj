@@ -37,14 +37,14 @@
 (defn- modify-message
   [exc]
   (let [exc-type (class exc)
-        {:keys [via data cause trace]} (Throwable->map exc)
+        {:keys [cause data via trace]} (Throwable->map exc)
         nested? (> (count via) 1)
         {:keys [type message]} (last via)
         phase (:clojure.error/phase (:data (first via)))
         exc-info? (= clojure.lang.ExceptionInfo exc-type)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
         (cond (and nested? compiler-exc? (processor/macro-spec? cause via))
-                   (str (processor/spec-macro-message exc) "\n" (processor/location-macro-spec via))
+                   (str (processor/spec-macro-message cause data) "\n" (processor/location-macro-spec via))
               (or (and exc-info? (not nested?))
                   (and compiler-exc? (= clojure.lang.ExceptionInfo (resolve type))))
                   (str (processor/spec-message data) "\n" (processor/location-function-spec data))

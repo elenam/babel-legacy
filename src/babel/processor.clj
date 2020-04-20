@@ -344,12 +344,10 @@
 
 
 (defn spec-macro-message
-  "Takes an exception of a macro spec failure and returns the description of
+  "Takes the cause and data of a macro spec failure and returns the description of
    the problem as a string"
-  [ex]
-  (let [exc-map (Throwable->map ex)
-        {:keys [cause data via trace]} exc-map
-        fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
+  [cause data]
+  (let [fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
         fn-name (if (= (str fn-name-match) "clojure.core/fn") "fn" (d/get-function-name fn-name-match))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
         val-str (d/print-macro-arg args) ; args is present in cases when there is no value (e.g. multi-arity defn)
@@ -359,15 +357,12 @@
               (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
               ;; should we report the extra parts?
               (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
-              ;; case of :data containing only :arg Example: (defn f ([+] 5 6) 9) - WE MIGHT NOT NEED THIS CASE
-              ;(or (= val-str " ") (= val-str "")) (str "The parameters are invalid in (" fn-name (s/join " " (d/macro-args->str args))  ")\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
                    (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
               (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
               (and (#{"let" "if-let"} fn-name) (seqable? value))
-                   ;(let-macros (if (d/let-is-fn? trace) "fn" fn-name) value problems)
                    (let-macros fn-name value problems)
               :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
 
