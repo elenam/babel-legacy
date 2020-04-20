@@ -337,10 +337,10 @@
                (s/cat :function (s/* any?))))
 (stest/instrument `clojure.core/comp)
 
-(s/fdef clojure.core/int
+#_(s/fdef clojure.core/int
   :args (s/and ::b-length-one
                (s/or :number number? :char char?)))
-(stest/instrument `clojure.core/int)
+#_(stest/instrument `clojure.core/int)
 
 (s/def ::innervector (s/cat :symbol symbol? :b (s/* (s/cat :key keyword :symbol-or-collection (s/or :symbol symbol?
                                                                           :collection (s/nilable coll?))))))

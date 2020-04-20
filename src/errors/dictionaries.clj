@@ -1,6 +1,5 @@
 (ns errors.dictionaries
-  (:require [errors.messageobj :as m-obj]
-            [clojure.string :as s]
+  (:require [clojure.string :as s]
             [com.rpl.specter :as sp]
             [corefns.corefns :as cf]))
 

@@ -1,6 +1,6 @@
+
 (ns errors.error-dictionary
-  (:use [errors.messageobj]
-        [errors.dictionaries]))
+(:use [errors.dictionaries]))
 
 ;; A vector of error dictionaries from the most specific one to the most general one.
 ;; Order matters because the vector is searched from top to bottom.
@@ -129,9 +129,11 @@
    {:key :illegal-input-must-be-x
    :class "IllegalArgumentException"
    :match (beginandend "Argument must be an (.*): (.*)  (.*)\\.(.*)\\.")
-   :make-msg-info-obj (fn [matches] (make-msg-info-hashes "The argument must be an " (nth matches 1) :type
-                                                           " but is " (nth matches 2) :arg
-                                                           ".\n"))}
+   :make-msg-info-obj (fn [matches] (str "The argument must be an "
+                                         (nth matches 1)
+                                         " but is "
+                                         (nth matches 2)
+                                         ".\n"))}
 
    {:key :illegal-not-supported-on-type
    :class "IllegalArgumentException"

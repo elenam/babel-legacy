@@ -1,6 +1,5 @@
 (ns babel.processor
  (:require [clojure.string :as s]
-           [errors.messageobj :as m-obj]
            [errors.prettify-exception :as p-exc]
            [errors.utils :as u]
            [errors.dictionaries :as d]
@@ -29,9 +28,7 @@
   "Takes a type and a message and returns a string based on the match found in error
   dictionary"
   [t m]
-  (->> (p-exc/process-errors t m)
-       :msg-info-obj
-       m-obj/get-all-text))
+  (p-exc/process-errors t m))
 
 (defn macro-spec?
   "Takes an exception object. Returns a true value if it's a spec error for a macro,

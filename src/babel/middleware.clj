@@ -1,8 +1,8 @@
+
 (ns babel.middleware
   (:require [babel.processor :as processor]
             [errors.dictionaries :as d]
             [errors.prettify-exception :as p-exc]
-            [errors.messageobj :as msg-o]
             [nrepl.middleware]
             [nrepl.middleware.caught]
             [clojure.repl]

@@ -1,12 +1,10 @@
 (ns errors.prettify-exception
-  (:require [clojure.string :as str]
+  (:require [clojure.string :as s]
             [errors.error-dictionary :refer :all])
-  (:use [errors.dictionaries]
-        [errors.messageobj]))
+  (:use [errors.dictionaries]))
 
 ;; Main error processing file. Standard errors are processed by `standard` function, and
 ;; modified errors are processed by `prettify-exception` function.
-
 
 (defn first-match
   [e-class message]
@@ -56,13 +54,7 @@
   (cond
     ;(and data entry) (msg-info-obj-with-data entry message data)
     entry ((:make-msg-info-obj entry) (re-matches (:match entry) message))
-    :else (make-msg-info-hashes message)))
-
-; This was added from another file and isn't needed:
-(defn get-sum-text
-  "concatenate all text from a message object into a string"
-  [msg-obj]
-  (reduce #(str %1 (:msg %2)) "" msg-obj)) ;; replace by join?
+    :else message))
 
 (defn process-errors
   "Takes a message from an exception as a string and returns a message object,
@@ -71,12 +63,8 @@
   (let [e-class (nth (re-matches #"(\w+)\.(\w+)\.(.*)" (str t)) 3)
         message (or m "") ; m can be nil
         entry (get-match e-class message)
-        msg-info-obj (or (msg-from-matched-entry entry message) (make-msg-info-hashes "No message detected"))]
-        (if (= java.lang.String (type msg-info-obj))
-            {:exception-class e-class  ;; Temporary fix for transitioning to strings from msg-info-objects
-             :msg-info-obj  (make-msg-info-hashes msg-info-obj)}
-            {:exception-class e-class
-             :msg-info-obj  msg-info-obj})))
+        modified (msg-from-matched-entry entry message)]
+       modified))
 
 (defn process-length
   [ex-str]
@@ -109,7 +97,7 @@
         shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred functdata)))))
         wrongval (:val functdata)
         via (first (:via functdata))
-        wrongvaltype (str/replace (str (type wrongval)) #"class " "")]
+        wrongvaltype (s/replace (str (type wrongval)) #"class " "")]
   (if (nil? (re-matches #"b-length(.*)" shouldbe))
       (if (nil? (re-matches #"b-(.*)" shouldbe))
           (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.")
@@ -137,10 +125,7 @@
         linenumber (str "Line: " (:clojure.error/line data))
         columnnumber (str " Column: " (:clojure.error/column data))
         sourcefile (str "\nIn: " (:clojure.error/source data) "\n")]
-        (if (nil? specerrdata)
-          (str (get-all-text (:msg-info-obj (process-errors (str errclass " " errmsg)))) linenumber columnnumber sourcefile)
-          (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile))))
-
+        (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile)))
 
 ;#########################################
 ;############ Location format  ###########
