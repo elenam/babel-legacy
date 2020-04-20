@@ -49,11 +49,12 @@
     :else v))
 
 (defn msg-from-matched-entry
-  "Creates a message info object from an exception and its data, if exists"
+  "Returns the modified error message by applying a function in the error
+  dictionary to the message. If no match found, returns the message as is"
   [entry message]
   (cond
     ;(and data entry) (msg-info-obj-with-data entry message data)
-    entry ((:make-msg-info-obj entry) (re-matches (:match entry) message))
+    entry ((:fn entry) (re-matches (:match entry) message))
     :else message))
 
 (defn process-errors
@@ -65,67 +66,6 @@
         entry (get-match e-class message)
         modified (msg-from-matched-entry entry message)]
        modified))
-
-(defn process-length
-  [ex-str]
-  (let [normal (re-matches #"b-length(\d+)\?" ex-str)
-        greater (re-matches #"b-length-greater(\d+)\?" ex-str)
-        greatereq (re-matches #"b-length-(\d+)greater\?" ex-str)
-        to (re-matches #"b-length(\d+)-to-(\d+)\?" ex-str)]
-        (if normal
-            (str (number-word (first (rest normal))) " argument")
-            (if greater
-                (str (number-word (str (+ 1 (read-string (first (rest greater)))))) " or more arguments")
-                (if greatereq
-                    (str (number-word (first (rest greatereq))) " or more arguments")
-                    (if to
-                      (str (number-word (first (rest to))) " to " (number-word (first (rest (rest to)))) " arguments")
-                      " no babel length data found"))))))
-
-(defn process-another
-  [functname location ex-str]
-  (let [not-zero (re-matches #"b-not-0\?" ex-str)]
-       (if not-zero
-           (str "In function " functname ", the " location " cannot be 0.\n"))))
-
-(defn create-spec-errors
-  "Takes the message and data from a spec error and returns a modified message"
-  [ex-str data]
-  (let [functname (second (rest (rest (first (re-seq #"(.*)Call to (.*)/(.*) did not conform to spec(.*)" ex-str)))))
-        functdata (first (:clojure.spec.alpha/problems data))
-        location (first (:in functdata))
-        shouldbe (second (rest (re-matches #"(.*)\/(.*)" (str (:pred functdata)))))
-        wrongval (:val functdata)
-        via (first (:via functdata))
-        wrongvaltype (s/replace (str (type wrongval)) #"class " "")]
-  (if (nil? (re-matches #"b-length(.*)" shouldbe))
-      (if (nil? (re-matches #"b-(.*)" shouldbe))
-          (str "In function " functname ", the " (arg-str location) " is expected to be a " (?-name shouldbe) ", but is " (get-dictionary-type wrongvaltype) wrongval " instead.")
-          (str (process-another functname (arg-str location) shouldbe)))
-      (str functname " can only take " (process-length shouldbe) "; received " (number-arg (str (count wrongval))) ".\n"))))
-
-(defn process-spec-errors
-  "Processes spec errors according to if they are a macro or not"
-  [ex-str data notmacro]
-  (let [locationdata (:clojure.spec.test.alpha/caller data)
-        linenumber (str "Line: " (:line locationdata))
-        sourcefile (str "\nIn: " (:file locationdata) "\n")]
-  (if notmacro
-    (str (create-spec-errors ex-str data) linenumber sourcefile)
-    (str (create-spec-errors ex-str data)))))
-
-(defn process-macro-errors
-  "Takes the message and data from a macro error and returns a modified message"
-  [err cause data]
-  (let [errmap (Throwable->map err)
-        specerrdata (:data errmap)
-        seconderr (second (:via errmap))
-        errmsg (:message seconderr)
-        errclass (:type seconderr)
-        linenumber (str "Line: " (:clojure.error/line data))
-        columnnumber (str " Column: " (:clojure.error/column data))
-        sourcefile (str "\nIn: " (:clojure.error/source data) "\n")]
-        (str (process-spec-errors errmsg specerrdata false) linenumber columnnumber sourcefile)))
 
 ;#########################################
 ;############ Location format  ###########
