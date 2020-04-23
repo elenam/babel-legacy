@@ -354,17 +354,47 @@
         n (count problems)]
         (cond (#{"fn"} fn-name) (fn-macros fn-name args problems)
               (#{"defn" "defn-"} fn-name) (defn-macros fn-name args problems)
-              (and (= n 1) (= "Insufficient input" (:reason (first problems)))) (str fn-name " requires more parts than given here: (" fn-name val-str ")\n")
+              (and (= n 1) (= "Insufficient input" (:reason (first problems))))
+                   (str fn-name
+                        " requires more parts than given here: ("
+                        fn-name
+                        val-str
+                        ")\n")
               ;; should we report the extra parts?
-              (and (= n 1) (= "Extra input" (:reason (first problems)))) (str fn-name " has too many parts here: (" fn-name " " val-str ")" (d/extra-macro-args-info (first problems)) "\n")
+              (and (= n 1) (= "Extra input" (:reason (first problems))))
+                   (str fn-name
+                        " has too many parts here: ("
+                        fn-name
+                        " "
+                        val-str
+                        ")"
+                        (d/extra-macro-args-info (first problems))
+                        "\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core.specs.alpha/even-number-of-forms?))
-                   (str fn-name " requires pairs of a name and an expression, but in (" fn-name val-str ") one element doesn't have a match.\n")
+                   (str fn-name
+                        " requires pairs of a name and an expression, but in ("
+                        fn-name
+                        val-str
+                        ") one element doesn't have a match.\n")
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
-                   (str fn-name " requires a vector of name/expression pairs, but is given " (d/print-macro-arg (:val (first problems)) :sym) " instead.\n")
-              (invalid-macro-params? problems) (str "The parameters are invalid in (" fn-name " " val-str ")\n")
+                   (str fn-name
+                        " requires a vector of name/expression pairs, but is given "
+                        (d/print-macro-arg (:val (first problems)) :sym)
+                        " instead.\n")
+              (invalid-macro-params? problems)
+                    (str "The parameters are invalid in ("
+                         fn-name
+                         " "
+                         val-str
+                         ")\n")
               (and (#{"let" "if-let"} fn-name) (seqable? value))
                    (let-macros fn-name value problems)
-              :else (str "Syntax problems with (" fn-name  " " val-str "):\n" (process-paths-macro problems)))))
+              :else (str "Syntax problems with ("
+                         fn-name
+                         " "
+                         val-str
+                         "):\n"
+                         (process-paths-macro problems)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; Location and stacktrace ;;;;;;;;;;;;;;;;;;;;;;

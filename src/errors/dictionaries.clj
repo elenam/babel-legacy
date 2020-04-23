@@ -317,25 +317,21 @@
    "Takes a single (atomic) argument of a macro and returns its string representation"
    [val]
    (cond
-     (and (re-matches #"p(\d)__(.*)" (str val)) (vector? val)) ""
      (string? val) (str "\"" val "\"")
      (char? val) (str "\\" val)
      (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
      (nil? val) "nil"
-     (and (symbol? val) (= "quote" (str val))) "'"
-     (= "fn*" (str val)) "#"
      (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
      (re-matches #"p__(.*)" (str val)) ""
      :else (str val)))
 
 (defn- args->str
-  "Takes a vector of (as strings) arguments and returns a string of these symbols
+  "Takes a vector of arguments (as strings) and returns a string of these symbols
   with separated by empty spaces, enclosed into open-sym at the start and close-sym
   at the end, if provided"
   ([args]
   (apply print-str args))
   ([args open-sym close-sym]
-  ;(s/join (cons open-sym (conj (vec (interpose " " args)) close-sym)))))
   (apply str [open-sym (apply print-str args) close-sym])))
 
 (defn- single-arg?
@@ -346,10 +342,16 @@
 
 (declare macro-args-rec) ;; needed for mutually recursive definitions & process-args
 
+(defn- map-entry->str
+  "Takes a map entry, applies macro-args-rec to both the key and the value,
+   and joins the two vectors together."
+  [[k v]]
+  (into (macro-args-rec k) (macro-args-rec v)))
+
 (defn- map-arg->str
   "Takes a map argument for a macro and returns its string representation"
   [map-arg]
-  (args->str (map #(args->str (into (macro-args-rec (first %)) (macro-args-rec (second %)))) map-arg) "{"  "}"))
+  (args->str (map #(args->str (map-entry->str %)) map-arg) "{"  "}"))
 
 (defn- seq-arg->str
   [arg]
