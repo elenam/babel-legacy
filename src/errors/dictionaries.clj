@@ -353,29 +353,23 @@
   [map-arg]
   (args->str (map #(args->str (map-entry->str %)) map-arg) "{"  "}"))
 
-(defn- seq-arg->str
+(defn- process-arg
   [arg]
-  (cond
-    (vector? arg) [(args->str (macro-args-rec arg) "[" "]")]
-    (set? arg) [(args->str (macro-args-rec arg) "#{" "}")]
-    (= "fn*" (str (first arg)))  ;;condition to remove a vector after fn*
-                              [(args->str (macro-args-rec (rest (rest arg)))"#" "")]
-    (and (symbol? (first arg)) (= "quote" (str (first arg)))) [(args->str (macro-args-rec (rest arg)) "'" "")]
-    :else [(args->str (macro-args-rec arg) "(" ")")]))
+  (cond (single-arg? arg) (print-single-arg arg)
+        (map? arg) (map-arg->str arg)
+        (vector? arg) (args->str (macro-args-rec arg) "[" "]")
+        (set? arg) (args->str (macro-args-rec arg) "#{" "}")
+        (= "fn*" (str (first arg))) (args->str (macro-args-rec (rest (rest arg))) "#" "")
+        (and (symbol? (first arg)) (= "quote" (str (first arg)))) (args->str (macro-args-rec (rest arg)) "'" "")
+        :else (args->str (macro-args-rec arg) "(" ")")))
 
 (defn- process-args
   [args]
-  (cond
-      (single-arg? args) [(print-single-arg args)]
-      ;; a sequence of a hashmap is two-element vectors; elements can have nested sequences:
-      (map? args) [(map-arg->str args)]
-      (map? (first args)) (into [(map-arg->str (first args))] (macro-args-rec (rest args)))
-      (empty? args) []
-      (not (single-arg? (first args)))
-            (into (seq-arg->str (first args)) (macro-args-rec (rest args)))
-      (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args)))"#" "")]
-      (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
-      :else (into [(print-single-arg (first args))] (macro-args-rec (rest args)))))
+  (cond (single-arg? args) [(print-single-arg args)]
+        (map? args) [(map-arg->str args)]
+        (= "fn*" (str (first args))) [(args->str (macro-args-rec (rest (rest args))) "#" "")]
+        (and (symbol? (first args)) (= "quote" (str (first args)))) [(args->str (macro-args-rec (rest args)) "'" "")]
+        :else (vec (map process-arg args))))
 
 (defn- macro-args-rec
   "Takes a potentially nested sequence of arguments of a macro and recursively
