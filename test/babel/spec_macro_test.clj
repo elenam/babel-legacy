@@ -89,7 +89,7 @@ In place of + x 1 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(defn macro [s] (let [(+ x 1) g] g))"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] (+ 1 2)):
-In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] (+ 1 2))"))
 
 (expect (t/make-pattern "Syntax problems with (let [[[3 4] [5 6]] y]):
@@ -160,19 +160,19 @@ In place of '(1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let ['(1 2) '(3 4)] '(1 2 3 4))"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8]):
-In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8])"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] [8 #(+ %1)]):
-In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] [8 #(+ %)])"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\"):
-In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\")"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] \"hello\" '(8)):
-In place of + 1 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ 1 2) (+ 1 2)] \"hello\" '(8))"))
 
 (expect (t/make-pattern "Syntax problems with (when-let [7 8]):

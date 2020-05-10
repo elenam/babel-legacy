@@ -396,24 +396,6 @@
  ([val open-sym close-sym]
   (str open-sym (process-arg val) close-sym)))
 
-#_(defn print-macro-arg
-  "Takes a potentially nested sequence of arguments of a macro and returns
-   its string represntation. If one argument is given, doesn't add any
-   delimeters. Can take optional delimeters."
-  ([val]
-   (cond (nil? val) ""
-         (set? val) (process-arg val)
-         (vector? val) (process-arg val)
-         :else (process-arg val)))
-  ([val k]
-     (cond #_(and (= k :sym) (not (single-arg? val)) (not (map? val)))
-                #_(s/join " " (macro-args-rec (list val)))
-           (= k :no-parens) (or (second (re-matches #"\((.*)\)" (process-arg val)))
-                                (process-arg val))
-           :else (process-arg val)))
-  ([val open-sym close-sym]
-   (str open-sym (process-arg val) close-sym)))
-
 ;; Note that, while this has an overlap with general-types, I prefer
 ;; to keep it separate since it's used for a different purpose.
 (def class-lookup [[java.lang.Number "a number"]

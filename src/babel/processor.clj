@@ -224,9 +224,9 @@
   (str "Syntax problems with ("
         fn-name
         " "
-        (str (d/print-macro-arg (first value) "[" "]") (cond (= (count (rest value)) 0) ""
-                                                    (= (count (rest value)) 1) (str " " (d/print-macro-arg (first (rest value)) :sym))
-                                                    :else (str " " (d/print-macro-arg (rest value)))))
+        (str (d/print-macro-arg (first value)) (cond (= (count (rest value)) 0) ""
+                                                    #_(= (count (rest value)) 1) #_(str " " (d/print-macro-arg (first (rest value)) :sym))
+                                                    :else (str " " (d/print-macro-arg (rest value) :no-parens))))
         "):\n"
         (process-paths-macro problems)))
 
@@ -462,6 +462,7 @@
        Throwable->map
        :trace
        u/filter-stacktrace
+       (take 20)
        u/format-stacktrace))
 
 (println "babel.processor loaded")
