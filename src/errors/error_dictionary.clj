@@ -82,9 +82,7 @@
     :class "IllegalArgumentException"
     :match (beginandend "Can't call nil, form: \\((.*)\\)")
     :fn (fn [matches] (str "You cannot call nil as a function. The expression was: "
-                                          "("
-                                          (print-macro-arg (read-string (str "("(nth matches 1)")")))
-                                          ")"))}
+                                          (print-macro-arg (read-string (str "(" (nth matches 1) ")")))))}
 
     {:key :duplicate-key-hashmap
     :class "IllegalArgumentException"

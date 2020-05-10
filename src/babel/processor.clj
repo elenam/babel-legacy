@@ -244,7 +244,7 @@
               ;; Multi-arity defn fails with a non-informtive spec failure
               (= n 0) (str error-name
                            "Unexpected element(s) outside of the first clause: "
-                           (d/print-macro-arg (rest (drop-while #(not (seq? %)) value))))
+                           (d/print-macro-arg (rest (drop-while #(not (seq? %)) value)) :no-parens))
               ;; Special case for defn since a string could be a doc-string and a map
               ;; could be a pre/post-conditions map:
               (and (= n 1) (u/has-match? probs-grouped {:path [:fn-tail] :reason "Insufficient input"}))
@@ -351,7 +351,7 @@
   (let [fn-name-match (nth (re-matches #"Call to (.*) did not conform to spec." cause) 1)
         fn-name (if (= (str fn-name-match) "clojure.core/fn") "fn" (d/get-function-name fn-name-match))
         {problems :clojure.spec.alpha/problems value :clojure.spec.alpha/value args :clojure.spec.alpha/args} data
-        val-str (d/print-macro-arg args) ; args is present in cases when there is no value (e.g. multi-arity defn)
+        val-str (d/print-macro-arg args :no-parens) ; args is present in cases when there is no value (e.g. multi-arity defn)
         n (count problems)]
         (cond (#{"fn"} fn-name) (fn-macros fn-name args problems)
               (#{"defn" "defn-"} fn-name) (defn-macros fn-name args problems)

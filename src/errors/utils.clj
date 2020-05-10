@@ -132,8 +132,8 @@
   [val]
   (cond
     (nil? val) "nil"
-    (and (seq? val) (not (#{"fn*" "quote"} (str (first val))))) (d/print-macro-arg val "(" ")")
-    :else (d/print-macro-arg val)))
+    (and (seq? val) (not (#{"fn*" "quote"} (str (first val))))) (d/print-macro-arg val)
+    :else (d/print-macro-arg val :no-parens)))
 
 (defn- not-names->str
   [val]
@@ -209,7 +209,7 @@
         amp-issues (ampersand-issues value in)]
         (cond (not (empty? amp-issues))
                 (str "& must be followed by exactly one name, but is followed by "
-                     (d/print-macro-arg amp-issues)
+                     (d/print-macro-arg amp-issues :no-parens)
                      " instead.")
           :else (str "Parameter vector must consist of names, but "
                 (not-names->str val)))))
@@ -233,7 +233,7 @@
               (and (= "Extra input" reason) (not (empty? amp-issues)))
                   (str clause-str
                        "& must be followed by exactly one name, but is followed by "
-                       (d/print-macro-arg amp-issues)
+                       (d/print-macro-arg amp-issues :no-parens)
                        " instead.")
               (= "Extra input" reason)
                  (str clause-str
