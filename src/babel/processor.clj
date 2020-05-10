@@ -224,9 +224,10 @@
   (str "Syntax problems with ("
         fn-name
         " "
-        (str (d/print-macro-arg (first value)) (cond (= (count (rest value)) 0) ""
-                                                    #_(= (count (rest value)) 1) #_(str " " (d/print-macro-arg (first (rest value)) :sym))
-                                                    :else (str " " (d/print-macro-arg (rest value) :no-parens))))
+        (d/print-macro-arg (first value))
+        (if (= (count (rest value)) 0)
+            ""
+            (str " " (d/print-macro-arg (rest value) :no-parens)))
         "):\n"
         (process-paths-macro problems)))
 
@@ -234,7 +235,7 @@
   "Takes parts of the spec message for defn and defn- and returns an error message as a string"
   [fn-name value problems]
   (let [n (count problems)
-        val-str (d/print-macro-arg value)
+        val-str (d/print-macro-arg value :no-parens)
         probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
         probs-grouped (group-by :in probs-labeled)
         error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
@@ -285,7 +286,7 @@
   "Takes parts of the spec message for fn and returns an error message as a string"
   [fn-name value problems]
   (let [n (count problems)
-       val-str (d/print-macro-arg value)
+       val-str (d/print-macro-arg value :no-parens)
        probs-labeled (u/label-vect-maps problems) ; each spec fail is labeled with its position in 'problems'
        probs-grouped (group-by :in probs-labeled)
        error-name (str "Syntax problems with (" fn-name (u/with-space-if-needed val-str) "):\n")]
@@ -379,7 +380,7 @@
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name
                         " requires a vector of name/expression pairs, but is given "
-                        (d/print-macro-arg (:val (first problems)) :sym)
+                        (d/print-macro-arg (:val (first problems)))
                         " instead.\n")
               (invalid-macro-params? problems)
                     (str "The parameters are invalid in ("
