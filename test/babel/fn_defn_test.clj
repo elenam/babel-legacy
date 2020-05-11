@@ -30,6 +30,10 @@ fn is missing a vector of parameters.")
 fn is missing a vector of parameters.")
 (log/babel-test-message "(fn)"))
 
+(expect (t/make-pattern "Syntax problems with (fn nil):
+Parameter vector must consist of names, but nil is not a name.")
+(log/babel-test-message "(fn nil)"))
+
 (expect (t/make-pattern
 "Syntax problems with (fn 5 6):
 A function definition requires a vector of parameters, but was given 5 instead."

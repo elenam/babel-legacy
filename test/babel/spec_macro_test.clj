@@ -71,11 +71,11 @@
 (log/babel-test-message "(let [[8 _]] 9)"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
-In place of + #(* %1 3) 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ #(* %1 3) 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ #(* %1 3) 2) g] 7)"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):
-In place of + #(* %1 3) 2 the following are allowed: a name or a vector or a hashmap")
+In place of (+ #(* %1 3) 2) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(+ #(* % 3) 2) g] 7)"))
 
 (expect (t/make-pattern "Syntax problems with (let [{:a 1} g] 7):
@@ -85,7 +85,7 @@ In place of 1 the following are allowed: a vector")
 (log/babel-test-message " (let [{:a 1} g] 7)"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ x 1) g] g):
-In place of + x 1 the following are allowed: a name or a vector or a hashmap")
+In place of (+ x 1) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(defn macro [s] (let [(+ x 1) g] g))"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ 1 2) (+ 1 2)] (+ 1 2)):
@@ -105,7 +105,7 @@ In place of #{\"chromosome\" [\"x\"] \"y\"} the following are allowed: a name or
 (log/babel-test-message "(let [#{\"chromosome\" [\"x\"] \"y\"} z])"))
 
 (expect (t/make-pattern "Syntax problems with (let [(let [x 5] #(+ %1)) 9] 8):
-In place of let [x 5] #(+ %1) the following are allowed: a name or a vector or a hashmap")
+In place of (let [x 5] #(+ %1)) the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(let [(let [x 5] #(+ %1)) 9] 8)"))
 
 (expect (t/make-pattern "Syntax problems with (let [#() 1] 5):

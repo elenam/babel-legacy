@@ -309,7 +309,7 @@
     [spec-problem]
     (let [{:keys [val]} spec-problem]
          (if-not (empty? val)
-                 (str " The extra parts are: " (print-macro-arg val))
+                 (str " The extra parts are: " (print-macro-arg val :no-parens))
                  "")))
 
 
@@ -389,10 +389,12 @@
       ""
       (process-arg val)))
  ([val k]
-    (if (= k :no-parens)
-        (or (second (re-matches #"\((.*)\)" (process-arg val)))
-            (process-arg val))
-        (process-arg val)))
+    (cond (and (= k :no-parens) (nil? val))
+            ""
+          (= k :no-parens)
+            (or (second (re-matches #"\((.*)\)" (process-arg val)))
+                (process-arg val))
+          :else (process-arg val)))
  ([val open-sym close-sym]
   (str open-sym (process-arg val) close-sym)))
 
