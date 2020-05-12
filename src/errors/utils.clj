@@ -181,11 +181,12 @@
             (cond
                (and (= pred 'clojure.core/vector?) (> clause-n start-clause))
                     (str "A function definition requires a vector of parameters, but was given "
-                          (d/print-macro-arg (seq (sp/select-one (sp/srange start-clause (inc clause-n)) value)))
+                          (d/print-macro-arg (seq (sp/select-one (sp/srange start-clause (inc clause-n)) value)) :no-parens)
                           " instead.")
                no-vectors?
                     (str "A function definition requires a vector of parameters, but was given "
-                         (if (nil? val) "nil" (d/print-macro-arg val)) " instead.")
+                         ;; TO-DO: check if the 'if' is needed:
+                         (if (nil? val) "nil" (d/print-macro-arg val :no-parens)) " instead.")
                 ;; Perhaps should report the failing argument
                 :else "The function definition is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
@@ -197,9 +198,7 @@
   (let [val (:val prob)
         no-vectors? (empty? (filter vector? value))]
         (if no-vectors?
-            (if (#{"fn*" "quote"} (str (first val)))
                 (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
-                (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val "(" ")") " instead."))
             ;; Perhaps should report the failing argument
             "The function definition is missing a vector of parameters or it is misplaced.")))
 
@@ -242,7 +241,7 @@
               (and (= pred 'clojure.core/vector?) (vector? clause-val))
                  (str clause-str
                       "A function clause must be enclosed in parentheses, but is a vector "
-                      (d/print-macro-arg clause-val "[" "]")
+                      (d/print-macro-arg clause-val)
                       " instead.")
               (and (= pred 'clojure.core/vector?) (#{"fn*" "quote"} (str val)))
                  (str clause-str
@@ -272,7 +271,7 @@
                                (gp (first ins)))
         prob (first less-nested-groups)
         val (:val prob)]
-        (str "Function parameters must be a vector of names, but " (d/print-macro-arg val) " was given instead.")))
+        (str "Function parameters must be a vector of names, but " (d/print-macro-arg val :no-parens) " was given instead.")))
 
 ;; ########################################################
 ;; ### Utils for getting location info from stacktrace ####

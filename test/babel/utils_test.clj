@@ -25,6 +25,14 @@
 (expect "#()" (print-macro-arg '(fn* [] ())))
 (expect "{2 3 4 5}" (print-macro-arg '{2 3 4 5}))
 (expect "#{6}" (print-macro-arg '#{6}))
+(expect "" (print-macro-arg 'nil))
+(expect "(nil)" (print-macro-arg '(nil)))
+
+;; print-macro-arg with :no-parens
+
+(expect "+ 2 3 4 5" (print-macro-arg '(+ 2 3 4 5) :no-parens))
+(expect "(+ 2 3 4 5)" (print-macro-arg '((+ 2 3 4 5)) :no-parens))
+
 
 ;; TO_DO:
 ;; - add cases with a quote inside an expression, the word "quote"
