@@ -53,7 +53,7 @@
 (expect (t/make-pattern "if-let requires a vector of name/expression pairs, but is given \"a\" instead.")
 (log/babel-test-message "(if-let \"a\" 6)"))
 
-(expect (t/make-pattern "if-let requires a vector of name/expression pairs, but is given {8 9 5 4} instead.")
+(expect (t/make-pattern "if-let requires a vector of name/expression pairs, but is given {8 9, 5 4} instead.")
 (log/babel-test-message "(if-let {8 9, 5 4} 6)"))
 
 (expect (t/make-pattern "when-let requires a vector of name/expression pairs, but is given 6 instead.")
