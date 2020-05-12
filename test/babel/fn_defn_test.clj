@@ -118,8 +118,8 @@ Parameter vector must consist of names, but '(2 3), 5 are not names.")
 ;; This is actually somewhat misleading since this would've been
 ;; correct as destructuring with keywords and names as map
 ;; elements
-(expect (t/make-pattern "Syntax problems with (fn [{a :a 5 6}] [a x]):
-Parameter vector must consist of names, but {a :a 5 6} is not a name.")
+(expect (t/make-pattern "Syntax problems with (fn [{a :a, 5 6}] [a x]):
+Parameter vector must consist of names, but {a :a, 5 6} is not a name.")
 (log/babel-test-message "(fn [{a :a 5 6}] [a x])"))
 
 (expect (t/make-pattern "Syntax problems with (fn a [nil]):
@@ -146,24 +146,24 @@ Function parameters must be a vector of names, but [[5]] was given instead.")
 ;;;;;;;;;;; fn: map binding errors ;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect (t/make-pattern "Syntax problems with (fn [{a :a 5 :b}] [a x]):
-Parameter vector must consist of names, but {a :a 5 :b} is not a name.")
+(expect (t/make-pattern "Syntax problems with (fn [{a :a, 5 :b}] [a x]):
+Parameter vector must consist of names, but {a :a, 5 :b} is not a name.")
 (log/babel-test-message "(fn [{a :a 5 :b}] [a x])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[{a :a 5 x}]] [a x]):
-Function parameters must be a vector of names, but [{a :a 5 x}] was given instead.")
+(expect (t/make-pattern "Syntax problems with (fn [[{a :a, 5 x}]] [a x]):
+Function parameters must be a vector of names, but [{a :a, 5 x}] was given instead.")
 (log/babel-test-message "(fn [[{a :a 5 x}]] [a x])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[[{a :a 5 x}]]] [a x]):
-Function parameters must be a vector of names, but [[{a :a 5 x}]] was given instead.")
+(expect (t/make-pattern "Syntax problems with (fn [[[{a :a, 5 x}]]] [a x]):
+Function parameters must be a vector of names, but [[{a :a, 5 x}]] was given instead.")
 (log/babel-test-message "(fn [[[{a :a 5 x}]]] [a x])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[[{a :a 5 x}] 5]] [a x]):
-Function parameters must be a vector of names, but [[{a :a 5 x}] 5] was given instead.")
+(expect (t/make-pattern "Syntax problems with (fn [[[{a :a, 5 x}] 5]] [a x]):
+Function parameters must be a vector of names, but [[{a :a, 5 x}] 5] was given instead.")
 (log/babel-test-message "(fn [[[{a :a 5 x}] 5]] [a x])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[[{a :a 5 x}] z]] [a x]):
-Function parameters must be a vector of names, but [[{a :a 5 x}] z] was given instead.")
+(expect (t/make-pattern "Syntax problems with (fn [[[{a :a, 5 x}] z]] [a x]):
+Function parameters must be a vector of names, but [[{a :a, 5 x}] z] was given instead.")
 (log/babel-test-message "(fn [[[{a :a 5 x}] z]] [a x])"))
 
 (expect (t/make-pattern "Syntax problems with (fn [x {:a 5}] 7):
@@ -388,7 +388,7 @@ The issue is in the second clause.
 
 ;; THIS STILL FAILS - Feb 11
 ;; Gives an error of 'parameter vector must consists of names'.
-;; This is not a preferred error, but would do for now. 
+;; This is not a preferred error, but would do for now.
 (expect (t/make-pattern "Syntax problems with (fn [x u [& z y]] 8):
 Parameter vector must consist of names, but [& z y] is not a name.")
 (log/babel-test-message "(fn [x u [& z y]] 8)"))

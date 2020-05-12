@@ -35,10 +35,10 @@
 (expect (t/make-pattern "let requires a vector of name/expression pairs, but is given {8 7} instead.")
 (log/babel-test-message "(let {8 7} 5)"))
 
-(expect (t/make-pattern "let requires a vector of name/expression pairs, but is given {8 7 9 0} instead.")
+(expect (t/make-pattern "let requires a vector of name/expression pairs, but is given {8 7, 9 0} instead.")
 (log/babel-test-message "(let {8 7 9 0} 5)"))
 
-(expect (t/make-pattern "let requires a vector of name/expression pairs, but is given {8 7 #(+ %1) 7} instead.")
+(expect (t/make-pattern "let requires a vector of name/expression pairs, but is given {8 7, #(+ %1) 7} instead.")
 (log/babel-test-message "(let {8 7 #(+ %) 7} 8)"))
 
 (expect (t/make-pattern "let requires a vector of name/expression pairs, but is given (+ 8 7 #(+ %1) 7) instead.")
@@ -54,7 +54,7 @@
 (log/babel-test-message "(if-let \"a\" 6)"))
 
 (expect (t/make-pattern "if-let requires a vector of name/expression pairs, but is given {8 9 5 4} instead.")
-(log/babel-test-message "(if-let {8 9 5 4} 6)"))
+(log/babel-test-message "(if-let {8 9, 5 4} 6)"))
 
 (expect (t/make-pattern "when-let requires a vector of name/expression pairs, but is given 6 instead.")
 (log/babel-test-message "(when-let 6)"))
@@ -118,8 +118,8 @@ In place of 8 the following are allowed: a name or a vector or a hashmap
 In place of 7 the following are allowed: a vector")
 (log/babel-test-message "(let [{8 7} 1] 0)"))
 
-(expect (t/make-pattern "Syntax problems with (let [{8 7 #(+ %1) 7} 1] 8):
-In place of {8 7 #(+ %1) 7} the following are allowed: a name or a vector
+(expect (t/make-pattern "Syntax problems with (let [{8 7, #(+ %1) 7} 1] 8):
+In place of {8 7, #(+ %1) 7} the following are allowed: a name or a vector
 In place of 8 the following are allowed: a name or a vector or a hashmap
 In place of 7 the following are allowed: a vector
 In place of #(+ %1) the following are allowed: a name or a vector or a hashmap")

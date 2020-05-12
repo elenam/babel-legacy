@@ -128,6 +128,7 @@
     (nil? val) '(nil)
     :else '()))
 
+;; TO-DO: check if this is needed
 (defn- print-with-nil-and-seq
   [val]
   (cond
@@ -185,8 +186,8 @@
                           " instead.")
                no-vectors?
                     (str "A function definition requires a vector of parameters, but was given "
-                         ;; TO-DO: check if the 'if' is needed:
-                         (if (nil? val) "nil" (d/print-macro-arg val :no-parens)) " instead.")
+                         (d/print-macro-arg val :no-parens)
+                         " instead.")
                 ;; Perhaps should report the failing argument
                 :else "The function definition is missing a vector of parameters or it is misplaced."))
       "Need to handle this case"))
@@ -198,7 +199,9 @@
   (let [val (:val prob)
         no-vectors? (empty? (filter vector? value))]
         (if no-vectors?
-                (str "A function definition requires a vector of parameters, but was given " (d/print-macro-arg val) " instead.")
+                (str "A function definition requires a vector of parameters, but was given "
+                     (d/print-macro-arg val)
+                     " instead.")
             ;; Perhaps should report the failing argument
             "The function definition is missing a vector of parameters or it is misplaced.")))
 
@@ -225,7 +228,9 @@
         multi-clause? (every? sequential? (drop start-clause before-n))
         clause-to-report (if named? (dec clause-n) clause-n)
         clause-str (if (> clause-to-report 0)
-                       (str "The issue is in the " (d/position-0-based->word clause-to-report) " clause.\n")
+                       (str "The issue is in the "
+                            (d/position-0-based->word clause-to-report)
+                            " clause.\n")
                        "")
         amp-issues (ampersand-issues value in)]
         (cond has-vector? "fn needs a vector of parameters and a body, but has something else instead."
@@ -271,7 +276,9 @@
                                (gp (first ins)))
         prob (first less-nested-groups)
         val (:val prob)]
-        (str "Function parameters must be a vector of names, but " (d/print-macro-arg val :no-parens) " was given instead.")))
+        (str "Function parameters must be a vector of names, but "
+             (d/print-macro-arg val :no-parens)
+             " was given instead.")))
 
 ;; ########################################################
 ;; ### Utils for getting location info from stacktrace ####

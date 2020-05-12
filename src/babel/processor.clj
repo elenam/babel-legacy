@@ -114,7 +114,8 @@
            " instead."))))
 
 (defn unknown-spec
-  "determines if the spec function is ours or someone's else"
+  "Handles spce that's not from clojure.core or babel: takes the exc-data
+  and returns the message as a string."
   [unknown-ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
         {:keys [path pred val via in]} (-> problem-list
@@ -225,6 +226,8 @@
         fn-name
         " "
         (d/print-macro-arg (first value))
+        ;; The 'if' is needed so that there is a space before the args, but no space when there
+        ;; are no args:
         (if (= (count (rest value)) 0)
             ""
             (str " " (d/print-macro-arg (rest value) :no-parens)))

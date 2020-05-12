@@ -351,7 +351,9 @@
 (defn- map-arg->str
   "Takes a map argument for a macro and returns its string representation"
   [map-arg]
-  (args->str (map #(args->str (map-entry->str %)) map-arg) "{"  "}"))
+  (str "{"
+       (s/join ", " (map #(args->str (map-entry->str %)) map-arg))
+       "}"))
 
 (defn- process-arg
   [arg]
@@ -395,7 +397,7 @@
             (or (second (re-matches #"\((.*)\)" (process-arg val)))
                 (process-arg val))
           :else (process-arg val)))
- ([val open-sym close-sym]
+ #_([val open-sym close-sym]
   (str open-sym (process-arg val) close-sym)))
 
 ;; Note that, while this has an overlap with general-types, I prefer
