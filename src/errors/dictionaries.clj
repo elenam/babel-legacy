@@ -184,7 +184,7 @@
 
 (defn number-word
   "number-word takes a non-negative integer as a string and changes it to a
-   string with the numbers corresponding spelling"
+   string with the number's corresponding spelling"
   [n]
   (if (< n 10) (["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"] n) n))
 
@@ -294,23 +294,14 @@
 
 (declare print-macro-arg)
 
-(defn macro-args->str
-  "Takes a sequence of arguments for a macro, returns a string
-   representation of these arguments for printing."
-  [args]
-  ; TO-DO: add printing of anonymous functions
-  (if (empty? args) " "
-      (let [args-with-spaces (conj (interpose " " args) " ")]
-           (apply str args-with-spaces))))
-
-  (defn extra-macro-args-info
-    "Takes a spec problem map. Returns information about extra input for a macro
-     if it exists (as a string), otherwise an empty string"
-    [spec-problem]
-    (let [{:keys [val]} spec-problem]
-         (if-not (empty? val)
-                 (str " The extra parts are: " (print-macro-arg val :no-parens))
-                 "")))
+(defn extra-macro-args-info
+  "Takes a spec problem map. Returns information about extra input for a macro
+   if it exists (as a string), otherwise an empty string"
+  [spec-problem]
+  (let [{:keys [val]} spec-problem]
+       (if-not (empty? val)
+               (str " The extra parts are: " (print-macro-arg val :no-parens))
+               "")))
 
 
  (defn print-single-arg
@@ -396,9 +387,7 @@
           (= k :no-parens)
             (or (second (re-matches #"\((.*)\)" (process-arg val)))
                 (process-arg val))
-          :else (process-arg val)))
- #_([val open-sym close-sym]
-  (str open-sym (process-arg val) close-sym)))
+          :else (process-arg val))))
 
 ;; Note that, while this has an overlap with general-types, I prefer
 ;; to keep it separate since it's used for a different purpose.

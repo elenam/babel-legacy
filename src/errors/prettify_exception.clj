@@ -30,24 +30,6 @@
       (symbol (get-function-name f-str))
       (symbol (get-function-name (.getName (type f)))))))
 
-(defn is-function?
-  "Uses our dictionary to check if a value should be printed as a function"
-  [v]
-  ;; checking for nil first:
-  (and v (= (get-type (.getName (type v))) "a function")))
-
-(defn lookup-fns
-  "Recursively replace internal Clojure function names with user-readable ones
-   in the given value"
-  [v]
-  (cond
-    (not (coll? v)) (if (is-function? v) (fn-name v) v)
-    (vector? v) (into [] (map lookup-fns v))
-    (seq? v) (into '() (reverse (map lookup-fns v)))
-    (set? v) (into #{} (map lookup-fns v))
-    (map? v) (reduce #(apply assoc %1 %2) {} (map lookup-fns v));; map has key/val pairs
-    :else v))
-
 (defn msg-from-matched-entry
   "Returns the modified error message by applying a function in the error
   dictionary to the message. If no match found, returns the message as is"
