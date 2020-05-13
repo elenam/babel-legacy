@@ -325,8 +325,8 @@
     :class "ClassNotFoundException"
     :match (beginandend "(\\S*)")
     :fn (fn [matches] (str "Name "
-                                          (nth matches 1)
-                                          " is undefined.\n"))}
+                           (nth matches 1)
+                           " is undefined.\n"))}
 
 
    ;###############################
@@ -337,8 +337,19 @@
     :class "NumberFormatException"
     :match (beginandend "Invalid number: (\\S*)")
     :fn (fn [matches] (str "The format of the number "
-                                          (nth matches 1)
-                                          " is invalid.\n"))}
+                           (nth matches 1)
+                           " is invalid.\n"))}
+
+    ;########################
+    ;### ClassFormatError ###
+    ;########################
+
+    {:key :class-format-error
+    :class "ClassFormatError"
+    :match (beginandend "Illegal field name (\\S*) in class (\\S*)")
+    :fn (fn [matches] (str "You cannot name a variable "
+                          (replace-special-symbols (nth matches 1))
+                          ".\n"))}
 
     ;#####################################################################
     ;### Runtime Exceptions or clojure.lang.LispReader$ReaderException ###

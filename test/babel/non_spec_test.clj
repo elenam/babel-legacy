@@ -60,6 +60,30 @@
 (expect #"(?s)The format of the number 8.5.1 is invalid\.(.*)"
 (log/babel-test-message "8.5.1"))
 
+;###############################
+;##### Class Format Error  #####
+;###############################
+
+(expect (t/make-pattern "You cannot name a variable \"?&5.a\".")
+(log/babel-test-message "(fn [?&5.a])"))
+
+(expect (t/make-pattern "You cannot name a variable \"?'.a\".")
+(log/babel-test-message "(fn [?'.a])"))
+
+;; Note: there is no way to restore _ back to - since there is
+;; no way to distiniguish the two:
+(expect (t/make-pattern "You cannot name a variable \"*_7.8\".")
+(log/babel-test-message "(fn [*-7.8])"))
+
+(expect (t/make-pattern "You cannot name a variable \"*7.6\".")
+(log/babel-test-message "(let [*7.6 8] 9)"))
+
+(expect (t/make-pattern "You cannot name a variable \"*7.6\".")
+(log/babel-test-message "(let [x 6 [*7.6] 8] 9)"))
+
+(expect (t/make-pattern "You cannot name a variable \"*+7.6\".")
+(log/babel-test-message "(let [x 6 [*+7.6] 8] 9)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;; RuntimeException ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

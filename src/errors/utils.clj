@@ -370,7 +370,7 @@
       or-empty-str
       d/fn-name-or-anonymous
       fn-name-trim
-      d/lookup-funct-name))
+      d/replace-special-symbols))
 
 (defn get-namespace-from-tr-element
   "Takes a function name as it appears in a stack trace

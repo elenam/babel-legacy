@@ -96,12 +96,12 @@
   (if (nil? v) "nil" (get-type (.getName (type v)))))
 
 ;; hashmap of internal function names and their user-friendly versions
-(def predefined-names {:_PLUS_ "+"  :_ "-" :_SLASH_ "/"})
+(def predefined-names {:_ "-" :_SLASH_ "/"})
 
-;;; lookup-funct-name: predefined function name -> string
-(defn lookup-funct-name
-  "looks up pre-defined function names, such as _PLUS_. If not found,
-	returns the original"
+(defn replace-special-symbols
+  "Takes a name with special symbols, such as _STAR_, and replaces them
+   with their printed equivalents. Special handling for '-' and '/'
+   which are replaced only when appearing as entire names."
   [fname]
   (let [lookup ((keyword fname) predefined-names)]
     (or lookup
@@ -111,7 +111,10 @@
             (s/replace #"_EQ_" "=")
             (s/replace #"_LT_" "<")
             (s/replace #"_GT_" ">")
-            (s/replace #"_STAR_" "*")))))
+            (s/replace #"_STAR_" "*")
+            (s/replace #"_SINGLEQUOTE_" "'")
+            (s/replace #"_PLUS_" "+") ;; Note: _SLASH_ also may need to be replaced, but we might not want to since it has a special meaning
+            (s/replace #"_AMPERSAND_" "&")))))
 
 ;;; fn-name-or-anonymous: string -> string
 (defn fn-name-or-anonymous
@@ -135,7 +138,7 @@
                     ;; the last match is the function name we need:
                     (first (reverse (re-matches #"(([^\.]+)\.)*([^\.]+)" fname))))]
     (if matched
-      (fn-name-or-anonymous (lookup-funct-name matched))
+      (fn-name-or-anonymous (replace-special-symbols matched))
       fname)))
 
 ;;; remove-inliner: string -> string
