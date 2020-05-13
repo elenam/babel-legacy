@@ -128,17 +128,11 @@
     (nil? val) '(nil)
     :else '()))
 
-;; TO-DO: check if this is needed
-#_(defn- print-with-nil-and-seq
-  [val]
-  (cond
-    (nil? val) "nil"
-    (and (seq? val) (not (#{"fn*" "quote"} (str (first val))))) (d/print-macro-arg val)
-    :else (d/print-macro-arg val :no-parens)))
-
 (defn- print-with-nil-and-seq
   [val]
-  (d/print-macro-arg val :no-parens :nil))
+  (if (and (seq? val) (not (#{"fn*" "quote"} (str (first val)))))
+      (d/print-macro-arg val :nil)
+      (d/print-macro-arg val :no-parens :nil)))
 
 (defn- not-names->str
   [val]
