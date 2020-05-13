@@ -35,7 +35,19 @@
 
 ;; print-macro-arg with :nil :
 (expect "nil" (print-macro-arg 'nil :nil))
-(expect "'(nil)" (print-macro-arg '(nil) :nil))
+(expect "(nil)" (print-macro-arg '(nil) :nil))
+
+;; Multiple keys
+(expect "nil" (print-macro-arg 'nil :nil :no-parens))
+(expect "nil" (print-macro-arg '(nil) :nil :no-parens))
+(expect "1 2 3" (print-macro-arg '(1 2 3) :nil :no-parens))
+(expect "[1 2 3]" (print-macro-arg '[1 2 3] :nil :no-parens))
+
+;; The order of the keys doesn't matter
+(expect "nil" (print-macro-arg 'nil :no-parens :nil))
+(expect "nil" (print-macro-arg '(nil) :no-parens :nil))
+(expect "1 2 3" (print-macro-arg '(1 2 3) :no-parens :nil))
+(expect "[1 2 3]" (print-macro-arg '[1 2 3] :no-parens :nil))
 
 ;; TO_DO:
 ;; - add cases with a quote inside an expression, the word "quote"
