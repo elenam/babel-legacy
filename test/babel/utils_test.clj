@@ -33,7 +33,9 @@
 (expect "+ 2 3 4 5" (print-macro-arg '(+ 2 3 4 5) :no-parens))
 (expect "(+ 2 3 4 5)" (print-macro-arg '((+ 2 3 4 5)) :no-parens))
 
+;; print-macro-arg with :nil :
+(expect "nil" (print-macro-arg 'nil :nil))
+(expect "'(nil)" (print-macro-arg '(nil) :nil))
 
 ;; TO_DO:
 ;; - add cases with a quote inside an expression, the word "quote"
-;; - add cases for :no-parens

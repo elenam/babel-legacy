@@ -258,6 +258,14 @@ Fails let spec; might be fixed in spec2.")
 fn is missing a name after &.")
 (log/babel-test-message "(fn [x &] 8)"))
 
+(expect (t/make-pattern "Syntax problems with (fn [& nil] 0):
+& must be followed by exactly one name, but is followed by nil instead.")
+(log/babel-test-message "(fn [& nil] 0)"))
+
+(expect (t/make-pattern "Syntax problems with (fn [& nil nil] 0):
+& must be followed by exactly one name, but is followed by nil nil instead.")
+(log/babel-test-message "(fn [& nil nil] 0)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; fn with & ;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

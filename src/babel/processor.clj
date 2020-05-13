@@ -200,7 +200,7 @@
   (let [printed-group (print-failed-predicates probs)]
        (if (not= printed-group "")
            (str "In place of "
-                (d/print-macro-arg val)
+                (d/print-macro-arg val :nil)
                 " the following are allowed:"
                 (print-failed-predicates probs) "\n")
            "")))
@@ -383,7 +383,7 @@
               (and (= n 1) (= (resolve (:pred (first problems))) #'clojure.core/vector?))
                    (str fn-name
                         " requires a vector of name/expression pairs, but is given "
-                        (d/print-macro-arg (:val (first problems)))
+                        (d/print-macro-arg (:val (first problems)) :nil)
                         " instead.\n")
               (invalid-macro-params? problems)
                     (str "The parameters are invalid in ("

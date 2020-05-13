@@ -388,6 +388,8 @@
           (= k :no-parens)
             (or (second (re-matches #"\((.*)\)" (process-arg val)))
                 (process-arg val))
+          (and (= k :nil) (nil? val))
+            "nil"
           :else (process-arg val))))
 
 ;; Note that, while this has an overlap with general-types, I prefer

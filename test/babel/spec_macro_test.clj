@@ -65,6 +65,9 @@
 (expect (t/make-pattern "let requires a vector of name/expression pairs, but is given '(1 2) instead.")
 (log/babel-test-message "(let '(1 2))"))
 
+(expect (t/make-pattern "when-let requires a vector of name/expression pairs, but is given nil instead.")
+(log/babel-test-message "(when-let nil nil)"))
+
 ;; TO-DO:
 ;; This wording is different from the wording above, and there is no space before the argument of 'let':
 (expect (t/make-pattern "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match. FIX!!!")
@@ -179,6 +182,9 @@ In place of (+ 1 2) the following are allowed: a name or a vector or a hashmap")
 In place of 7 the following are allowed: a name or a vector or a hashmap")
 (log/babel-test-message "(when-let [7 8])"))
 
+(expect (t/make-pattern "Syntax problems with (when-let [nil] [nil]):
+In place of nil the following are allowed: a name or a vector or a hashmap")
+(log/babel-test-message "(when-let [nil] [nil])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Extra Input;;;;;;;;;;;;;;;;;;;;;
