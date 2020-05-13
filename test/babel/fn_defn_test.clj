@@ -194,6 +194,14 @@ A function definition requires a vector of parameters, but was given #{8} instea
 Parameter vector must consist of names, but nil is not a name.")
 (log/babel-test-message "(fn a nil)"))
 
+(expect (t/make-pattern "Syntax problems with (fn [#(+ %&)]):
+Parameter vector must consist of names, but #(+ %&) is not a name.")
+(log/babel-test-message "(fn [#(+ %&)])"))
+
+(expect (t/make-pattern "Syntax problems with (fn [#(+ %&) [#(%&)]]):
+Parameter vector must consist of names, but #(+ %&), [#(%&)] are not names.")
+(log/babel-test-message "(fn [#(+ %&) [#(%&)]])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

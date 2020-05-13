@@ -314,6 +314,7 @@
      (nil? val) "nil"
      (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
      (re-matches #"p__(.*)" (str val)) ""
+     (re-matches #"rest__(\d+)(.*)" (str val)) "%&"
      :else (str val)))
 
 (defn- args->str
