@@ -583,6 +583,22 @@ A function definition requires a vector of parameters, but was given {:pre x} {:
 & must be followed by exactly one name, but is followed by 7 instead.")
 (log/babel-test-message "(defn a [& 7] 8)"))
 
+(expect (t/make-pattern "Syntax problems with (defn f [[& nil]] 6):
+& must be followed by exactly one name, but is followed by nil instead.")
+(log/babel-test-message "(defn f [[& nil]] 6)"))
+
+(expect (t/make-pattern "Syntax problems with (defn f [[x & #{9}]] 6):
+& must be followed by exactly one name, but is followed by #{9} instead.")
+(log/babel-test-message "(defn f [[x & #{9}]] 6)"))
+
+(expect (t/make-pattern "Syntax problems with (defn f [[x & #{}]] 6):
+& must be followed by exactly one name, but is followed by #{} instead.")
+(log/babel-test-message "(defn f [[x & #{}]] 6)"))
+
+(expect (t/make-pattern "Syntax problems with (defn f \"doc string\" [[x & #{}]] 6):
+& must be followed by exactly one name, but is followed by #{} instead.")
+(log/babel-test-message "(defn f \"doc string\" [[x & #{}]] 6)"))
+
 (expect (t/make-pattern "Syntax problems with (defn a \"doc string\" [x & 7] 8):
 & must be followed by exactly one name, but is followed by 7 instead.")
 (log/babel-test-message "(defn a \"doc string\" [x & 7] 8)"))

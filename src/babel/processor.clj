@@ -275,6 +275,13 @@
                                                  {:reason "Extra input", :path [:fn-tail :arity-1 :params]}))
                                       value))
               (u/has-every-match? probs-grouped
+                   [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                    {:path [:fn-tail :arity-n :bodies :params :var-params :var-form :local-symbol]}])
+                   (str error-name (u/parameters-not-names
+                                     (first (u/get-match probs-grouped
+                                                 {:path [:fn-tail :arity-n :bodies :params :var-params :var-form :local-symbol]}))
+                                      value))
+              (u/has-every-match? probs-grouped
                    [{:path [:fn-tail :arity-1 :params :var-params :var-form :local-symbol]}
                     {:path [:fn-tail :arity-1 :params :var-params :var-form :seq-destructure]}
                     {:path [:fn-tail :arity-1 :params :var-params :var-form :map-destructure]}
