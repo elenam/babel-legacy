@@ -388,18 +388,7 @@
               (or (second (re-matches #"\((.*)\)" (process-arg val)))
                   (process-arg val))
         :else (process-arg val)))
- ; ([val k]
- ;    (cond (and (= k :no-parens) (nil? val))
- ;            ""
- ;          (= k :no-parens)
- ;            (or (second (re-matches #"\((.*)\)" (process-arg val)))
- ;                (process-arg val))
- ;          (and (= k :nil) (nil? val))
- ;            "nil"
- ;          :else (process-arg val))))
-
-;; Note that, while this has an overlap with general-types, I prefer
-;; to keep it separate since it's used for a different purpose.
+ 
 (def class-lookup [[java.lang.Number "a number"]
                    [java.lang.String "a string"]
                    [java.lang.Character "a character"]])

@@ -326,6 +326,13 @@
                                                 {:reason "Extra input", :path [:fn-tail :arity-n :params]}))
                                    value))
              (u/has-every-match? probs-grouped
+                 [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
+                  {:path [:fn-tail :arity-n :params :var-params :var-form :local-symbol]}])
+                 (str error-name (u/parameters-not-names
+                                   (first (u/get-match probs-grouped
+                                                {:path [:fn-tail :arity-n :params :var-params :var-form :local-symbol]}))
+                                   value))
+             (u/has-every-match? probs-grouped
                  [{:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}
                   {:reason "Insufficient input", :path [:fn-tail :arity-n :params]}])
                  (str error-name (u/parameters-not-names

@@ -299,7 +299,6 @@ fn is missing a name after &.")
 fn needs a vector of parameters and a body, but has something else instead.")
 (log/babel-test-message "(fn [[x] &] 8)"))
 
-;; FAILED AFTER THE CHANGE
 (expect (t/make-pattern "Syntax problems with (fn [5 & 7] 8):
 Parameter vector must consist of names, but 5, 7 are not names.")
 (log/babel-test-message "(fn [5 & 7] 8)"))
@@ -311,6 +310,30 @@ Parameter vector must consist of names, but 5, 7 are not names.")
 (expect (t/make-pattern "Syntax problems with (fn [[x] & [5]] 2 3):
 fn needs a vector of parameters and a body, but has something else instead.")
 (log/babel-test-message "(fn [[x] & [5]] 2 3)"))
+
+;; Nested vector with &:
+
+(expect (t/make-pattern "Syntax problems with (fn [[x & nil]] 8):
+& must be followed by exactly one name, but is followed by nil instead.")
+(log/babel-test-message "(fn [[x & nil]] 8)"))
+
+(expect (t/make-pattern "Syntax problems with (fn [[& nil]] 8):
+& must be followed by exactly one name, but is followed by nil instead.")
+(log/babel-test-message "(fn [[& nil]] 8)"))
+
+(expect (t/make-pattern "Syntax problems with (fn [[& 6 & 6]] 8):
+& must be followed by exactly one name, but is followed by 6 & 6 instead.")
+(log/babel-test-message "(fn [[& 6 & 6]] 8)"))
+
+(expect (t/make-pattern "Syntax problems with (fn [[x &]] 8):
+fn is missing a name after &.")
+(log/babel-test-message "(fn [[x &]] 8)"))
+
+;; Nested vector with & after a variable:
+
+(expect (t/make-pattern "Syntax problems with (fn [x [& 6 & 6]] 8):
+Parameter vector must consist of names, but [& 6 & 6] is not a name.")
+(log/babel-test-message "(fn [x [& 6 & 6]] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;; a nested seq fn ;;;;;;;;;;;;;;;;;;;;
