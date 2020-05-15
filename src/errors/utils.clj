@@ -142,8 +142,22 @@
             (str names-str " is not a name.")
             (str names-str " are not names."))))
 
+(defn- vector-amp-issues
+  "Takes a vector and returns the part of the vector after the ampersand
+   if the vector has an invalid use of amepersand, or an empty list if there
+   are no ampersand issues. Is applied recursively to subvectors until
+   one is found."
+  [v]
+  (let [[before-amp amp-and-after] (split-with (complement #{'&}) v)
+         has-amp? (not (empty? amp-and-after))
+         not-names-before-amp (filter #(not (symbol? %)) before-amp)
+         count-after-amp (dec (count amp-and-after))
+         length-issue-after-amp? (not= count-after-amp 1)
+         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]))
+
 (defn- ampersand-issues
   [value in]
+  ;(println "Ampersand:" value " " in)
   (let [val-in (first (sp/select [(apply sp/nthpath (drop-last in))] value))
         [before-amp amp-and-after] (split-with (complement #{'&}) val-in)
         has-amp? (not (empty? amp-and-after))
@@ -151,9 +165,10 @@
         count-after-amp (dec (count amp-and-after))
         length-issue-after-amp? (not= count-after-amp 1)
         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
+        ;(println before-amp " and " amp-and-after)
         (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
             (rest amp-and-after)
-            '())))
+            nil)))
 
 (defn missing-name
   "Takes a value that's reported when defn is missing a name,
@@ -207,7 +222,7 @@
   [prob value]
   (let [{:keys [val in]} prob
         amp-issues (ampersand-issues value in)]
-        (cond (not (empty? amp-issues))
+        (cond (not (nil? amp-issues))
                 (str "& must be followed by exactly one name, but is followed by "
                      (d/print-macro-arg amp-issues :no-parens)
                      " instead.")
@@ -232,7 +247,7 @@
                        "")
         amp-issues (ampersand-issues value in)]
         (cond has-vector? "fn needs a vector of parameters and a body, but has something else instead."
-              (and (= "Extra input" reason) (not (empty? amp-issues)))
+              (and (= "Extra input" reason) (not (nil? amp-issues)))
                   (str clause-str
                        "& must be followed by exactly one name, but is followed by "
                        (d/print-macro-arg amp-issues :no-parens)
