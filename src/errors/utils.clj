@@ -144,7 +144,7 @@
 
 (defn- vector-amp-issues
   "Takes a vector and returns the part of the vector after the ampersand
-   if the vector has an invalid use of amepersand, or an empty list if there
+   if the vector has an invalid use of amepersand, or nil if there
    are no ampersand issues. Is applied recursively to subvectors until
    one is found."
   [v]
@@ -153,22 +153,26 @@
          not-names-before-amp (filter #(not (symbol? %)) before-amp)
          count-after-amp (dec (count amp-and-after))
          length-issue-after-amp? (not= count-after-amp 1)
-         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]))
+         not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
+         (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
+             (rest amp-and-after)
+             (first (filter #(not (nil? %)) (map vector-amp-issues (filter vector? v)))))))
 
 (defn- ampersand-issues
   [value in]
   ;(println "Ampersand:" value " " in)
-  (let [val-in (first (sp/select [(apply sp/nthpath (drop-last in))] value))
-        [before-amp amp-and-after] (split-with (complement #{'&}) val-in)
-        has-amp? (not (empty? amp-and-after))
-        not-names-before-amp (filter #(not (symbol? %)) before-amp)
-        count-after-amp (dec (count amp-and-after))
-        length-issue-after-amp? (not= count-after-amp 1)
-        not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
-        ;(println before-amp " and " amp-and-after)
-        (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
-            (rest amp-and-after)
-            nil)))
+  (let [val-in (first (sp/select [(apply sp/nthpath (drop-last in))] value))]
+       (vector-amp-issues val-in)))
+        ; [before-amp amp-and-after] (split-with (complement #{'&}) val-in)
+        ; has-amp? (not (empty? amp-and-after))
+        ; not-names-before-amp (filter #(not (symbol? %)) before-amp)
+        ; count-after-amp (dec (count amp-and-after))
+        ; length-issue-after-amp? (not= count-after-amp 1)
+        ; not-allowed-after-amp (or (not (symbol? (second amp-and-after))) (= '& (second amp-and-after)))]
+        ; ;(println before-amp " and " amp-and-after)
+        ; (if (and has-amp? (empty? not-names-before-amp) (or length-issue-after-amp? not-allowed-after-amp))
+        ;     (rest amp-and-after)
+        ;     nil)))
 
 (defn missing-name
   "Takes a value that's reported when defn is missing a name,
