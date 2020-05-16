@@ -329,10 +329,14 @@ fn needs a vector of parameters and a body, but has something else instead.")
 fn is missing a name after &.")
 (log/babel-test-message "(fn [[x &]] 8)"))
 
+(expect (t/make-pattern "Syntax problems with (fn [x u [[a [&]]]] 8):
+Missing a name after &.")
+(log/babel-test-message "(fn [x u [[a [&]]]] 8)"))
+
 ;; Nested vector with & after a variable:
 
 (expect (t/make-pattern "Syntax problems with (fn [x [& 6 & 6]] 8):
-Parameter vector must consist of names, but [& 6 & 6] is not a name.")
+P& must be followed by exactly one name, but is followed by 6 & 6 instead.")
 (log/babel-test-message "(fn [x [& 6 & 6]] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -425,11 +429,8 @@ The issue is in the second clause.
 & must be followed by exactly one name, but is followed by y z instead.")
 (log/babel-test-message "(fn ([x] 5) ([x & y z] 8))"))
 
-;; THIS STILL FAILS - Feb 11
-;; Gives an error of 'parameter vector must consists of names'.
-;; This is not a preferred error, but would do for now.
 (expect (t/make-pattern "Syntax problems with (fn [x u [& z y]] 8):
-Parameter vector must consist of names, but [& z y] is not a name.")
+& must be followed by exactly one name, but is followed by z y instead.")
 (log/babel-test-message "(fn [x u [& z y]] 8)"))
 
 (expect (t/make-pattern "Syntax problems with (fn [x & u [z y]] 8):
@@ -594,6 +595,10 @@ A function definition requires a vector of parameters, but was given {:pre x} {:
 (expect (t/make-pattern "Syntax problems with (defn f [[x & #{}]] 6):
 & must be followed by exactly one name, but is followed by #{} instead.")
 (log/babel-test-message "(defn f [[x & #{}]] 6)"))
+
+(expect (t/make-pattern "Syntax problems with (defn a [x u [[a [&]]]] 8):
+Missing a name after &.")
+(log/babel-test-message "(defn a [x u [[a [&]]]] 8)"))
 
 (expect (t/make-pattern "Syntax problems with (defn f \"doc string\" [[x & #{}]] 6):
 & must be followed by exactly one name, but is followed by #{} instead.")

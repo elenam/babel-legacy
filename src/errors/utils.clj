@@ -222,12 +222,16 @@
   [prob value]
   (let [{:keys [val in]} prob
         amp-issues (ampersand-issues value in)]
-        (cond (not (nil? amp-issues))
-                (str "& must be followed by exactly one name, but is followed by "
-                     (d/print-macro-arg amp-issues :no-parens)
-                     " instead.")
-          :else (str "Parameter vector must consist of names, but "
-                (not-names->str val)))))
+        (cond
+          (nil? amp-issues) ;; No issues with &
+              (str "Parameter vector must consist of names, but "
+                   (not-names->str val))
+          (empty? amp-issues) ; Nothing after &
+              (str "Missing a name after &.")
+          :else
+              (str "& must be followed by exactly one name, but is followed by "
+                   (d/print-macro-arg amp-issues :no-parens)
+                   " instead."))))
 
 (defn clause-single-spec
   [prob value]
