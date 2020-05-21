@@ -233,6 +233,31 @@
                    (d/print-macro-arg amp-issues :no-parens)
                    " instead."))))
 
+(defn multi-clause-fn?
+  "Takes a value of fn and returns true if it has multiple clauses
+   and false otherwise."
+  [value]
+  (if (symbol? (first value)) ;; check if a named fn
+      (every? seq? (rest value))
+      (every? seq? value)))
+
+(defn multi-clause-defn?
+  "Takes a value of defn and returns true if it has multiple clauses
+   and false otherwise."
+  [[_ & s]]
+  ;; The first of value is a name, ignore it
+  ;; The second may be a doc-string
+  (let [clauses-or-maps (if (string? (first s))
+                            (rest s)
+                            s)]
+       ;; the first and the last are allowed to be attribute maps
+       (or (every? seq? clauses-or-maps)
+           (and (map? (first clauses-or-maps))
+                (every? seq? (rest clauses-or-maps)))
+           (and (map? (first clauses-or-maps))
+                (map? (last clauses-or-maps))
+                (every? seq? (drop-last (rest clauses-or-maps)))))))
+
 (defn clause-single-spec
   [prob value]
   (let [{:keys [reason val pred in path]} prob
@@ -242,6 +267,8 @@
         named? (symbol? (first value))
         start-clause (if named? 1 0)
         has-vector? (some vector? before-n)
+        ;; Shouldn't this also be (> (count value) 1) or some such, adjusted to
+        ;; the name and possibly doc-string?
         multi-clause? (every? sequential? (drop start-clause before-n))
         clause-to-report (if named? (dec clause-n) clause-n)
         clause-str (if (> clause-to-report 0)
@@ -250,7 +277,8 @@
                             " clause.\n")
                        "")
         amp-issues (ampersand-issues value in)]
-        (cond has-vector? "fn needs a vector of parameters and a body, but has something else instead."
+        (cond has-vector?
+                "fn needs a vector of parameters and a body, but has something else instead."
               (and (= "Extra input" reason) (not (nil? amp-issues)))
                   (str clause-str
                        "& must be followed by exactly one name, but is followed by "
