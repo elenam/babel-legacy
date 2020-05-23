@@ -467,11 +467,15 @@ The issue is in the second clause.
 Parameter vector must consist of names, but 2, 7 are not names.")
 (log/babel-test-message "(fn a ([x] 2 3) ([2 & 7] 3))"))
 
-;; Doesn't report the clause
 (expect (t/make-pattern "Syntax problems with (fn a ([x] 2 3) ([x &] 3)):
 The issue is in the second clause.
 fn is missing a name after &.")
 (log/babel-test-message "(fn a ([x] 2 3) ([x &] 3))"))
+
+(expect (t/make-pattern "Syntax problems with (fn a ([x &] 3) ([x] 2 3)):
+The issue is in the first clause.
+fn is missing a name after &.")
+(log/babel-test-message "(fn a ([x &] 3) ([x] 2 3))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; defn missing name ;;;;;;;;;;;;;;;;

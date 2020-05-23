@@ -241,6 +241,14 @@
       (every? seq? (rest value))
       (every? seq? value)))
 
+(defn err-clause-str
+  [value [n & _]]
+  (let [k (if (symbol? (first value)) (dec n) n)
+        clause (d/position-0-based->word k)]
+       (str "The issue is in the "
+            clause
+            " clause.\n")))
+
 (defn multi-clause-defn?
   "Takes a value of defn and returns true if it has multiple clauses
    and false otherwise."
@@ -269,45 +277,44 @@
         has-vector? (some vector? before-n)
         ;; Shouldn't this also be (> (count value) 1) or some such, adjusted to
         ;; the name and possibly doc-string?
-        multi-clause? (every? sequential? (drop start-clause before-n))
-        clause-to-report (if named? (dec clause-n) clause-n)
-        clause-str (if (> clause-to-report 0)
-                       (str "The issue is in the "
-                            (d/position-0-based->word clause-to-report)
-                            " clause.\n")
-                       "")
+        ; multi-clause? (multi-clause-fn? value)
+        ; clause-to-report (if named? (dec clause-n) clause-n)
+        ; clause-str (err-clause-str value in)
+        ; clause-str (if (> clause-to-report 0)
+        ;                (err-clause-str value in)
+        ;                "")
         amp-issues (ampersand-issues value in)]
         (cond has-vector?
                 "fn needs a vector of parameters and a body, but has something else instead."
               (and (= "Extra input" reason) (not (nil? amp-issues)))
-                  (str clause-str
+                  (str ;clause-str
                        "& must be followed by exactly one name, but is followed by "
                        (d/print-macro-arg amp-issues :no-parens)
                        " instead.")
               (= "Extra input" reason)
-                 (str clause-str
+                 (str ;clause-str
                       "Parameter vector must consist of names, but "
                       (not-names->str val))
               (and (= pred 'clojure.core/vector?) (vector? clause-val))
-                 (str clause-str
+                 (str ;clause-str
                       "A function clause must be enclosed in parentheses, but is a vector "
                       (d/print-macro-arg clause-val)
                       " instead.")
               (and (= pred 'clojure.core/vector?) (#{"fn*" "quote"} (str val)))
-                 (str clause-str
+                 (str ;clause-str
                       (d/print-macro-arg clause-val)
                       " cannot be outside of a function body.")
-              (and (= pred 'clojure.core/vector?) (> clause-n start-clause) (not multi-clause?))
-                 (str clause-str
+              (and (= pred 'clojure.core/vector?) (> clause-n start-clause) (not (multi-clause-fn? value)))
+                 (str ;clause-str
                       "A function definition requires a vector of parameters, but was given "
                       (d/print-macro-arg (sp/select-one (sp/srange start-clause (inc clause-n)) value))
                       " instead.")
               (= pred 'clojure.core/vector?)
-                 (str clause-str
+                 (str ;clause-str
                       "A function definition requires a vector of parameters, but was given "
                       (d/print-macro-arg val)
                       " instead.")
-              :else (str clause-str
+              :else (str ;clause-str
                          (d/print-macro-arg val)
                          " cannot be outside of a function body."))))
 
