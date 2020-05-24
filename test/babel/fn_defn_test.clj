@@ -353,22 +353,18 @@ Parameter vector must consist of names, but 6 is not a name.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) 5):
-The issue is in the second clause.
 5 cannot be outside of a function body.")
 (log/babel-test-message "(fn ([x & y] 2 3) 5)"))
 
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) [5]):
-The issue is in the second clause.
 A function clause must be enclosed in parentheses, but is a vector [5] instead.")
 (log/babel-test-message "(fn ([x & y] 2 3) [5])"))
 
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) [x]):
-The issue is in the second clause.
 A function clause must be enclosed in parentheses, but is a vector [x] instead.")
 (log/babel-test-message "(fn ([x & y] 2 3) [x])"))
 
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) [#(+ %1)]):
-The issue is in the second clause.
 A function clause must be enclosed in parentheses, but is a vector [#(+ %1)] instead.")
 (log/babel-test-message "(fn ([x & y] 2 3) [#(+ %)])"))
 
@@ -441,21 +437,22 @@ The issue is in the second clause.
 & must be followed by exactly one name, but is followed by u [z y] instead.")
 (log/babel-test-message "(fn [x & u [z y]] 8)"))
 
+;; This shouldn't report the clause:
 (expect (t/make-pattern "Syntax problems with (fn a ([x y] 7) ([x] 7) 8):
-The issue is in the third clause.
 8 cannot be outside of a function body.")
 (log/babel-test-message "(fn a ([x y] 7) ([x] 7) 8)"))
 
+;; This shouldn't report the clause:
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) #{6}):
-The issue is in the second clause.
 #{6} cannot be outside of a function body.")
 (log/babel-test-message "(fn ([x & y] 2 3) #{6})"))
 
+;; This shouldn't report the clause:
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) {:a :b}):
-The issue is in the second clause.
 {:a :b} cannot be outside of a function body.")
 (log/babel-test-message "(fn ([x & y] 2 3) {:a :b})"))
 
+;; Reports the clause because functions are represented as sequences
 (expect (t/make-pattern "Syntax problems with (fn ([x & y] 2 3) #(+ %1 %1)):
 The issue is in the second clause.
 #(+ %1 %1) cannot be outside of a function body.")
