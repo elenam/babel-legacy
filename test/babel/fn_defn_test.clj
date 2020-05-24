@@ -336,7 +336,7 @@ Missing a name after &.")
 ;; Nested vector with & after a variable:
 
 (expect (t/make-pattern "Syntax problems with (fn [x [& 6 & 6]] 8):
-P& must be followed by exactly one name, but is followed by 6 & 6 instead.")
+& must be followed by exactly one name, but is followed by 6 & 6 instead.")
 (log/babel-test-message "(fn [x [& 6 & 6]] 8)"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -344,6 +344,7 @@ P& must be followed by exactly one name, but is followed by 6 & 6 instead.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (expect (t/make-pattern "Syntax problems with (fn ([[x] 6])):
+The issue is in the first clause.
 Parameter vector must consist of names, but 6 is not a name.")
 (log/babel-test-message "(fn ([[x] 6]))"))
 
@@ -407,7 +408,7 @@ The issue is in the third clause.
 (log/babel-test-message "(fn a ([x] 2 3) ([] 8) ([& x y] 3))"))
 
 (expect (t/make-pattern "Syntax problems with (fn ([x 5] 2 3) ([x y] 3)):
-The issue is in first clause.
+The issue is in the first clause.
 Parameter vector must consist of names, but 5 is not a name.")
 (log/babel-test-message "(fn ([x 5] 2 3) ([x y] 3))"))
 
@@ -416,11 +417,14 @@ The issue is in the second clause.
 Parameter vector must consist of names, but 6, 7 are not names.")
 (log/babel-test-message "(fn ([x] 5) ([6 & 7] 8))"))
 
+;; Because of parentheses, this needs the clause number
 (expect (t/make-pattern "Syntax problems with (fn ([x {6 7}])):
+The issue is in first clause.
 Parameter vector must consist of names, but {6 7} is not a name.")
 (log/babel-test-message "(fn ([x {6 7}]))"))
 
 (expect (t/make-pattern "Syntax problems with (fn ([[x] #(+ %3 %2)]) (8 9)):
+The issue is in the first clause.
 Parameter vector must consist of names, but #(+ %3 %2) is not a name.")
 (log/babel-test-message "(fn ([[x] #(+ %3 %2)]) (8 9))"))
 

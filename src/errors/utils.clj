@@ -237,9 +237,10 @@
   "Takes a value of fn and returns true if it has multiple clauses
    and false otherwise."
   [value]
-  (if (symbol? (first value)) ;; check if a named fn
-      (every? seq? (rest value))
-      (every? seq? value)))
+  (cond (empty? value) false
+        ;; check if a named fn:
+        (symbol? (first value)) (every? seq? (rest value))
+        :else (every? seq? value)))
 
 (defn err-clause-str
   [value [n & _]]
