@@ -419,7 +419,7 @@ Parameter vector must consist of names, but 6, 7 are not names.")
 
 ;; Because of parentheses, this needs the clause number
 (expect (t/make-pattern "Syntax problems with (fn ([x {6 7}])):
-The issue is in first clause.
+The issue is in the first clause.
 Parameter vector must consist of names, but {6 7} is not a name.")
 (log/babel-test-message "(fn ([x {6 7}]))"))
 

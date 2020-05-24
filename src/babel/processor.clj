@@ -308,7 +308,7 @@
                        (if multi-clause?
                            (u/err-clause-str value
                                              (:in (first problems)))
-                            "")                               
+                            "")
                        "fn is missing a name after &.")
              (u/has-every-match? probs-grouped
                   [{:pred 'clojure.core/vector?}
@@ -368,8 +368,10 @@
                                      value))
               (and (= n 1) (u/has-match-by-prefix? probs-grouped {:path [:fn-tail :arity-n]}))
                    (str error-name
-                        (u/err-clause-str value
-                                          (:in (first problems)))
+                        (if multi-clause?
+                            (u/err-clause-str value
+                                              (:in (first problems)))
+                            "")
                         (u/clause-single-spec (first problems) ; n=1, so there is only one prob
                                               value))
               :else (str error-name "Placeholder for a message for fn"))))
