@@ -332,10 +332,13 @@
              (u/has-every-match? probs-grouped
                  [{:reason "Extra input", :path [:fn-tail :arity-n :params]}
                   {:pred 'clojure.core/vector?, :path [:fn-tail :arity-1 :params]}])
-                 (str error-name (u/parameters-not-names
-                                   (first (u/get-match probs-grouped
-                                                {:reason "Extra input", :path [:fn-tail :arity-n :params]}))
-                                   value))
+                 (let [prob1 (first (u/get-match probs-grouped
+                              {:reason "Extra input", :path [:fn-tail :arity-n :params]}))]
+                       (str error-name
+                            (u/err-clause-str value
+                                              (:in prob1))
+                            (u/parameters-not-names prob1
+                                                    value)))
              (u/has-every-match? probs-grouped
                  [{:reason "Extra input", :path [:fn-tail :arity-1 :params]}
                   {:path [:fn-tail :arity-n :params :var-params :var-form :local-symbol]}])
@@ -363,8 +366,8 @@
               (str error-name
                    (u/err-clause-str value
                                      (:in (first problems)))
-                   (str error-name (u/clause-single-spec (first problems) ; n=1, so there is only one prob
-                                                         value)))
+                   (u/clause-single-spec (first problems) ; n=1, so there is only one prob
+                                         value))
               :else (str error-name "Placeholder for a message for fn"))))
 
 
