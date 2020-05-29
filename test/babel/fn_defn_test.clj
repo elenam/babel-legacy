@@ -634,6 +634,22 @@ Unexpected element(s) outside of the first clause: ([9] 0)")
 (log/babel-test-message "(defn f ([x] 6) ([9] 0))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; defn invalid signature ;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[x] 9] you need a list.")
+(log/babel-test-message "(defn f ([x] 9) [[x] 9] ([] 0))"))
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[]] you need a list.")
+(log/babel-test-message "(defn f ([x] 9) [[]] ([] 0))"))
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[] nil] you need a list.")
+(log/babel-test-message "(defn f ([x] 9) [[] nil] ([] 0))"))
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[] a] you need a list.")
+(log/babel-test-message "(defn f ([x] 9) [[] a] ([] 0))"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;; fn non-spec error   ;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

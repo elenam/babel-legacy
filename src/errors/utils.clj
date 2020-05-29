@@ -576,11 +576,20 @@
                       (recur (rest tr) result)
                   :else (recur (rest tr) (conj result (first tr)))))))
 
+(defn- filter-out-assert-fdecl
+  "Takes an exception stacktrace and removes everything that follows
+   assert_valid_fdecl"
+  [trace]
+  (first (split-with #(not= "assert_valid_fdecl" (get-name-from-tr-element %))
+                     trace)))
+
 (defn filter-stacktrace
+  "Takes an exception stacktrace and filters out unneeded elements."
   [trace]
   (let [[tr1 tr2] (split-with before-compiler? trace)]
        (->> (into (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-regex)] tr1)
                   (sp/select [sp/ALL (partial trace-elt-included? excluded-ns-after-compiler)] tr2))
+             filter-out-assert-fdecl
              remove-duplicates)))
 
 (defn- format-tr-element
