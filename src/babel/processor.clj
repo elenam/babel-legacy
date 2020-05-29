@@ -31,11 +31,18 @@
   (p-exc/process-errors t m))
 
 (defn macro-spec?
-  "Takes an exception object. Returns a true value if it's a spec error for a macro,
-   a false value otherwise."
+  "Takes an exception cause and via. Returns a true value
+   if it's a spec error for a macro, a false value otherwise."
   [cause via]
    (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
         (re-matches #"Call to (.*) did not conform to spec." cause)))
+
+(defn invalid-signature?
+  "Takes an exception cause and via. Returns a true value
+   if it's an invalid signature error, a false value otherwise."
+  [cause via]
+   (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
+        (re-matches #"Invalid signature (.*) should be a (.*)" cause)))
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
                 :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
@@ -49,6 +56,7 @@
                  :b-length-zero-to-one "zero or one arguments", :b-length-one-to-two "one or two arguments", :b-length-two-to-three "two or three arguments",
                  :b-length-two-to-four "two or up to four arguments", :b-length-one-to-three "one or up to three arguments", :b-length-zero-to-three "zero or up to three arguments"})
 
+;; TO-DO: check if this is used!
 (defn stringify
   "Takes a vector of keywords of failed predicates. If there is
   only one, returns the result of looking it up in spec-ref.
@@ -429,6 +437,19 @@
                          val-str
                          "):\n"
                          (process-paths-macro problems)))))
+
+ (defn invalid-sig-message
+   "Takes the cause and symbol of an invalid signature macroexpansion error and
+    returns the description of the problem as a string"
+   [cause s]
+   (let [[_ what should-be] (re-matches #"Invalid signature \"(.*)\" should be a (.*)" cause)]
+        (str "Syntax problems in "
+              s
+              ": instead of "
+              what
+              " you need a " ;; Encountered cases are: list, vector. Later we may need "an" article for some cases
+              should-be
+              ".")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; Location and stacktrace ;;;;;;;;;;;;;;;;;;;;;;

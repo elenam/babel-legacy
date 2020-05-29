@@ -44,17 +44,32 @@
         exc-info? (= clojure.lang.ExceptionInfo exc-type)
         compiler-exc? (= clojure.lang.Compiler$CompilerException exc-type)]
         (cond (and nested? compiler-exc? (processor/macro-spec? cause via))
-                   (str (processor/spec-macro-message cause data) "\n" (processor/location-macro-spec via))
+                   (str (processor/spec-macro-message cause data)
+                        "\n"
+                        (processor/location-macro-spec via))
+              (and nested? compiler-exc? (processor/invalid-signature? cause via))
+                   (str (processor/invalid-sig-message cause
+                                                       (:clojure.error/symbol (:data (first via))))
+                        "\n"
+                        (processor/location-macro-spec via))
               (or (and exc-info? (not nested?))
                   (and compiler-exc? (= clojure.lang.ExceptionInfo (resolve type))))
-                  (str (processor/spec-message data) "\n" (processor/location-function-spec data))
+                  (str (processor/spec-message data)
+                       "\n"
+                       (processor/location-function-spec data))
               (and exc-info? (= clojure.lang.ExceptionInfo (resolve type)))
-                  (str (processor/spec-message data) "\n" (processor/location-print-phase-spec data))
+                  (str (processor/spec-message data)
+                       "\n"
+                       (processor/location-print-phase-spec data))
               ;; Non-spec message in the print-eval phase:
               (= phase :print-eval-result)
-                  (str (processor/process-message type message) "\n" (processor/location-print-phase via trace))
+                  (str (processor/process-message type message)
+                       "\n"
+                       (processor/location-print-phase via trace))
               :else
-                  (str (processor/process-message type message) "\n" (processor/location-non-spec via trace)))))
+                  (str (processor/process-message type message)
+                       "\n"
+                       (processor/location-non-spec via trace)))))
 
 ;; I don't seem to be able to bind this var in middleware.
 ;; Running (setup-exc) in repl does the trick.
