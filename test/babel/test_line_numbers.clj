@@ -78,3 +78,8 @@
                         #"Called from the function: filter; location unknown\.")
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/spec-in-filter-test)"))
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[] a] you need a list."
+                        #"(.*)"
+                        "In file fragment3.clj on line 7 at position 1.")
+(log/babel-test-message "(load-file \"src/sample_test_files/fragment3.clj\")"))

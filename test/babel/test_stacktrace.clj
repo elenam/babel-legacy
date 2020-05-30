@@ -104,3 +104,13 @@
 ;#########################################################
 ;##### lazy seqs (:print-eval-result phase) ##############
 ;#########################################################
+
+;#########################################################
+;##### invalid signature (empty stacktrace) ##############
+;#########################################################
+
+(expect (t/make-pattern "Syntax problems in defn: instead of [[] a] you need a list."
+                        #"(.*)"
+                        "In file fragment3.clj on line 7 at position 1."
+                        #"(\s*)")
+(log/babel-test-message "(load-file \"src/sample_test_files/fragment3.clj\")"))
