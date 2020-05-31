@@ -38,9 +38,14 @@
     {:key :wrong-number-of-args-passed-to-a-keyword
     :class "IllegalArgumentException"
     :match (beginandend "Wrong number of args passed to keyword: (\\S*)")
-    :fn (fn [matches] (str "A keyword: "
+    :fn (fn [matches] (str "A keyword "
                                           (nth matches 1)
                                           " can only take one or two arguments.\n"))}
+
+    {:key :key-must-be-integer
+    :class "IllegalArgumentException"
+    :match (beginandend "Key must be integer(\\S*)")
+    :fn (fn [matches] "An argument for a vector must be an integer number.\n")}
 
     {:key :illegal-argument-no-val-supplied-for-key
     :class "IllegalArgumentException"

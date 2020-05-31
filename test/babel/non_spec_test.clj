@@ -139,8 +139,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; I don't think this is the wording we want, but this is what our processing currently does
-(expect #"(?s)A keyword: :a can only take one or two arguments\.(.*)"
+(expect #"(?s)A keyword :a can only take one or two arguments\.(.*)"
 (log/babel-test-message "(:a 4 5 6)"))
+
+(expect #"(?s)An argument for a vector must be an integer number\.(.*)"
+(log/babel-test-message "([7] \"a\")"))
 
 (expect #"(?s)Every key for a hashmap must be followed by a value, but the key :2 does not have a matching value\.(.*)"
 (log/babel-test-message "(hash-map :1 1, :2)"))
