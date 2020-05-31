@@ -124,7 +124,7 @@
 (defn- not-names->seq
   [val]
   (cond
-    (seq? val) (filter #(not (symbol? %)) val)
+    (seq? val) (filter #(not (simple-symbol? %)) val)
     (nil? val) '(nil)
     :else '()))
 
@@ -137,10 +137,17 @@
 (defn- not-names->str
   [val]
   (let [s (not-names->seq val)
+        n (count s)
         names-str (s/join ", " (map print-with-nil-and-seq s))]
-        (if (= 1 (count s))
-            (str names-str " is not a name.")
-            (str names-str " are not names."))))
+        (cond (and (= n 1) (symbol? (first s)))
+                   ;; case of a qualified name, e.g. a/b
+                   (str names-str " is not a valid name.")
+              (and (> n 1) (some symbol? s))
+                   ;; some are qualified name
+                   (str names-str " are not valid names.")
+              (= n 1)
+                   (str names-str " is not a name.")
+              :else (str names-str " are not names."))))
 
 
 (defn- vector-amp-issues

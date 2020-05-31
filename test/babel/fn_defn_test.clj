@@ -34,6 +34,14 @@ fn is missing a vector of parameters.")
 Parameter vector must consist of names, but nil is not a name.")
 (log/babel-test-message "(fn nil)"))
 
+(expect (t/make-pattern "Syntax problems with (fn a [a a.b/c 5]):
+Parameter vector must consist of names, but a.b/c, 5 are not valid names.")
+(log/babel-test-message "(fn a [a a.b/c 5])"))
+
+(expect (t/make-pattern "Syntax problems with (fn a [a.b/c]):
+Parameter vector must consist of names, but a.b/c is not a valid name.")
+(log/babel-test-message "(fn a [a.b/c])"))
+
 (expect (t/make-pattern
 "Syntax problems with (fn 5 6):
 A function definition requires a vector of parameters, but was given 5 instead."
@@ -521,6 +529,14 @@ defn is missing a name after &.")
 (expect (t/make-pattern "Syntax problems with (defn a [x 3 y z] 7):
 Parameter vector must consist of names, but 3 is not a name.")
 (log/babel-test-message "(defn a [x 3 y z] 7)"))
+
+(expect (t/make-pattern "Syntax problems with (defn a [a b/c]):
+Parameter vector must consist of names, but b/c is not a valid name.")
+(log/babel-test-message "(defn a [a b/c])"))
+
+(expect (t/make-pattern "Syntax problems with (defn a [a b/c 5]):
+Parameter vector must consist of names, but b/c, 5 are not valid names.")
+(log/babel-test-message "(defn a [a b/c 5])"))
 
 (expect (t/make-pattern "Syntax problems with (defn a [x 3 y #(+ 7 %1)] 7):
 Parameter vector must consist of names, but 3, #(+ 7 %1) are not names.")
