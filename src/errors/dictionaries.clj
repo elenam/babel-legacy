@@ -49,7 +49,7 @@
                       :clojure.lang.Named "a keyword or a symbol"
                       :clojure.lang.nil "nil"
                       :java.io.BufferedReader "a file or an input stream"
-                      ;; gives enough to beginners to look it up: 
+                      ;; gives enough to beginners to look it up:
                       :java.lang.Throwable "an exception (Throwable)"
                       :java.lang.Exception "an exception"})
 
@@ -84,7 +84,7 @@
         t2 (if (= (type t1) clojure.lang.Var) (type (var-get t1)) t1)
         t3 (or t2 (clojure.lang.RT/loadClassForName (str "clojure.lang." t))) ;; may need to add clojure.lang. for some types.
         matched-type (lookup-general-type t3)]
-    (or matched-type (str "unrecognized type " t))))
+    (or matched-type (str t))))
 
 ;;; get-type: type -> string
 (defn get-type

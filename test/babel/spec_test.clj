@@ -127,6 +127,13 @@
 (expect (t/make-pattern "The second argument of (contains? \"apple\" :a) was expected to be a number but is a keyword :a instead.")
 (log/babel-test-message "(contains? \"apple\" :a)"))
 
+(expect (t/make-pattern "The second argument of (map + 1) was expected to be a sequence but is a number 1 instead.")
+(log/babel-test-message "(map + (Byte. \"1\"))"))
+
+;; I am not sure how to print the object of an unknown type other than calling its toString
+(expect (t/make-pattern "The second argument of (map + class java.lang.Class) was expected to be a sequence but is java.lang.Class instead.")
+(log/babel-test-message "(map + (type (class 6)))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec errors on functions invoked by higher order functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -304,6 +304,8 @@
 (expect #"(?s)Expected a function, but a number was given instead\.(.*)"
 (log/babel-test-message "(->> 4 5)"))
 
+;; The tests below might stop working if our spec on map and + changes:
+
 (expect #"(?s)Expected a number, but a character was given instead\.(.*)"
 (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
@@ -318,6 +320,10 @@
 
 (expect #"(?s)Expected a number, but an exception \(Throwable\) was given instead\.(.*)"
 (log/babel-test-message "(+ (Throwable. \"hi\") [9 0])"))
+
+;; What used to be 'unrecognized class', now just prints the class:
+(expect #"(?s)Expected a number, but java\.lang\.Class was given instead\.(.*)"
+(log/babel-test-message "(+ 8 (type (class 7)))"))
 
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
