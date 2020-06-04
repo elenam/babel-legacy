@@ -48,7 +48,10 @@
 		                  ;; source: https://groups.google.com/forum/?fromgroups#!topic/clojure/rd-MDXvn3q8
                       :clojure.lang.Named "a keyword or a symbol"
                       :clojure.lang.nil "nil"
-                      :java.io.BufferedReader "a file or an input stream"})
+                      :java.io.BufferedReader "a file or an input stream"
+                      ;; gives enough to beginners to look it up: 
+                      :java.lang.Throwable "an exception (Throwable)"
+                      :java.lang.Exception "an exception"})
 
 ;; matching type interfaces to beginner-friendly names.
 ;; Note: since a type may implement more than one interface,

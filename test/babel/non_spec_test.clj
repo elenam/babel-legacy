@@ -307,6 +307,18 @@
 (expect #"(?s)Expected a number, but a character was given instead\.(.*)"
 (log/babel-test-message "(map #(> % 5) \"strawberry\")"))
 
+(expect #"(?s)Expected an exception \(Throwable\), but a number was given instead\.(.*)"
+(log/babel-test-message "(throw 5)"))
+
+(expect #"(?s)Expected a function, but an exception was given instead\.(.*)"
+(log/babel-test-message "(map (Exception. \"hi\") [9 0])"))
+
+(expect #"(?s)Expected a number, but an exception was given instead\.(.*)"
+(log/babel-test-message "(+ 5 (Exception. \"hi\"))"))
+
+(expect #"(?s)Expected a number, but an exception \(Throwable\) was given instead\.(.*)"
+(log/babel-test-message "(+ (Throwable. \"hi\") [9 0])"))
+
 (expect nil (log/babel-test-message "(compare 5 nil)"))
 
 (expect nil (log/babel-test-message "(compare nil 5)"))
