@@ -134,6 +134,12 @@
 (expect (t/make-pattern "The second argument of (map + class java.lang.Class) was expected to be a sequence but is java.lang.Class instead.")
 (log/babel-test-message "(map + (type (class 6)))"))
 
+(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
+(log/babel-test-message "(even? (StringBuilder. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
+(log/babel-test-message "(even? (StringBuffer. \"a\"))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec errors on functions invoked by higher order functions ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

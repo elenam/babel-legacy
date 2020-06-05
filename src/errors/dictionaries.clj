@@ -270,13 +270,21 @@
    [s]
    (or (cf/specced-lookup s) s))
 
+(defn- stringlike?
+  "Returns true if its argument should be printed as a string (in double quotes)
+   and false otherwise."
+  [s]
+  (or (string? s)
+      (instance? StringBuffer s)
+      (instance? StringBuilder s)))
+
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
   when given an anonymous function."
   [s]
-  (cond (string? s) ["a string " (str "\"" s "\"")]
-        (nil? s) ["" "nil"]
+  (cond (nil? s) ["" "nil"]
+        (stringlike? s) ["a string " (str "\"" s "\"")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         :else (let [t (get-dictionary-type s)]
@@ -302,26 +310,25 @@
 
 (defn extra-macro-args-info
   "Takes a spec problem map. Returns information about extra input for a macro
-   if it exists (as a string), otherwise an empty string"
+   if it exists (as a string), otherwise an empty string."
   [spec-problem]
   (let [{:keys [val]} spec-problem]
        (if-not (empty? val)
                (str " The extra parts are: " (print-macro-arg val :no-parens))
                "")))
 
-
- (defn print-single-arg
-   "Takes a single (atomic) argument of a macro and returns its string representation"
-   [val]
-   (cond
-     (string? val) (str "\"" val "\"")
-     (char? val) (str "\\" val)
-     (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
-     (nil? val) "nil"
-     (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
-     (re-matches #"p__(.*)" (str val)) ""
-     (re-matches #"rest__(\d+)(.*)" (str val)) "%&"
-     :else (str val)))
+(defn print-single-arg
+ "Takes a single (atomic) argument of a macro and returns its string representation."
+ [val]
+ (cond
+   (nil? val) "nil"
+   (char? val) (str "\\" val)
+   (string? val) (str "\"" val "\"")
+   (instance? java.util.regex.Pattern val) (str "#\"" val "\"")
+   (re-matches #"p(\d)__(.*)" (str val)) (s/replace (subs (str val) 0 2) #"p" "%")
+   (re-matches #"p__(.*)" (str val)) ""
+   (re-matches #"rest__(\d+)(.*)" (str val)) "%&"
+   :else (str val)))
 
 (defn- args->str
   "Takes a vector of arguments (as strings) and returns a string of these symbols
@@ -336,7 +343,7 @@
   "Returns true if the argument is not seqable or a string or nil,
    false otherwise"
   [val]
-  (or (not (seqable? val)) (string? val) (nil? val)))
+  (or (nil? val) (not (seqable? val)) (string? val)))
 
 (declare macro-args-rec) ;; needed for mutually recursive definitions & process-args
 
