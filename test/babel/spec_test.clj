@@ -25,13 +25,14 @@
 (expect (t/make-pattern "Wrong number of arguments in (map ): the function map expects one or more arguments but was given no arguments.")
 (log/babel-test-message "(map)"))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;Extra Output;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (expect (t/make-pattern "Wrong number of arguments in (contains? {} \"a\" #{}): the function contains? expects two arguments but was given three arguments.")
 (log/babel-test-message "(contains? {} \"a\" #{})"))
 
+(expect (t/make-pattern "Wrong number of arguments in (even? 6 ...): the function even? expects one argument but was given two arguments.")
+(log/babel-test-message "(even? 6 (Object.))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;First Argument;;;;;;;;;;;;;;;;;;;;
@@ -139,6 +140,11 @@
 
 (expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
 (log/babel-test-message "(even? (StringBuffer. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? ...) was expected to be a number but is an object ... instead.")
+(log/babel-test-message "(even? (Object.))"))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec errors on functions invoked by higher order functions ;;
