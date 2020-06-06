@@ -278,6 +278,11 @@
       (instance? StringBuffer s)
       (instance? StringBuilder s)))
 
+(defn- message-or-empty
+  [s]
+  (let [m (.getMessage s)]
+       (if m (str ": \"" m "\"") "")))
+
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
@@ -285,7 +290,11 @@
   [s]
   (cond (nil? s) ["" "nil"]
         (stringlike? s) ["a string " (str "\"" s "\"")]
-        (= Object (class s)) ["an object " "..."]
+        (= Object (class s)) ["an object " "<...>"]
+        (instance? java.lang.Throwable s) ["an exception " (str "<"
+                                                                (.getSimpleName (type s))
+                                                                (message-or-empty s)
+                                                                ">")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         :else (let [t (get-dictionary-type s)]
