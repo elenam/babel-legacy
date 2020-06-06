@@ -279,9 +279,19 @@
       (instance? StringBuilder s)))
 
 (defn- message-or-empty
+  "Takes an exception and returns its message formatting for a fucntion argument
+   or an empty string if the message is nil."
   [s]
   (let [m (.getMessage s)]
        (if m (str ": \"" m "\"") "")))
+
+(declare type-and-val)
+
+(defn- print-val
+  [x]
+  (-> x
+      type-and-val
+      second))
 
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
@@ -297,6 +307,8 @@
                                                                 ">")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
+        (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-val %) s))]
+        (coll? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL print-val s))]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
@@ -342,7 +354,7 @@
 
 (defn- args->str
   "Takes a vector of arguments (as strings) and returns a string of these symbols
-  with separated by empty spaces, enclosed into open-sym at the start and close-sym
+  separated by empty spaces, enclosed into open-sym at the start and close-sym
   at the end, if provided"
   ([args]
   (apply print-str args))
