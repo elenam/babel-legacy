@@ -34,16 +34,6 @@
 (expect (t/make-pattern "Wrong number of arguments in (even? 6 <...>): the function even? expects one argument but was given two arguments.")
 (log/babel-test-message "(even? 6 (Object.))"))
 
-(expect (t/make-pattern "The first argument of (even? <Exception: \"a\">) was expected to be a number but is an exception <Exception: \"a\"> instead.")
-(log/babel-test-message "(even?  (Exception. \"a\"))"))
-
-(expect (t/make-pattern "The first argument of (even? <ClassCastException: \"a\">) was expected to be a number "
-                        "but is an exception <ClassCastException: \"a\"> instead.")
-(log/babel-test-message "(even?  (ClassCastException. \"a\"))"))
-
-(expect (t/make-pattern "The first argument of (even? <Exception>) was expected to be a number but is an exception <Exception> instead.")
-(log/babel-test-message "(even?  (Exception.))"))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;First Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,6 +92,16 @@
                         "but is a regular expression pattern #\"\\*\" instead.")
 (log/babel-test-message "(clojure.string/split #\"\\*\" \"ab * 9 * l\")"))
 
+(expect (t/make-pattern "The first argument of (even? <Exception: \"a\">) was expected to be a number but is an exception <Exception: \"a\"> instead.")
+(log/babel-test-message "(even?  (Exception. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? <ClassCastException: \"a\">) was expected to be a number "
+                        "but is an exception <ClassCastException: \"a\"> instead.")
+(log/babel-test-message "(even?  (ClassCastException. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? <Exception>) was expected to be a number but is an exception <Exception> instead.")
+(log/babel-test-message "(even?  (Exception.))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -151,7 +151,7 @@
 (expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
 (log/babel-test-message "(even? (StringBuffer. \"a\"))"))
 
-(expect (t/make-pattern "The first argument of (even? ...) was expected to be a number but is an object ... instead.")
+(expect (t/make-pattern "The first argument of (even? <...>) was expected to be a number but is an object <...> instead.")
 (log/babel-test-message "(even? (Object.))"))
 
 
