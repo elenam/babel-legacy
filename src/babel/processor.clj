@@ -94,7 +94,7 @@
                                            filter-extra-spec-errors
                                            first)
         fn-name (d/get-function-name (str fn-full-name))
-        function-args-val (apply str (interpose " " (map d/range-collapse (map d/anonymous? (map #(second (d/type-and-val %)) args-val)))))
+        function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
         arg-number (first in)
         [print-type print-val] (map d/range-collapse (d/type-and-val val))]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
@@ -130,7 +130,7 @@
                                            filter-extra-spec-errors
                                            first)
          fn-name (d/get-function-name (str fn-full-name))
-         function-args-val (apply str (interpose " " (map d/anonymous? (map #(second (d/type-and-val %)) args-val))))
+         function-args-val (apply str (interpose " " (map d/anonymous->str (map #(second (d/type-and-val %)) args-val))))
          arg-number (first in)
          [print-type print-val] (d/type-and-val val)]
      (cond

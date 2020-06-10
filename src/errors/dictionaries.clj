@@ -318,15 +318,25 @@
                          (re-find #"unrecognized type" t) [t ""]
                          :else [t s]))))
 
-(defn anonymous?
-  "Returns a string representation of an anonymous function."
-  [a]
-  (if (= (str a) "an anonymous function") "#(...)" a))
+(defn anonymous->str
+  "Replaces the 'anonymous function' wording with #(...)."
+  [s]
+  (s/replace s "an anonymous function" "#(...)"))
 
 (defn range-collapse
-  "takes a range and if the collection is over 10 elements, returns the first 10 elements"
+  "Takes a range and if the collection is over 10 elements, returns the first 10 elements"
   [n]
   (if (and (cf/lazy? n) (< 10 (count n))) (cons (take 10 n) '(...)) n))
+
+(defn non-macro-spec-arg->str
+  "Takes a macro argument and returns its easy-to-read string representation."
+  [s]
+  (-> s
+      type-and-val
+      second
+      anonymous->str
+      range-collapse))
+
 
 (declare print-macro-arg)
 
