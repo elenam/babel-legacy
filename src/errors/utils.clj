@@ -173,7 +173,6 @@
 
 (defn- ampersand-issues
   [value in]
-  ;(println "Ampersand:" value " " in)
   (let [val-in (first (sp/select [(apply sp/nthpath (drop-last in))] value))]
        (vector-amp-issues val-in)))
 

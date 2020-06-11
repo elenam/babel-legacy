@@ -287,7 +287,7 @@
 
 (declare type-and-val)
 
-(defn- print-val
+(defn- print-coll-val
   [x]
   (-> x
       type-and-val
@@ -307,8 +307,8 @@
                                                                 ">")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
-        (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-val %) s))]
-        (coll? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL print-val s))]
+        (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-coll-val %) s))]
+        (coll? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL print-coll-val s))]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
@@ -325,8 +325,10 @@
 
 (defn range-collapse
   "Takes a range and if the collection is over 10 elements, returns the first 10 elements"
-  [n]
-  (if (and (cf/lazy? n) (< 10 (count n))) (cons (take 10 n) '(...)) n))
+  [s]
+  (if (and (coll? s) (< 10 (count s)))
+      (cons (take 10 s) `(...))
+      s))
 
 (defn non-macro-spec-arg->str
   "Takes a macro argument and returns its easy-to-read string representation."
@@ -337,6 +339,15 @@
       anonymous->str
       range-collapse))
 
+(defn anon-fn-handling
+  [s]
+  (if (= s "an anonymous function")
+      s
+      (anonymous->str (range-collapse s))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;; Printing macro args ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (declare print-macro-arg)
 

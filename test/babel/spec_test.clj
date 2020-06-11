@@ -102,6 +102,18 @@
 (expect (t/make-pattern "The first argument of (even? <Exception>) was expected to be a number but is an exception <Exception> instead.")
 (log/babel-test-message "(even?  (Exception.))"))
 
+(expect (t/make-pattern "The first argument of (even? #(...)) was expected to be a number but is an anonymous function instead.")
+(log/babel-test-message "(even? #(+ %))"))
+
+(expect (t/make-pattern "The first argument of (even? [#(...)]) was expected to be a number but is a vector [#(...)] instead.")
+(log/babel-test-message "(even? [#(+ %)])"))
+
+(expect (t/make-pattern "The first argument of (even? {<Exception> #(...)}) was expected to be a number but is a map {<Exception> #(...)} instead.")
+(log/babel-test-message "(even? {(Exception.) #(+ %)})"))
+
+(expect (t/make-pattern "The first argument of (even? {<Exception> [#(...)]}) was expected to be a number but is a map {<Exception> [#(...)]} instead.")
+(log/babel-test-message "(even? {(Exception.) [#(+ %)]})"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
