@@ -287,11 +287,57 @@
 
 (declare type-and-val)
 
+(defn- trim-to-n
+  "Takes a non-map collection and returns the first up to n elements,
+   preserving the collection type."
+  [c n]
+  (let [m (count c)]
+       (if (<= m n)
+           (print-str c)
+           (let [c1 (sp/transform [(sp/srange (inc m) (inc n))] sp/NONE c)
+                 c2 (if (set? c)
+                        (into #{} c1)
+                        c1)]
+                 (str (subs c2 0 (dec (count c2)))
+                      "..."
+                      (subs c2 (dec (count c2)) (count c2)))))))
+
+(defn- trim-map-to-n
+  "Takes a map and returns up to n elements of it. Elements are
+   chosen based on the first n values of the map's keys"
+  [m n]
+  (let [k (count m)]
+       (if (<= k n)
+           (print-str m)
+           (let [ks (take n (keys m))]
+                (sp/select-one (sp/submap ks) m)))))
+
 (defn- print-coll-val
   [x]
   (-> x
       type-and-val
       second))
+
+(defn anonymous->str
+  "Replaces the 'anonymous function' wording with #(...)."
+  [s]
+  (s/replace s "an anonymous function" "#(...)"))
+
+(defn non-macro-spec-arg->str
+  "Takes a macro argument and returns its easy-to-read string representation."
+  [s]
+  (-> s
+      type-and-val
+      second
+      anonymous->str
+      range-collapse))
+
+(defn anon-fn-handling
+  [s]
+  (if (= s "an anonymous function")
+      s
+      (anonymous->str (range-collapse s))))
+
 
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
@@ -317,33 +363,6 @@
                          (= t "a function ") [t (get-function-name (str s))]
                          (re-find #"unrecognized type" t) [t ""]
                          :else [t s]))))
-
-(defn anonymous->str
-  "Replaces the 'anonymous function' wording with #(...)."
-  [s]
-  (s/replace s "an anonymous function" "#(...)"))
-
-(defn range-collapse
-  "Takes a range and if the collection is over 10 elements, returns the first 10 elements"
-  [s]
-  (if (and (coll? s) (< 10 (count s)))
-      (cons (take 10 s) `(...))
-      s))
-
-(defn non-macro-spec-arg->str
-  "Takes a macro argument and returns its easy-to-read string representation."
-  [s]
-  (-> s
-      type-and-val
-      second
-      anonymous->str
-      range-collapse))
-
-(defn anon-fn-handling
-  [s]
-  (if (= s "an anonymous function")
-      s
-      (anonymous->str (range-collapse s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Printing macro args ;;;;;;;;;;;;;;;;;;;;;;;
