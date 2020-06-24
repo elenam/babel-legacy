@@ -96,7 +96,8 @@
         fn-name (d/get-function-name (str fn-full-name))
         function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
         arg-number (first in)
-        [print-type print-val] (map d/range-collapse (d/type-and-val val))]
+        ;[print-type print-val] (map d/range-collapse (d/type-and-val val))]
+        [print-type print-val] (map d/type-and-val val)]
     (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
       (str "Wrong number of arguments in ("
            fn-name

@@ -287,20 +287,27 @@
 
 (declare type-and-val)
 
+(defn- add-dots
+  "Takes a string and inserts ... before the last character."
+  [s]
+  (let [n (count s)
+        m (dec n)]
+        (str (subs s 0 m)
+             "..."
+             (subs s m n))))
+
 (defn- trim-to-n
   "Takes a non-map collection and returns the first up to n elements,
    preserving the collection type."
   [c n]
   (let [m (count c)]
        (if (<= m n)
-           (print-str c)
+           (str c)
            (let [c1 (sp/transform [(sp/srange (inc m) (inc n))] sp/NONE c)
                  c2 (if (set? c)
                         (into #{} c1)
                         c1)]
-                 (str (subs c2 0 (dec (count c2)))
-                      "..."
-                      (subs c2 (dec (count c2)) (count c2)))))))
+                 (add-dots c2)))))
 
 (defn- trim-map-to-n
   "Takes a map and returns up to n elements of it. Elements are
@@ -308,9 +315,9 @@
   [m n]
   (let [k (count m)]
        (if (<= k n)
-           (print-str m)
+           (str m)
            (let [ks (take n (keys m))]
-                (sp/select-one (sp/submap ks) m)))))
+                (add-dots (sp/select-one (sp/submap ks) m))))))
 
 (defn- print-coll-val
   [x]
@@ -330,13 +337,13 @@
       type-and-val
       second
       anonymous->str
-      range-collapse))
+      #_range-collapse))
 
 (defn anon-fn-handling
   [s]
   (if (= s "an anonymous function")
       s
-      (anonymous->str (range-collapse s))))
+      (anonymous->str s)));(range-collapse s))))
 
 
 (defn type-and-val
