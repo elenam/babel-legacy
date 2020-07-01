@@ -297,17 +297,19 @@
              (subs s m n))))
 
 (defn- trim-to-n
-  "Takes a non-map collection and returns the first up to n elements,
-   preserving the collection type."
+  "Takes a non-map collection and returns the string representation of its
+   first up to n elements, with ellipses as needed."
   [c n]
+  ;(println c)
   (let [m (count c)]
        (if (<= m n)
-           (str c)
-           (let [c1 (sp/transform [(sp/srange (inc m) (inc n))] sp/NONE c)
+           (print-str c)
+           (let [c1 (sp/transform [(sp/srange (inc n) m)] sp/NONE c)
                  c2 (if (set? c)
                         (into #{} c1)
-                        c1)]
-                 (add-dots c2)))))
+                        c1)
+                 c3 (print-str (sp/transform [sp/ALL] #(second (type-and-val %)) c2))]
+                 (add-dots c3)))))
 
 (defn- trim-map-to-n
   "Takes a map and returns up to n elements of it. Elements are
@@ -351,6 +353,7 @@
   of its type and readable value. Returns \"anonymous function\" as a value
   when given an anonymous function."
   [s]
+  ;(println "In type-and-val: " s)
   (cond (nil? s) ["" "nil"]
         (stringlike? s) ["a string " (str "\"" s "\"")]
         (= Object (class s)) ["an object " "<...>"]
@@ -361,7 +364,7 @@
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-coll-val %) s))]
-        (coll? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL print-coll-val s))]
+        (coll? s) [(get-dictionary-type s) (trim-to-n s 10)]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
