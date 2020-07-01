@@ -300,15 +300,15 @@
   "Takes a non-map collection and returns the string representation of its
    first up to n elements, with ellipses as needed."
   [c n]
-  ;(println c)
+  (println c)
   (let [m (count c)]
        (if (<= m n)
-           (print-str c)
+           (print-str (sp/transform [sp/ALL] #(second (type-and-val % 3)) c))
            (let [c1 (sp/transform [(sp/srange (inc n) m)] sp/NONE c)
                  c2 (if (set? c)
                         (into #{} c1)
                         c1)
-                 c3 (print-str (sp/transform [sp/ALL] #(second (type-and-val %)) c2))]
+                 c3 (print-str (sp/transform [sp/ALL] #(second (type-and-val % 3)) c2))]
                  (add-dots c3)))))
 
 (defn- trim-map-to-n
@@ -352,8 +352,9 @@
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
   when given an anonymous function."
-  [s]
-  ;(println "In type-and-val: " s)
+  ([s]
+    (type-and-val s 10))
+  ([s n]
   (cond (nil? s) ["" "nil"]
         (stringlike? s) ["a string " (str "\"" s "\"")]
         (= Object (class s)) ["an object " "<...>"]
@@ -364,7 +365,7 @@
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-coll-val %) s))]
-        (coll? s) [(get-dictionary-type s) (trim-to-n s 10)]
+        (coll? s) [(get-dictionary-type s) (trim-to-n s n)]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
@@ -372,7 +373,7 @@
                               ["" "an anonymous function"]
                          (= t "a function ") [t (get-function-name (str s))]
                          (re-find #"unrecognized type" t) [t ""]
-                         :else [t s]))))
+                         :else [t s])))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;; Printing macro args ;;;;;;;;;;;;;;;;;;;;;;;
