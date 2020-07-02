@@ -287,13 +287,13 @@
 
 (declare type-and-val)
 
-(defn- add-dots
-  "Takes a string and inserts ... before the last character."
-  [s]
+(defn- insert-str-into-coll
+  "Takes a string and a string to insert (such as "...") and inserts it before the last character."
+  [s dots]
   (let [n (count s)
         m (dec n)]
         (str (subs s 0 m)
-             "..."
+             dots
              (subs s m n))))
 
 (def LEVEL-1-LENGTH 10)
@@ -309,7 +309,6 @@
   "Takes a non-map collection and returns the string representation of its
    first up to n elements, with ellipses as needed."
   [c n]
-  (println c)
   (let [m (count c)]
        (if (<= m n)
            (print-str (sp/transform [sp/ALL] #(print-coll-elt % NESTED-LENGTH) c))
@@ -318,7 +317,7 @@
                         (into #{} c1)
                         c1)
                  c3 (print-str (sp/transform [sp/ALL] #(print-coll-elt % NESTED-LENGTH) c2))]
-                 (add-dots c3)))))
+                 (insert-str-into-coll c3 "...")))))
 
 (defn- trim-map-to-n
   "Takes a map and returns the string representation of up to n of its
@@ -338,7 +337,7 @@
                                              (fn [[k v]] [(print-coll-elt k NESTED-LENGTH)
                                                           (print-coll-elt v NESTED-LENGTH)])
                                              m1))]
-                (add-dots m2)))))
+                (insert-str-into-coll m2 ",...")))))
 
 (defn anonymous->str
   "Replaces the 'anonymous function' wording with #(...)."
@@ -358,7 +357,7 @@
   [s]
   (if (= s "an anonymous function")
       s
-      (anonymous->str s)));(range-collapse s))))
+      (anonymous->str s)))
 
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
