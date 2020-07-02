@@ -288,7 +288,7 @@
 (declare type-and-val)
 
 (defn- insert-str-into-coll
-  "Takes a string and a string to insert (such as "...") and inserts it before the last character."
+  "Takes a string and a string to insert (such as \"...\") and inserts it before the last character."
   [s dots]
   (let [n (count s)
         m (dec n)]
