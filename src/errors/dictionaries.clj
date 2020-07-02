@@ -296,6 +296,15 @@
              "..."
              (subs s m n))))
 
+(def LEVEL-1-LENGTH 10)
+(def NESTED-LENGTH 3)
+
+(defn- print-coll-elt
+  [x n]
+  (-> x
+      (type-and-val n)
+      second))
+
 (defn- trim-to-n
   "Takes a non-map collection and returns the string representation of its
    first up to n elements, with ellipses as needed."
@@ -303,29 +312,33 @@
   (println c)
   (let [m (count c)]
        (if (<= m n)
-           (print-str (sp/transform [sp/ALL] #(second (type-and-val % 3)) c))
-           (let [c1 (sp/transform [(sp/srange (inc n) m)] sp/NONE c)
+           (print-str (sp/transform [sp/ALL] #(print-coll-elt % NESTED-LENGTH) c))
+           (let [c1 (sp/transform [(sp/srange n m)] sp/NONE c)
                  c2 (if (set? c)
                         (into #{} c1)
                         c1)
-                 c3 (print-str (sp/transform [sp/ALL] #(second (type-and-val % 3)) c2))]
+                 c3 (print-str (sp/transform [sp/ALL] #(print-coll-elt % NESTED-LENGTH) c2))]
                  (add-dots c3)))))
 
 (defn- trim-map-to-n
-  "Takes a map and returns up to n elements of it. Elements are
-   chosen based on the first n values of the map's keys"
+  "Takes a map and returns the string representation of up to n of its
+   key/val pairs. Elements are chosen based on the first n values of the
+   map's keys"
   [m n]
-  (let [k (count m)]
+  (let [k (count m)] ; counts the number of key/val pairs
        (if (<= k n)
-           (str m)
-           (let [ks (take n (keys m))]
-                (add-dots (sp/select-one (sp/submap ks) m))))))
-
-(defn- print-coll-val
-  [x]
-  (-> x
-      type-and-val
-      second))
+           ;; need to make recursive calls on all of its keys and vals
+           (print-str (sp/transform [sp/ALL]
+                                    (fn [[k v]] [(print-coll-elt k NESTED-LENGTH)
+                                                 (print-coll-elt v NESTED-LENGTH)])
+                                    m))
+           (let [ks (take n (keys m))
+                 m1 (sp/select-one (sp/submap ks) m)
+                 m2 (print-str (sp/transform [sp/ALL]
+                                             (fn [[k v]] [(print-coll-elt k NESTED-LENGTH)
+                                                          (print-coll-elt v NESTED-LENGTH)])
+                                             m1))]
+                (add-dots m2)))))
 
 (defn anonymous->str
   "Replaces the 'anonymous function' wording with #(...)."
@@ -347,13 +360,12 @@
       s
       (anonymous->str s)));(range-collapse s))))
 
-
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
   when given an anonymous function."
   ([s]
-    (type-and-val s 10))
+    (type-and-val s LEVEL-1-LENGTH))
   ([s n]
   (cond (nil? s) ["" "nil"]
         (stringlike? s) ["a string " (str "\"" s "\"")]
@@ -364,7 +376,7 @@
                                                                 ">")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
-        (map? s) [(get-dictionary-type s) (print-str (sp/transform sp/ALL #(sp/transform sp/ALL print-coll-val %) s))]
+        (map? s) [(get-dictionary-type s) (trim-map-to-n s (Math/ceil (/ n 2)))] ; passing the number of pairs for a map
         (coll? s) [(get-dictionary-type s) (trim-to-n s n)]
         :else (let [t (get-dictionary-type s)]
                    (cond

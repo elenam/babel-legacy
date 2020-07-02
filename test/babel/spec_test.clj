@@ -132,6 +132,42 @@
 (expect (t/make-pattern "The first argument of (even? {9 0, 8 7, 5 6, 7 8, 2 4,...})) was expected to be a number but is a map {9 0, 8 7, 5 6, 7 8, 2 4,...} instead.")
 (log/babel-test-message "(even? {9 0 8 7 5 6 7 8 2 4 6 9 0 7})"))
 
+(expect (t/make-pattern "The first argument of (even? #{"
+                        ;; We don't know the order of set elements:
+                        #"(\d+ ){9}"
+                        #"(\d+)"
+                        "...}) was expected to be a number but is a set #{"
+                        #"(\d+ ){9}"
+                        #"(\d+)"
+                        "...} instead.")
+(log/babel-test-message "(even? #{1 2 3 4 5 6 7 8 9 10 11 12 13})"))
+
+(expect (t/make-pattern "The first argument of (even? #{#{"
+                        ;; We don't know the order of set elements:
+                        #"(\d+ ){2}"
+                        #"(\d+)"
+                        "...} #{"
+                        #"(\d+ ){2}"
+                        #"(\d+)"
+                        "...} #{"
+                        #"\d+ \d+"
+                        "}}) was expected to be a number but is a set #{#{"
+                        #"(\d+ ){2}"
+                        #"(\d+)"
+                        "...} #{"
+                        #"(\d+ ){2}"
+                        #"(\d+)"
+                        "...} #{"
+                        #"\d+ \d+"
+                        "}} instead.")
+(log/babel-test-message "(even? #{#{1 2 3 4 5 6} #{7 8 9 10 11} #{12 13}})"))
+
+(expect (t/make-pattern "The first argument of (even? #{#{[1 2 3...]}}) was expected to be a number but is a set #{#{[1 2 3...]}} instead.")
+(log/babel-test-message "(even? #{#{[1 2 3 4 5 6 7 8 9 10 11 12 13]}})"))
+
+(expect (t/make-pattern "The first argument of (even? [#(...) #(...) 1 2 3 4 5 6 7 8...]) was expected to be a number but is a vector [#(...) #(...) 1 2 3 4 5 6 7 8...] instead.")
+(log/babel-test-message "(even? [#(+ %) (fn [x] (+ x)) 1 2 3 4 5 6 7 8 9 10 11 12])"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
