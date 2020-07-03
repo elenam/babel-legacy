@@ -285,6 +285,10 @@
   (let [m (.getMessage s)]
        (if m (str ": \"" m "\"") "")))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Functions for printing args for non-macro spec failures ;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (declare type-and-val)
 
 (defn- insert-str-into-coll
@@ -345,10 +349,10 @@
   (s/replace s "an anonymous function" "#(...)"))
 
 (defn non-macro-spec-arg->str
-  "Takes a macro argument and returns its easy-to-read string representation."
+  "Takes a non-macro argument and returns its easy-to-read string representation."
   [s]
   (-> s
-      print-coll-elt
+      (print-coll-elt LEVEL-1-LENGTH)
       anonymous->str))
 
 (defn anon-fn-handling
@@ -374,6 +378,7 @@
                                                                 (message-or-empty s)
                                                                 ">")]
         (instance? java.util.regex.Pattern s) ["a regular expression pattern " (str "#\"" s "\"")]
+        (instance? java.lang.reflect.Type s) ["a type " (.getTypeName s)]
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         (map? s) [(get-dictionary-type s) (trim-map-to-n s (Math/ceil (/ n 2)))] ; passing the number of pairs for a map
         (coll? s) [(get-dictionary-type s) (trim-to-n s n)]

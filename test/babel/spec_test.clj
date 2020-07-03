@@ -220,7 +220,9 @@
 (log/babel-test-message "(map + (Byte. \"1\"))"))
 
 ;; I am not sure how to print the object of an unknown type other than calling its toString
-(expect (t/make-pattern "The second argument of (map + class java.lang.Class) was expected to be a sequence but is java.lang.Class instead.")
+;; Need another example!!!
+
+(expect (t/make-pattern "The second argument of (map + java.lang.Class) was expected to be a sequence but is a type java.lang.Class instead.")
 (log/babel-test-message "(map + (type (class 6)))"))
 
 (expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
