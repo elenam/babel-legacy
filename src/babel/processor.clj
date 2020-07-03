@@ -119,7 +119,7 @@
            (stringify path)
            " but is "
            print-type
-           print-val
+           (d/anon-fn-handling print-val)
            " instead."))))
 
 (defn unknown-spec

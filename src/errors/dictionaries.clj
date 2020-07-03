@@ -348,12 +348,12 @@
   "Takes a macro argument and returns its easy-to-read string representation."
   [s]
   (-> s
-      type-and-val
-      second
-      anonymous->str
-      #_range-collapse))
+      print-coll-elt
+      anonymous->str))
 
 (defn anon-fn-handling
+  "Takes a processed value and replaces anonymous functions in it, unless
+   the entire expression is 'an anonymous function'"
   [s]
   (if (= s "an anonymous function")
       s

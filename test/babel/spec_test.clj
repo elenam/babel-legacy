@@ -117,7 +117,7 @@
 (expect (t/make-pattern "The first argument of (even? [1 2 3 4 5 6 7 8 9 0...]) was expected to be a number but is a vector [1 2 3 4 5 6 7 8 9 0...] instead.")
 (log/babel-test-message "(even? [1 2 3 4 5 6 7 8 9 0 1 2 3 4])"))
 
-(expect (t/make-pattern "The first argument of (even? '(1 2 3 4 5 6 7 8 9 0...)) was expected to be a number but is a list '(1 2 3 4 5 6 7 8 9 0...) instead.")
+(expect (t/make-pattern "The first argument of (even? (1 2 3 4 5 6 7 8 9 0...)) was expected to be a number but is a list (1 2 3 4 5 6 7 8 9 0...) instead.")
 (log/babel-test-message "(even? '(1 2 3 4 5 6 7 8 9 0 1 2 3 4))"))
 
 (expect (t/make-pattern "The first argument of (even? [[1 2 3...]]) was expected to be a number but is a vector [[1 2 3...]] instead.")
@@ -129,7 +129,7 @@
 (expect (t/make-pattern "The first argument of (even? {[1 2 3...] [1 2 3...]}) was expected to be a number but is a map {[1 2 3...] [1 2 3...]} instead.")
 (log/babel-test-message "(even? {[1 2 3 4 5 6 7 8 9 0 1 2 3 4] [1 2 3 4 5 6 7 8 9 0 1 2 3 4]})"))
 
-(expect (t/make-pattern "The first argument of (even? {9 0, 8 7, 5 6, 7 8, 2 4,...})) was expected to be a number but is a map {9 0, 8 7, 5 6, 7 8, 2 4,...} instead.")
+(expect (t/make-pattern "The first argument of (even? {9 0, 8 7, 5 6, 7 8, 2 4,...}) was expected to be a number but is a map {9 0, 8 7, 5 6, 7 8, 2 4,...} instead.")
 (log/babel-test-message "(even? {9 0 8 7 5 6 7 8 2 4 6 9 0 7})"))
 
 (expect (t/make-pattern "The first argument of (even? #{"
