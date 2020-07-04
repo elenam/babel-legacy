@@ -164,7 +164,7 @@
        {:keys [pred]} (-> problem-list
                           filter-extra-spec-errors
                           first)]
- (if (or (re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred)))
+ (if (or #_(re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred)))
      (babel-spec-message data)
      (unknown-spec data))))
 
