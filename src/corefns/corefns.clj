@@ -61,7 +61,7 @@
 
 (s/def ::b-function-or-lazy (s/alt :function ifn? :lazy ::b-lazy))
 (s/def ::b-number-or-lazy (s/alt :num ::b-number :lazy ::b-lazy))
-(s/def ::b-string-or-lazy (s/alt :string ::b-string :lazy ::b-lazy))
+(s/def ::b-string-or-lazy (s/alt :str ::b-string :lazy ::b-lazy))
 (s/def ::b-map-vec-or-lazy (s/alt :or (s/alt :map map? :vector vector?) :lazy ::b-lazy))
 (s/def ::any-or-lazy (s/alt :any any? :lazy ::b-lazy))
 (s/def ::greater-than-zero greater-than-zero?) ;; CHECK WHY THIS DOESN'T INCLUDE lazy
@@ -372,19 +372,19 @@
 
 #_(s/fdef clojure.core/require
   :args (s/and ::b-length-greater-zero
-        (s/+ (s/cat :arg-one (s/or :list ::requirelist :vector ::requirevector :symbol symbol? :class class? :key keyword?)
+        (s/+ (s/cat :arg-one (s/or :list ::requirelist :vector ::requirevector :symbol ::b-symbol :class class? :key keyword?)
                     :arg-two (s/* (s/or :key keyword? :collection (s/nilable ::b-coll)))))))
 #_(stest/instrument `clojure.core/require)
 
 #_(s/fdef clojure.core/use
   :args (s/and ::b-length-greater-zero
-               (s/cat :a (s/+ (s/or :list ::requirelist :vector ::requirevector :symbol symbol? :class class?))
+               (s/cat :a (s/+ (s/or :list ::requirelist :vector ::requirevector :symbol ::b-symbol :class class?))
                       :keyword (s/* keyword?))))
 #_(stest/instrument `clojure.core/use)
 
 #_(s/fdef clojure.core/refer
   :args (s/and ::b-length-greater-zero
-               (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable ::b-coll)))))))
+               (s/cat :symbol ::b-symbol :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable ::b-coll)))))))
 #_(stest/instrument `clojure.core/refer)
 
 (def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +, 'even? even?, 'odd? odd?}))
