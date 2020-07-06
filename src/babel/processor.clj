@@ -164,7 +164,7 @@
   "Takes a list of spec problems, returns true if any of the :via starts
    with :corefns.corefns"
   [probs]
-  (sp/selected-any? [sp/ALL :via sp/ALL #(s/starts-with? % BABEL-NS)] probs))
+  (sp/selected-any? [sp/ALL (sp/multi-path :via :pred) sp/ALL #(s/starts-with? % BABEL-NS)] probs))
 
 
 (defn spec-message
