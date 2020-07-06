@@ -123,8 +123,8 @@
            (d/anon-fn-handling print-val)
            " instead."))))
 
-(defn unknown-spec
-  "Handles spce that's not from clojure.core or babel: takes the exc-data
+(defn third-party-spec
+  "Handles spce that's not from babel: takes the exc-data
   and returns the message as a string."
   [unknown-ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
@@ -161,10 +161,11 @@
 (def BABEL-NS ":corefns.corefns")
 
 (defn- babel-fn-spec?
-  "Takes a list of spec problems, returns true if any of the :via starts
-   with :corefns.corefns"
+  "Takes a list of spec problems, returns true if any of the :via or :pred
+   starts with :corefns.corefns"
   [probs]
-  (sp/selected-any? [sp/ALL (sp/multi-path :via :pred) sp/ALL #(s/starts-with? % BABEL-NS)] probs))
+  (let [p (sp/select [sp/ALL (sp/multi-path :via :pred)] probs)]
+        (sp/selected-any? [sp/ALL (sp/if-path vector? sp/ALL sp/STAY)  #(s/starts-with? (str %) BABEL-NS)] p)))
 
 
 (defn spec-message
@@ -174,7 +175,7 @@
  (let [{probs :clojure.spec.alpha/problems} data]
  (if (babel-fn-spec? probs)
      (babel-spec-message data)
-     (unknown-spec data))))
+     (third-party-spec data))))
 
 
 ;; Predicates are mapped to a pair of a position and a beginner-friendly
