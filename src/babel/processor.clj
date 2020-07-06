@@ -1,5 +1,6 @@
 (ns babel.processor
  (:require [clojure.string :as s]
+           [com.rpl.specter :as sp]
            [errors.prettify-exception :as p-exc]
            [errors.utils :as u]
            [errors.dictionaries :as d]
@@ -157,14 +158,21 @@
             ") fails a requirement: must be a "
             pred))))
 
+(def BABEL-NS ":corefns.corefns")
+
+(defn- babel-fn-spec?
+  "Takes a list of spec problems, returns true if any of the :via starts
+   with :corefns.corefns"
+  [probs]
+  (sp/selected-any? [sp/ALL :via sp/ALL #(s/starts-with? % BABEL-NS)] probs))
+
+
 (defn spec-message
- "uses babel-spec-message"
+ "Takes exception data and calls either babel spec processing or third-party spec
+  processing."
  [data]
- (let [{problem-list :clojure.spec.alpha/problems} data
-       {:keys [pred]} (-> problem-list
-                          filter-extra-spec-errors
-                          first)]
- (if (or #_(re-matches #"clojure.core(.*)" (str pred)) (re-matches #"corefns\.corefns(.*)" (str pred)))
+ (let [{probs :clojure.spec.alpha/problems} data]
+ (if (babel-fn-spec? probs)
      (babel-spec-message data)
      (unknown-spec data))))
 
