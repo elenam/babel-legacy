@@ -43,12 +43,16 @@
 
 ;;;;;;;;;;;;;; Data types ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (s/def ::b-number number?)
+(s/def ::b-seqable seqable?)
+(s/def ::b-string string?)
+(s/def ::b-coll coll?)
+(s/def ::b-symbol symbol?)
 
 (defn b-not-0? [num] (not= num 0))
 (defn greater-than-zero? [number] (and (::b-number number)(< 0 number)))
 
 ;#########Lazy functions############
-(defn not-map? [coll] (and (coll? coll) (not (map? coll))))
+(defn not-map? [coll] (and (::b-coll coll) (not (map? coll))))
 (s/def ::b-not-map not-map?)
 
 (defn lazy? [lazy-sequence] (or (instance? clojure.lang.IChunkedSeq lazy-sequence)
@@ -57,7 +61,7 @@
 
 (s/def ::b-function-or-lazy (s/alt :function ifn? :lazy ::b-lazy))
 (s/def ::b-number-or-lazy (s/alt :num ::b-number :lazy ::b-lazy))
-(s/def ::b-string-or-lazy (s/alt :num string? :lazy ::b-lazy))
+(s/def ::b-string-or-lazy (s/alt :string ::b-string :lazy ::b-lazy))
 (s/def ::b-map-vec-or-lazy (s/alt :or (s/alt :map map? :vector vector?) :lazy ::b-lazy))
 (s/def ::any-or-lazy (s/alt :any any? :lazy ::b-lazy))
 (s/def ::greater-than-zero greater-than-zero?) ;; CHECK WHY THIS DOESN'T INCLUDE lazy
@@ -68,7 +72,7 @@
 
 (s/def ::number-or-collection (s/alt :arg-one ::b-number-or-lazy
                                      :arg-two (s/cat :number ::b-number-or-lazy
-                                                     :collection (s/nilable seqable?))))
+                                                     :collection (s/nilable ::b-seqable))))
 
 ;;; ###################### Length-with-lazy ##############################
 
@@ -77,8 +81,8 @@
 (s/def ::length-greater-zero-number (s/and ::b-length-greater-zero (s/cat :number (s/+ ::b-number))))
 
 (s/def ::bindings-seq2 (s/and vector? ::binding-seq))
-(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/or :a (s/nilable coll?)
-                                                                              :b symbol?)))
+(s/def ::binding-seq (s/cat :a :clojure.core.specs.alpha/binding-form :b (s/or :a (s/nilable ::b-coll)
+                                                                              :b ::b-symbol)))
 
 
 
@@ -146,14 +150,14 @@
 (s/fdef clojure.core/into
   :args (s/and ::b-length-zero-to-three
                (s/or :arg-one (s/cat :any (s/? any?))
-                     :arg-two (s/cat :coll (s/nilable coll?) :any any?)
-                     :arg-three (s/cat :coll (s/nilable coll?) :function ::b-function-or-lazy :coll any?)
+                     :arg-two (s/cat :coll (s/nilable ::b-coll) :any any?)
+                     :arg-three (s/cat :coll (s/nilable ::b-coll) :function ::b-function-or-lazy :coll any?)
                      )))
 (stest/instrument `clojure.core/into)
 
 (s/fdef clojure.core/map
   :args (s/and ::b-length-greater-zero
-               (s/cat :function any? :collection (s/* seqable?)))) ;change to a + to block transducers
+               (s/cat :function any? :collection (s/* ::b-seqable)))) ;change to a + to block transducers
 (stest/instrument `clojure.core/map)
 
 (s/fdef clojure.core/mod
@@ -177,14 +181,14 @@
 
 (s/fdef clojure.core/reduce
   :args (s/and ::b-length-two-to-three
-    (s/or :arg-one (s/cat :function ::b-function-or-lazy :collection (s/nilable coll?))
-          :arg-two (s/cat :function ::b-function-or-lazy :value any? :collection (s/nilable coll?)))))
+    (s/or :arg-one (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-coll))
+          :arg-two (s/cat :function ::b-function-or-lazy :value any? :collection (s/nilable ::b-coll)))))
 (stest/instrument `clojure.core/reduce)
 
 (s/fdef clojure.core/get-in
   :args (s/and ::b-length-two-to-three
-    (s/or :arg-one (s/cat :collection (s/nilable coll?) :collection (s/nilable coll?))
-          :arg-two (s/cat :collection (s/nilable coll?) :collection (s/nilable coll?) :value any?))))
+    (s/or :arg-one (s/cat :collection (s/nilable ::b-coll) :collection (s/nilable ::b-coll))
+          :arg-two (s/cat :collection (s/nilable ::b-coll) :collection (s/nilable ::b-coll) :value any?))))
 (stest/instrument `clojure.core/get-in)
 
 #_(s/fdef clojure.core/var-get
@@ -231,99 +235,99 @@
 (s/fdef clojure.core/contains?
   :args (s/and ::b-length-two
     (s/alt :arg-one (s/cat :only-collection (s/alt :map (s/nilable map?) :set (s/nilable set?) :vector (s/nilable vector?) :lazy ::b-lazy) :any (s/nilable any?))
-          :arg-two (s/cat :string (s/nilable string?) :number (s/alt :number (s/nilable ::b-number) :lazy ::b-lazy)))))
+          :arg-two (s/cat :string (s/nilable ::b-string) :number (s/alt :number (s/nilable ::b-number) :lazy ::b-lazy)))))
 (stest/instrument `clojure.core/contains?)
 
 (s/fdef clojure.core/filter
   :args (s/and ::b-length-one-to-two
     ;; TODO: figure out if there is any reason for any-or-lazy
-    (s/or :arg-one (s/cat :function ::any-or-lazy :collection (s/nilable seqable?))
+    (s/or :arg-one (s/cat :function ::any-or-lazy :collection (s/nilable ::b-seqable))
           :arg-two (s/cat :function ::b-function-or-lazy))))
 (stest/instrument `clojure.core/filter)
 
 (s/fdef clojure.core/take
   :args (s/and ::b-length-one-to-two
           (s/or :arg-one (s/cat :number ::b-number-or-lazy)
-                :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?)))))
+                :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/take)
 
 (s/fdef clojure.core/take-nth
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :number ::b-number-or-lazy)
-          :arg-two (s/cat :number-greater-than-zero ::greater-than-zero :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :number-greater-than-zero ::greater-than-zero :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/take-nth)
 
 (s/fdef clojure.core/take-last
   :args (s/and ::b-length-one-to-two
-    (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?))))
+    (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable))))
 (stest/instrument `clojure.core/take-last)
 
 (s/fdef clojure.core/take-while
   :args (s/and ::b-length-one-to-two
         (s/or :arg-one (s/cat :function ::b-function-or-lazy)
-              :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?)))))
+              :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/take-while)
 
 (s/fdef clojure.core/drop
   :args (s/and ::b-length-one-to-two
         (s/or :arg-one (s/cat :number ::b-number-or-lazy)
-              :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?)))))
+              :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/drop)
 
 (s/fdef clojure.core/drop-last
   :args (s/and ::b-length-one-to-two
-               (s/alt :arg-one (s/cat :collection (s/nilable seqable?))
-                      :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?)))))
+               (s/alt :arg-one (s/cat :collection (s/nilable ::b-seqable))
+                      :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/drop-last)
 
 (s/fdef clojure.core/drop-while
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :function ::b-function-or-lazy)
-          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/drop-while)
 
 (s/fdef clojure.core/remove
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :function ::b-function-or-lazy)
-          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/remove)
 
 (s/fdef clojure.core/group-by
   :args (s/and ::b-length-two
-    (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?))))
+    (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable))))
 (stest/instrument `clojure.core/group-by)
 
 (s/fdef clojure.core/replace
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :map-or-vector (s/nilable ::b-map-vec-or-lazy))
-          :arg-two (s/cat :map-or-vector (s/nilable ::b-map-vec-or-lazy) :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :map-or-vector (s/nilable ::b-map-vec-or-lazy) :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/replace)
 
 (s/fdef clojure.core/keep
   :args (s/and ::b-length-one-to-two
     (s/or :arg-one (s/cat :function ::b-function-or-lazy)
-          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/keep)
 
 (s/fdef clojure.core/partition
   :args (s/and ::b-length-two-to-four
     (s/or
-      :arg-one (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?))
-      :arg-two (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :collection (s/nilable seqable?))
-      :arg-three (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :value any? :collection (s/nilable seqable?)))))
+      :arg-one (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable))
+      :arg-two (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :collection (s/nilable ::b-seqable))
+      :arg-three (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :value any? :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/partition)
 
 (s/fdef clojure.core/partition-by
   :args (s/and ::b-length-one-to-two
           (s/or :arg-one (s/cat :function ::b-function-or-lazy)
-                :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable seqable?)))))
+                :arg-two (s/cat :function ::b-function-or-lazy :collection (s/nilable ::b-seqable)))))
 (stest/instrument `clojure.core/partition-by)
 
 (s/fdef clojure.core/partition-all :args
   (s/and ::b-length-one-to-three
     (s/or :arg-one (s/cat :number ::b-number-or-lazy)
-          :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable seqable?))
-          :arg-three  (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :collection (s/nilable seqable?)))))
+          :arg-two (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable))
+          :arg-three  (s/cat :number ::b-number-or-lazy :number ::b-number-or-lazy :collection (s/nilable ::b-seqable)))))
 ;(stest/instrument `clojure.core/partition-all)
 
 (s/fdef clojure.string/split
@@ -342,30 +346,34 @@
                (s/or :number ::b-number :char char?)))
 #_(stest/instrument `clojure.core/int)
 
-(s/def ::innervector (s/cat :symbol symbol? :b (s/* (s/cat :key keyword :symbol-or-collection (s/or :symbol symbol?
-                                                                          :collection (s/nilable coll?))))))
-(s/def ::requiredlist (s/or :arg-one (s/cat :symbol (s/* symbol?))
-                            :arg-two (s/cat :symbol symbol? :vector (s/and vector? ::innervector))))
+;;;;;;;;;;;;;;;;; Our spec for macros ;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; TODO: need to revisit
+
+(s/def ::innervector (s/cat :symbol ::b-symbol :b (s/* (s/cat :key keyword :symbol-or-collection (s/or :symbol ::b-symbol
+                                                                          :collection (s/nilable ::b-coll))))))
+(s/def ::requiredlist (s/or :arg-one (s/cat :symbol (s/* ::b-symbol))
+                            :arg-two (s/cat :symbol ::b-symbol :vector (s/and vector? ::innervector))))
 (s/def ::requirelist (s/and list? ::requiredlist))
-(s/def ::requiredvector (s/or :arg-one (s/cat :symbol symbol?)
-                              :arg-two (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :b (s/or :symbol symbol?
-                                                                                                    :collection (s/nilable coll?)
+(s/def ::requiredvector (s/or :arg-one (s/cat :symbol ::b-symbol)
+                              :arg-two (s/cat :symbol ::b-symbol :b (s/* (s/cat :key keyword? :b (s/or :symbol ::b-symbol
+                                                                                                    :collection (s/nilable ::b-coll)
                                                                                                     :key keyword?))))
-                              :arg-three (s/cat :symbol symbol? :vector (s/and vector? ::innervector))))
+                              :arg-three (s/cat :symbol ::b-symbol :vector (s/and vector? ::innervector))))
 (s/def ::requirevector (s/and vector? ::requiredvector))
-(s/def ::importlists (s/and (s/nilable coll?) ::importlist))
-(s/def ::importlist (s/cat :a (s/+ (s/or :string string?
-                                         :symbol symbol?
+(s/def ::importlists (s/and (s/nilable ::b-coll) ::importlist))
+(s/def ::importlist (s/cat :a (s/+ (s/or :string ::b-string
+                                         :symbol ::b-symbol
                                          :class class?
                                          :quotelist ::quotelist))))
-(s/def ::quotelist (s/cat :a (s/+ (s/or :string string?
-                                        :symbol symbol?
+(s/def ::quotelist (s/cat :a (s/+ (s/or :string ::b-string
+                                        :symbol ::b-symbol
                                         :class class?))))
 
 #_(s/fdef clojure.core/require
   :args (s/and ::b-length-greater-zero
         (s/+ (s/cat :arg-one (s/or :list ::requirelist :vector ::requirevector :symbol symbol? :class class? :key keyword?)
-                    :arg-two (s/* (s/or :key keyword? :collection (s/nilable coll?)))))))
+                    :arg-two (s/* (s/or :key keyword? :collection (s/nilable ::b-coll)))))))
 #_(stest/instrument `clojure.core/require)
 
 #_(s/fdef clojure.core/use
@@ -376,7 +384,7 @@
 
 #_(s/fdef clojure.core/refer
   :args (s/and ::b-length-greater-zero
-               (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable coll?)))))))
+               (s/cat :symbol symbol? :b (s/* (s/cat :key keyword? :collection (s/* (s/nilable ::b-coll)))))))
 #_(stest/instrument `clojure.core/refer)
 
 (def specced-lookup (clojure.set/map-invert {'map map, 'filter filter, '+ +, 'even? even?, 'odd? odd?}))

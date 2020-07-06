@@ -124,7 +124,7 @@
            " instead."))))
 
 (defn third-party-spec
-  "Handles spce that's not from babel: takes the exc-data
+  "Handles spec that's not from babel: takes the exc-data
   and returns the message as a string."
   [unknown-ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
