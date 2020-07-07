@@ -165,7 +165,11 @@
    starts with :corefns.corefns"
   [probs]
   (let [p (sp/select [sp/ALL (sp/multi-path :via :pred)] probs)]
-        (sp/selected-any? [sp/ALL (sp/if-path vector? sp/ALL sp/STAY)  #(s/starts-with? (str %) BABEL-NS)] p)))
+        (sp/selected-any? [sp/ALL
+                           ;; Can handle a vector or a list of predicates or a single predicate:
+                           (sp/if-path seqable? sp/ALL sp/STAY)
+                           #(s/starts-with? (str %) BABEL-NS)]
+                          p)))
 
 
 (defn spec-message
