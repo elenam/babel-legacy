@@ -18,8 +18,10 @@
                 (def file-name "this file")
                 (:file (meta #'file-name)))))
 
-(expect (t/make-pattern "Tried to divide by zero"
-                        #"(.*)"
-                        "In file sample1.clj on line 12.")
+(expect (t/make-pattern "In (my-test-fn 3 4) the second argument 4 fails a requirement: clojure.core/string?")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                          (sample-test-files.third-party-spec/my-test-fn 3 4)"))
+
+(expect (t/make-pattern "In (my-test-fn \"a\" \"b\") the first argument \"a\" fails a requirement: clojure.core/int?")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn \"a\" \"b\")"))
