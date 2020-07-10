@@ -138,23 +138,36 @@
      (cond
        (= (:reason (first problem-list)) "Extra input")
           (str
-            "Extra input: 'In the "
-            fn-name
-            "call ("
+            "Wrong number of arguments in ("
             fn-name
             " "
             function-args-val
-            ") there were extra arguments'")
-       (= (:reason (first problem-list)) "Insufficient input")
+            "): the function "
+            fn-name
+            " requires fewer than "
+            (d/number-word (count args-val))
+            " arguments.")
+       (and (= (:reason (first problem-list)) "Insufficient input") (> (count args-val) 0))
           (str
-            "Insufficient input: 'In the "
-            fn-name
-            "call ("
+            "Wrong number of arguments in ("
             fn-name
             " "
             function-args-val
-            ") there were insufficient arguments'")
-       :else ;; "In (my-test-fn 3 4) the second argument 4 fails a requirement: clojure.core/string?"
+            "): the function "
+            fn-name
+            " requires more than "
+            (d/number-word (count args-val))
+            " arguments.")
+      (= (:reason (first problem-list)) "Insufficient input") ;; (= (count args-val) 0)
+         (str
+           "Wrong number of arguments in ("
+           fn-name
+           " "
+           function-args-val
+           "): the function "
+           fn-name
+           " cannot be called with no arguments.")
+       :else
           (str
             "In ("
             fn-name
@@ -162,9 +175,10 @@
             function-args-val
             ") the "
             (d/arg-str arg-number)
-            " "
-            print-val
-            " fails a requirement: "
+            ", which is "
+            print-type
+            (d/anon-fn-handling print-val)
+            ", fails a requirement: "
             pred))))
 
 (def BABEL-NS ":corefns.corefns")
