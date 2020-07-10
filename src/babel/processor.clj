@@ -126,13 +126,13 @@
 (defn third-party-spec
   "Handles spec that's not from babel: takes the exc-data
   and returns the message as a string."
-  [unknown-ex-data]
-  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
+  [ex-data]
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
         {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
          fn-name (d/get-function-name (str fn-full-name))
-         function-args-val (apply str (interpose " " (map d/anonymous->str (map #(second (d/type-and-val %)) args-val))))
+         function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
          arg-number (first in)
          [print-type print-val] (d/type-and-val val)]
      (cond
@@ -141,21 +141,30 @@
             "Extra input: 'In the "
             fn-name
             "call ("
-            fn-name function-args-val
+            fn-name
+            " "
+            function-args-val
             ") there were extra arguments'")
        (= (:reason (first problem-list)) "Insufficient input")
           (str
             "Insufficient input: 'In the "
             fn-name
             "call ("
-            fn-name function-args-val
+            fn-name
+            " "
+            function-args-val
             ") there were insufficient arguments'")
-       :else
+       :else ;; "In (my-test-fn 3 4) the second argument 4 fails a requirement: clojure.core/string?"
           (str
-            "Fails a predicate: 'The "
-            arg-number " argument of ("
-            fn-name function-args-val
-            ") fails a requirement: must be a "
+            "In ("
+            fn-name
+            " "
+            function-args-val
+            ") the "
+            (d/arg-str arg-number)
+            " "
+            print-val
+            " fails a requirement: "
             pred))))
 
 (def BABEL-NS ":corefns.corefns")

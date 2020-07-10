@@ -25,3 +25,7 @@
 (expect (t/make-pattern "In (my-test-fn \"a\" \"b\") the first argument \"a\" fails a requirement: clojure.core/int?")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn \"a\" \"b\")"))
+
+(expect (t/make-pattern "In (my-test-fn #(...) #(...)) the first argument #(...) fails a requirement: clojure.core/int?")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn #(+ %) #(+ %))"))
