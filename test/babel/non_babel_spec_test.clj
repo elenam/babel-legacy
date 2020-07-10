@@ -34,7 +34,7 @@
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn #(+ %) #(+ %))"))
 
-(expect (t/make-pattern "Wrong number of arguments in (my-test-fn 3 \"a\" 5): the function my-test-fn requires fewer than three arguments."
+(expect (t/make-pattern "Wrong number of arguments in (my-test-fn 3 \"a\" 5): the function my-test-fn requires fewer than three arguments.")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                          (sample-test-files.third-party-spec/my-test-fn 3 \"a\" 5)"))
 
