@@ -126,36 +126,59 @@
 (defn third-party-spec
   "Handles spec that's not from babel: takes the exc-data
   and returns the message as a string."
-  [unknown-ex-data]
-  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} unknown-ex-data
+  [ex-data]
+  (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
         {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
          fn-name (d/get-function-name (str fn-full-name))
-         function-args-val (apply str (interpose " " (map d/anonymous->str (map #(second (d/type-and-val %)) args-val))))
+         function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
          arg-number (first in)
          [print-type print-val] (d/type-and-val val)]
      (cond
        (= (:reason (first problem-list)) "Extra input")
           (str
-            "Extra input: 'In the "
+            "Wrong number of arguments in ("
             fn-name
-            "call ("
-            fn-name function-args-val
-            ") there were extra arguments'")
-       (= (:reason (first problem-list)) "Insufficient input")
+            " "
+            function-args-val
+            "): the function "
+            fn-name
+            " requires fewer than "
+            (d/number-word (count args-val))
+            " arguments.")
+       (and (= (:reason (first problem-list)) "Insufficient input") (> (count args-val) 0))
           (str
-            "Insufficient input: 'In the "
+            "Wrong number of arguments in ("
             fn-name
-            "call ("
-            fn-name function-args-val
-            ") there were insufficient arguments'")
+            " "
+            function-args-val
+            "): the function "
+            fn-name
+            " requires more than "
+            (d/number-word (count args-val))
+            " arguments.")
+      (= (:reason (first problem-list)) "Insufficient input") ;; (= (count args-val) 0)
+         (str
+           "Wrong number of arguments in ("
+           fn-name
+           " "
+           function-args-val
+           "): the function "
+           fn-name
+           " cannot be called with no arguments.")
        :else
           (str
-            "Fails a predicate: 'The "
-            arg-number " argument of ("
-            fn-name function-args-val
-            ") fails a requirement: must be a "
+            "In ("
+            fn-name
+            " "
+            function-args-val
+            ") the "
+            (d/arg-str arg-number)
+            ", which is "
+            print-type
+            (d/anon-fn-handling print-val)
+            ", fails a requirement: "
             pred))))
 
 (def BABEL-NS ":corefns.corefns")
