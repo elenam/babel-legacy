@@ -45,3 +45,7 @@
 (expect (t/make-pattern "Wrong number of arguments in (my-test-fn): the function my-test-fn cannot be called with no arguments.")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn)"))
+
+(expect (t/make-pattern "In (my-test-fn (1 2 3)) the first argument, which is a list (1 2 3), fails requirements: clojure.core/vector?, clojure.core/map?")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn2 '(1 2 3))"))

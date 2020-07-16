@@ -166,7 +166,7 @@
   (nth (re-matches #"(.*)/(.*)" mname) 2))
 
 (defn position-0-based->word
-  "number word takes a positive integer as a string and changes it to its
+  "Takes a non-negative integer as a number and changes it to its
   position (first, second, etc.) spelled out; 0 corresponds to 'first'."
   [n]
   (let [m (inc n)
@@ -184,9 +184,10 @@
 ;;; arg-str: non-negative integer as a string -> string
 (defn arg-str
   "arg-str takes a non-negative integer and matches it
-   to the corresponding argument number as a string, number as adjective"
+   to the corresponding argument number as a string, number as adjective."
   [n]
-  (str (position-0-based->word n) " argument"))
+  (str (position-0-based->word n)
+       " argument"))
 
 (defn number-word
   "number-word takes a non-negative integer as a string and changes it to a

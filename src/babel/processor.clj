@@ -57,7 +57,6 @@
                  :b-length-zero-to-one "zero or one arguments", :b-length-one-to-two "one or two arguments", :b-length-two-to-three "two or three arguments",
                  :b-length-two-to-four "two or up to four arguments", :b-length-one-to-three "one or up to three arguments", :b-length-zero-to-three "zero or up to three arguments"})
 
-;; TO-DO: check if this is used!
 (defn stringify
   "Takes a vector of keywords of failed predicates. If there is
   only one, returns the result of looking it up in spec-ref.
@@ -128,12 +127,14 @@
   and returns the message as a string."
   [ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
+        ;; need to group by :in
         {:keys [path pred val via in]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
          fn-name (d/get-function-name (str fn-full-name))
          function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
          arg-number (first in)
+         ;; Move the arg->str call (as needed) here
          [print-type print-val] (d/type-and-val val)]
      (cond
        (= (:reason (first problem-list)) "Extra input")
