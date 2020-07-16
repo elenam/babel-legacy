@@ -86,6 +86,15 @@
             (filter #(not (contains? % :reason))))
        problem-maps))
 
+(defn- multi-spec-fails->str
+  "Takes a list of spec failure problems and the :in path and returns
+   a string of failed predicates."
+  [probs in]
+  (->> probs
+      (sp/select [sp/ALL (sp/pred #(= (:in %) in)) :pred])
+      (s/join " or ")))
+
+
 (defn babel-spec-message
   "Takes ex-info data of our babel spec error, returns a modified message as a string"
   [ex-data]
@@ -127,14 +136,11 @@
   and returns the message as a string."
   [ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
-        ;; need to group by :in
-        {:keys [path pred val via in]} (-> problem-list
-                                           filter-extra-spec-errors
-                                           first)
+         filtered-probs (filter-extra-spec-errors problem-list)
+         {:keys [path pred val via in]} (first filtered-probs)
          fn-name (d/get-function-name (str fn-full-name))
          function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
          arg-number (first in)
-         ;; Move the arg->str call (as needed) here
          [print-type print-val] (d/type-and-val val)]
      (cond
        (= (:reason (first problem-list)) "Extra input")
@@ -168,7 +174,7 @@
            "): the function "
            fn-name
            " cannot be called with no arguments.")
-       :else
+       (= 1 (count filtered-probs))
           (str
             "In ("
             fn-name
@@ -180,7 +186,21 @@
             print-type
             (d/anon-fn-handling print-val)
             ", fails a requirement: "
-            pred))))
+            pred)
+         ;; if there are more errors with the same :in, pull all the pred names
+         :else
+           (str
+             "In ("
+             fn-name
+             " "
+             function-args-val
+             ") the "
+             (d/arg-str arg-number)
+             ", which is "
+             print-type
+             (d/anon-fn-handling print-val)
+             ", fails a requirement: "
+             (multi-spec-fails->str filtered-probs in)))))
 
 (def BABEL-NS ":corefns.corefns")
 
