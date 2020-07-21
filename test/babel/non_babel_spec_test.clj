@@ -42,10 +42,23 @@
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn 3)"))
 
-(expect (t/make-pattern "Wrong number of arguments in (my-test-fn): the function my-test-fn cannot be called with no arguments.")
+(expect (t/make-pattern "Wrong number of arguments in (my-test-fn ): the function my-test-fn cannot be called with no arguments.")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn)"))
 
-(expect (t/make-pattern "In (my-test-fn (1 2 3)) the first argument, which is a list (1 2 3), fails a requirement: clojure.core/vector? or clojure.core/map?")
+(expect (t/make-pattern "In (my-test-fn2 (1 2 3)) the first argument, which is a list (1 2 3), fails a requirement: clojure.core/vector? or clojure.core/map?")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn2 '(1 2 3))"))
+
+(expect (t/make-pattern "In (my-test-fn3 [8 9]) the first argument, which is a vector [8 9], fails a requirement: (clojure.core/fn [%] (clojure.core/> (clojure.core/count %) 2))")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn3 [8 9])"))
+
+(expect (t/make-pattern "In (my-test-fn4 #(...)) the first argument, which is an anonymous function, fails a requirement: (clojure.core/fn [%] (clojure.core/instance? java.lang.Double %))")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn4 #(+ %2))"))
+
+
+(expect (t/make-pattern "In (my-test-fn5 #(...)) the first argument, which is an anonymous function, fails a requirement: clojure.core/int?")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn5 #(+ %2))"))

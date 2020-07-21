@@ -34,3 +34,30 @@
 (sc/fdef my-test-fn2 :args (sc/cat :one (sc/or :vector vector? :map map?)))
 
 (stest/instrument `my-test-fn2)
+
+(defn my-test-fn3
+  [s]
+  (map str s))
+
+(sc/fdef my-test-fn3 :args (sc/cat :one (sc/and vector?  #(> (count %) 2))))
+
+(stest/instrument `my-test-fn3)
+
+
+(defn my-test-fn4
+  [n]
+  (+ n 6.7))
+
+(sc/fdef my-test-fn4 :args (sc/cat :one #(instance? java.lang.Double %)))
+
+(stest/instrument `my-test-fn4)
+
+(defn my-test-fn5
+  [n]
+  (+ n 6.7))
+
+(sc/def ::my-pred int?)
+
+(sc/fdef my-test-fn5 :args (sc/cat :one ::my-pred))
+
+(stest/instrument `my-test-fn5)
