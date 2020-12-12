@@ -62,8 +62,10 @@
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn5 #(+ %2))"))
 
+(expect (t/make-pattern "In (my-test-fn5 \"a\") the first argument, which is a string \"a\", fails a requirement: clojure.core/int?")
+(log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
+                        (sample-test-files.third-party-spec/my-test-fn6 [6 \"a\" 5]"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Testing line numbers & stacktrace ;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-                        

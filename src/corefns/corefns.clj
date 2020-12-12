@@ -51,9 +51,12 @@
 (defn b-not-0? [num] (not= num 0))
 (defn greater-than-zero? [number] (and (::b-number number)(< 0 number)))
 
+;#########Specific collections############
+
+(defn coll-not-map? [coll] (and (coll? coll) (not (map? coll))))
+(s/def ::b-coll-not-map coll-not-map?)
+
 ;#########Lazy functions############
-(defn not-map? [coll] (and (coll? coll) (not (map? coll))))
-(s/def ::b-not-map not-map?)
 
 (defn lazy? [lazy-sequence] (or (instance? clojure.lang.IChunkedSeq lazy-sequence)
                                 (instance? clojure.lang.IPending lazy-sequence)))
@@ -143,7 +146,7 @@
   :args (s/and ::b-length-zero-or-greater
                (s/or :any (s/cat :any (s/? (s/nilable any?))) ;conj with a single arg acts like identity
                      :map-arg (s/cat :collection-map map? :sequence (s/alt :map map? :vec (s/* (s/coll-of any? :kind vector? :count 2))))
-                     :collection (s/cat :collection (s/nilable ::b-not-map) :any (s/+ any?))
+                     :collection (s/cat :collection (s/nilable ::b-coll-not-map) :any (s/+ any?))
                     )))
 (stest/instrument `clojure.core/conj)
 
