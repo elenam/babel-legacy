@@ -61,3 +61,7 @@
 (sc/fdef my-test-fn5 :args (sc/cat :one ::my-pred))
 
 (stest/instrument `my-test-fn5)
+
+(defn my-test-fn6
+  [s]
+  (reduce + (map my-test-fn5 s)))

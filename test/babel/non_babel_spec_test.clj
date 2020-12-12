@@ -58,7 +58,12 @@
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn4 #(+ %2))"))
 
-
 (expect (t/make-pattern "In (my-test-fn5 #(...)) the first argument, which is an anonymous function, fails a requirement: clojure.core/int?")
 (log/babel-test-message "(load-file \"src/sample_test_files/third_party_spec.clj\")
                         (sample-test-files.third-party-spec/my-test-fn5 #(+ %2))"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; Testing line numbers & stacktrace ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+                        
