@@ -99,37 +99,39 @@
   "Takes ex-info data of our babel spec error, returns a modified message as a string"
   [ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
-        {:keys [path pred val via in]} (-> problem-list
+        {:keys [path pred val via in reason]} (-> problem-list
                                            filter-extra-spec-errors
                                            first)
         fn-name (d/get-function-name (str fn-full-name))
         function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
         arg-number (first in)
         [print-type print-val] (d/type-and-val val)]
-    (if (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-      (str "Wrong number of arguments in ("
-           fn-name
-           " "
-           function-args-val
-           "): the function "
-           fn-name
-           " expects "
-           (length-ref (keyword (d/get-function-name (str (first via)))))
-           " but was given "
-           (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))
-           (if (= (count val) 1) " argument." " arguments."))
-      (str "The "
-           (d/arg-str arg-number)
-           " of ("
-           fn-name
-           " "
-           function-args-val
-           ") was expected to be "
-           (stringify path)
-           " but is "
-           print-type
-           (d/anon-fn-handling print-val)
-           " instead."))))
+    (cond reason "babel specs are inconsistent, sorry" ; If the only spec contains :reason, this means that babel specs for length aren't set up right
+          (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
+                      (str "Wrong number of arguments in ("
+                           fn-name
+                           " "
+                           function-args-val
+                           "): the function "
+                           fn-name
+                           " expects "
+                           (length-ref (keyword (d/get-function-name (str (first via)))))
+                           " but was given "
+                           (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))
+                           (if (= (count val) 1) " argument." " arguments."))
+           :else
+                      (str "The "
+                           (d/arg-str arg-number)
+                           " of ("
+                           fn-name
+                           " "
+                           function-args-val
+                           ") was expected to be "
+                           (stringify path)
+                           " but is "
+                           print-type
+                           (d/anon-fn-handling print-val)
+                           " instead."))))
 
 (defn third-party-spec
   "Handles spec that's not from babel: takes the exc-data
