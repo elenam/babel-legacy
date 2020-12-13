@@ -261,7 +261,7 @@
 (stest/instrument `clojure.core/take-nth)
 
 (s/fdef clojure.core/take-last
-  :args (s/and ::b-length-one-to-two
+  :args (s/and ::b-length-two ; unlike other take/drop variants, doesn't have a 1-arity version
     (s/cat :number ::b-number-or-lazy :collection (s/nilable ::b-seqable))))
 (stest/instrument `clojure.core/take-last)
 

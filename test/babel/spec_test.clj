@@ -25,6 +25,9 @@
 (expect (t/make-pattern "Wrong number of arguments in (map ): the function map expects one or more arguments but was given no arguments.")
 (log/babel-test-message "(map)"))
 
+(expect (t/make-pattern "Wrong number of arguments in (take-last 5): the function take-last expects two arguments but was given one argument.")
+(log/babel-test-message "(take-last 5)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;Extra Output;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
