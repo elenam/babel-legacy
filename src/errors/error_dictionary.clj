@@ -25,6 +25,14 @@
                                            (get-type (nth matches 2)) ", but "
                                            (get-type (nth matches 1)) " was given instead.\n"))}
 
+    ;; Class cast exception phrasing in openjdk:
+    {:key :class-cast-exception-with-class
+     :class "ClassCastException"
+     :match (beginandend "class (\\S*) cannot be cast to class (\\S*)")
+     :fn (fn [matches] (str "Expected "
+                                          (get-type (nth matches 2)) ", but "
+                                          (get-type (nth matches 1)) " was given instead.\n"))}
+
     ;###################################
     ;### Illegal Argument Exceptions ###
     ;###################################
