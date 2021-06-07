@@ -65,7 +65,9 @@
 (s/def ::b-function-or-lazy (s/alt :function ifn? :lazy ::b-lazy))
 (s/def ::b-number-or-lazy (s/alt :num ::b-number :lazy ::b-lazy))
 (s/def ::b-string-or-lazy (s/alt :str ::b-string :lazy ::b-lazy))
-(s/def ::b-map-vec-or-lazy (s/alt :or (s/alt :map map? :vector vector?) :lazy ::b-lazy))
+;; We need s/or to combine the predicates; s/alt seem to be using 'apply'
+;; and checks the elements of the first arg, not the first arg itself: 
+(s/def ::b-map-vec-or-lazy (s/or :vector vector? :map map? :lazy ::b-lazy))
 (s/def ::any-or-lazy (s/alt :any any? :lazy ::b-lazy))
 (s/def ::greater-than-zero greater-than-zero?) ;; CHECK WHY THIS DOESN'T INCLUDE lazy
 (s/def ::b-not-zero-or-lazy (s/alt :num-non-zero (s/and ::b-number b-not-0?) :lazy ::b-lazy))
