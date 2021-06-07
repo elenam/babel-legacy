@@ -46,7 +46,7 @@
         (re-matches #"Invalid signature (.*) should be a (.*)" cause)))
 
 (def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
-                :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map-or-vector",
+                :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map or a vector",
                 :regex "a regular expression", :num-non-zero "a number that's not zero", :num "a number", :lazy "a lazy sequence"
                 :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs",
                 :number-greater-than-zero "a number that's greater than zero",
