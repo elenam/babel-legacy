@@ -183,6 +183,12 @@
 (expect (t/make-pattern "The first argument of (even? {[1 2 3...] 7, {8 9, 0 #(...)} 12}) was expected to be a number but is a map {[1 2 3...] 7, {8 9, 0 #(...)} 12} instead.")
 (log/babel-test-message "(even? {[1 2 3 4 5 6] 7 {8 9 0 #(+ %1 %2)} 12})"))
 
+(expect (t/make-pattern "The first argument of (keep [0, 0, 0, 0, 0] [0, 0, 0, 0, 0]) was expected to be a function but is an array [0, 0, 0, 0, 0] instead.")
+(log/babel-test-message "(def a (make-array Integer/TYPE 5)) (keep a a)"))
+
+(expect (t/make-pattern "The first argument of (even? [false, false]) was expected to be a number but is an array [false, false] instead.")
+(log/babel-test-message "(def a (make-array Boolean/TYPE 2)) (even? a)"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,5 +1,6 @@
 (ns errors.dictionaries
-  (:require [clojure.string :as s]
+  (:require
+            [clojure.string :as s]
             [com.rpl.specter :as sp]
             [corefns.corefns :as cf]))
 
@@ -364,6 +365,7 @@
       s
       (anonymous->str s)))
 
+
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
   of its type and readable value. Returns \"anonymous function\" as a value
@@ -383,6 +385,7 @@
         (instance? clojure.lang.LazySeq s) ["a sequence " (print-str s)]
         (map? s) [(get-dictionary-type s) (trim-map-to-n s (Math/ceil (/ n 2)))] ; passing the number of pairs for a map
         (coll? s) [(get-dictionary-type s) (trim-to-n s n)]
+        (.isArray (type s)) ["an array "  (s/trim (with-out-str (clojure.pprint/pprint s)))]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
