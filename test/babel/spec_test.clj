@@ -189,6 +189,15 @@
 (expect (t/make-pattern "The first argument of (even? [false, false]) was expected to be a number but is an array [false, false] instead.")
 (log/babel-test-message "(def a (make-array Boolean/TYPE 2)) (even? a)"))
 
+(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
+(log/babel-test-message "(even? (StringBuilder. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
+(log/babel-test-message "(even? (StringBuffer. \"a\"))"))
+
+(expect (t/make-pattern "The first argument of (even? <...>) was expected to be a number but is an object <...> instead.")
+(log/babel-test-message "(even? (Object.))"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;Second Argument;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -228,21 +237,12 @@
 (expect (t/make-pattern "The second argument of (map + 1) was expected to be a sequence but is a number 1 instead.")
 (log/babel-test-message "(map + (Byte. \"1\"))"))
 
-;; I am not sure how to print the object of an unknown type other than calling its toString
-;; Need another example!!!
-
 (expect (t/make-pattern "The second argument of (map + java.lang.Class) was expected to be a sequence but is a type java.lang.Class instead.")
 (log/babel-test-message "(map + (type (class 6)))"))
 
-(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
-(log/babel-test-message "(even? (StringBuilder. \"a\"))"))
-
-(expect (t/make-pattern "The first argument of (even? \"a\") was expected to be a number but is a string \"a\" instead.")
-(log/babel-test-message "(even? (StringBuffer. \"a\"))"))
-
-(expect (t/make-pattern "The first argument of (even? <...>) was expected to be a number but is an object <...> instead.")
-(log/babel-test-message "(even? (Object.))"))
-
+;; Enum printing: 
+(expect (t/make-pattern "The second argument of (map inc NEW) was expected to be a sequence but is a constant NEW instead.")
+(log/babel-test-message "(map inc (.getState (new java.lang.Thread)))"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

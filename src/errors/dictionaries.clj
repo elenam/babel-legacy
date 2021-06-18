@@ -386,6 +386,7 @@
         (map? s) [(get-dictionary-type s) (trim-map-to-n s (Math/ceil (/ n 2)))] ; passing the number of pairs for a map
         (coll? s) [(get-dictionary-type s) (trim-to-n s n)]
         (.isArray (type s)) ["an array "  (s/trim (with-out-str (clojure.pprint/pprint s)))]
+        (.isEnum (type s)) ["a constant "  (s/trim (.toString s))]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
