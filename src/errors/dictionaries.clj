@@ -359,12 +359,29 @@
 
 (defn anon-fn-handling
   "Takes a processed value and replaces anonymous functions in it, unless
-   the entire expression is 'an anonymous function'"
+   the entire expression is 'an anonymous function'."
   [s]
   (if (= s "an anonymous function")
       s
       (anonymous->str s)))
 
+(def java-packages ["java." "javax." "com.sun." "jdk." "netscape.javascript" "org.ietf." "org.w3c." "org.xml."])
+
+(defn- matching-prefix?
+  "Takes a package name and returns a truthy value if it starts with one of teh listed packages,
+  nil otherwise."
+  [st]
+  (filter #(s/starts-with? st %) java-packages))
+
+(defn- isJava?
+  "Takes a type and returns true if it's a Java (non-Clojure) type
+   and false otherwise."
+   [t]
+   (-> t
+       type
+       .getPackage
+       .getName
+       matching-prefix?))
 
 (defn type-and-val
   "Takes a value from a spec error, returns a vector
@@ -386,13 +403,14 @@
         (map? s) [(get-dictionary-type s) (trim-map-to-n s (Math/ceil (/ n 2)))] ; passing the number of pairs for a map
         (coll? s) [(get-dictionary-type s) (trim-to-n s n)]
         (.isArray (type s)) ["an array "  (s/trim (with-out-str (clojure.pprint/pprint s)))]
-        (.isEnum (type s)) ["a constant "  (s/trim (.toString s))]
+        (.isEnum (type s)) ["a constant "  (s/trim (str s))]
         :else (let [t (get-dictionary-type s)]
                    (cond
                          (is-specced-fn? s) ["a function " (str (specced-fn-name s))]
                          (and (= t "a function ") (= (get-function-name (str s)) "anonymous function"))
                               ["" "an anonymous function"]
                          (= t "a function ") [t (get-function-name (str s))]
+                         (and (re-find #"unrecognized type" t) (isJava? s)) [(str "a Java type ") (str s)]
                          (re-find #"unrecognized type" t) [t ""]
                          :else [t s])))))
 
