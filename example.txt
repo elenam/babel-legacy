@@ -1,3 +1,5 @@
+Adding a useless line to check access on new machine
+
 value of *e, spit
 clojure.lang.ExceptionInfo: Call to #'user/blipper did not conform to spec:
 val: (true) fails at: [:args] predicate: int?
