@@ -6,25 +6,32 @@
            [errors.dictionaries :as d]
            [clojure.core.specs.alpha]))
 
-;;an atom that record original error response
-(def recorder (atom {:msg [] :detail []}))
+(def recorder 
+  "An atom to record unmodified error messages and their details."
+  (atom {:msg [] :detail []}))
 
-(defn reset-recorder
-  "This function reset the recorder atom"
+;; NOTE: It's standard practice in Clojure to end function names
+;; with ! if they are "not safe in STM transactions," in our case
+;; if they are changing an atom's state.
+;; See: https://github.com/bbatsov/clojure-style-guide?tab=readme-ov-file#unsafe-functions
+
+(defn reset-recorder!
+  "Resets the recorder atom."
   []
   (reset! recorder {:msg [] :detail []}))
 
-(defn update-recorder-msg
-  "takes an unfixed error message, and put it into the recorder"
-  [inp-message]
-  (swap! recorder update-in [:msg] conj inp-message))
-  ;(swap! recorder assoc :msg inp-message))
+(defn update-recorder-msg!
+  "Takes an unmodified error message, and appends it to the recorder's message contents."
+  [input-message]
+  (swap! recorder update-in [:msg] conj input-message))
 
 (defn update-recorder-detail
-  "takes error message details, and put them into the recorder"
+  "Takes details of an unmodified error, and appends it to the recorder's detail contents."
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
+;; QUESTION: Do we need this function? All it does is wrap p-exc/process-errors.
+;; Are we adding anything to this in the future?
 (defn process-message
   "Takes a type and a message and returns a string based on the match found in error
   dictionary"
@@ -32,15 +39,15 @@
   (p-exc/process-errors t m))
 
 (defn macro-spec?
-  "Takes an exception cause and via. Returns a true value
-   if it's a spec error for a macro, a false value otherwise."
+  "Takes a \"cause\" string and a \"via\" vector from exception data. Returns 
+   true if the exception is a macro spec error."
   [cause via]
    (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
         (re-matches #"Call to (.*) did not conform to spec." cause)))
 
 (defn invalid-signature?
-  "Takes an exception cause and via. Returns a true value
-   if it's an invalid signature error, a false value otherwise."
+  "Takes a \"cause\" string and a \"via\" vector from exception data. Returns
+   true if the exception is an invalid signature error."
   [cause via]
    (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
         (re-matches #"Invalid signature (.*) should be a (.*)" cause)))
