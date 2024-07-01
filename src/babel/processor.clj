@@ -156,10 +156,11 @@
     (cond reason "babel specs are inconsistent, sorry",
     ;;    ^^^ If the only spec contains :reason, this means that babel 
     ;; specs for length aren't set up right... i.e., we shouldn't be here.  
-    ;; Do we need this...? 
+    ;; QUESTION: Do we need this...? 
 
           ;; Case: the spec relates to a babel/length predicate. In this case, the user
           ;; has entered the wrong number of arguments for the function.
+          ;; TODO: update the regex here to match namespace correctly. also, look into a better function
           (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
           (str "Wrong number of arguments in (" fn-name " " function-args-val "): "
                "the function " fn-name " expects "
@@ -253,7 +254,7 @@
              ", fails a requirement: "
              (multi-spec-fails->str filtered-probs in)))))
 
-(def BABEL-NS ":corefns.corefns")
+(def babel-ns ":corefns.corefns")
 
 (defn- babel-fn-spec?
   "Takes a list of spec problems, returns true if any of the :via or :pred
@@ -267,7 +268,7 @@
     (sp/selected-any? [sp/ALL
                        ;; Can handle a vector or a list of predicates or a single predicate:
                        (sp/if-path seqable? sp/ALL sp/STAY)
-                       #(s/starts-with? (str %) BABEL-NS)]
+                       #(s/starts-with? (str %) babel-ns)]
                       p)))
 
 
