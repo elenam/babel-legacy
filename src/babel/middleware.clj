@@ -1,13 +1,9 @@
-
 (ns babel.middleware
   (:require [babel.processor :as processor]
-            [errors.dictionaries :as d]
-            [errors.prettify-exception :as p-exc]
             [nrepl.middleware]
             [nrepl.middleware.caught]
             [clojure.repl]
-            [clojure.main :as cm :refer [ex-str ex-triage]]
-            [clojure.string :as s :refer [trim]])
+            [clojure.main :as cm])
   (:import nrepl.transport.Transport)
   (:gen-class))
 
@@ -17,14 +13,13 @@
   "applies processor/modify-errors to every response that emerges from the server"
   [handler]
   (fn [inp-message]
-    (let [transport (inp-message :transport)
-          sess (inp-message :session)]
+    (let [transport (inp-message :transport)]
           ;dummy (reset! track {:session sess})]
       (handler (assoc inp-message :transport
                       (reify Transport
-                        (recv [this] (.recv transport))
-                        (recv [this timeout] (.recv transport timeout))
-                        (send [this msg]     (.send transport msg))))))))
+                        (recv [_] (.recv transport))
+                        (recv [_ timeout] (.recv transport timeout))
+                        (send [_ msg]     (.send transport msg))))))))
 
 ;;sets the appropriate flags on the middleware so it is placed correctly
 (nrepl.middleware/set-descriptor! #'interceptor
@@ -35,6 +30,7 @@
   (cm/ex-str (cm/ex-triage (Throwable->map e))))
 
 (defn- modify-message
+  "-"
   [exc]
   (let [exc-type (class exc)
         {:keys [cause data via trace]} (Throwable->map exc)
@@ -79,6 +75,6 @@
           trace (processor/print-stacktrace %)
           _ (reset! track {:message (record-message %) :modified modified :trace trace})] ; for logging
     (println modified)
-    (if (not= trace "") (println trace))))))
+    (if (not= trace "") (println trace) ())))))
 
 (defn reset-track [] (reset! track {}))
