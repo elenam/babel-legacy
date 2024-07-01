@@ -17,9 +17,9 @@
           ;dummy (reset! track {:session sess})]
       (handler (assoc inp-message :transport
                       (reify Transport
-                        (recv [_] (.recv transport))
-                        (recv [_ timeout] (.recv transport timeout))
-                        (send [_ msg]     (.send transport msg))))))))
+                        (recv [_this] (.recv transport))
+                        (recv [_this timeout] (.recv transport timeout))
+                        (send [_this msg]     (.send transport msg))))))))
 
 ;;sets the appropriate flags on the middleware so it is placed correctly
 (nrepl.middleware/set-descriptor! #'interceptor
@@ -30,7 +30,7 @@
   (cm/ex-str (cm/ex-triage (Throwable->map e))))
 
 (defn- modify-message
-  "-"
+  "TODO: Write some great docstring explaining what all of this does."
   [exc]
   (let [exc-type (class exc)
         {:keys [cause data via trace]} (Throwable->map exc)

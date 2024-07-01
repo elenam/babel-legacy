@@ -111,6 +111,10 @@
    a string of failed predicates."
   [probs in]
   (->> probs
+       #_{:clj-kondo/ignore [:unresolved-var]}
+       ;; This code works. Some VS Code extensions might complain about sp/ALL
+       ;; being an "unresolved var" for whatever reason, likely due to the 
+       ;; naming conventions used in the specter import.
        (sp/select [sp/ALL (sp/pred #(= (:in %) in)) :pred])
        (s/join " or ")))
 
@@ -184,7 +188,7 @@
   [ex-data]
   (let [{problem-list :clojure.spec.alpha/problems fn-full-name :clojure.spec.alpha/fn args-val :clojure.spec.alpha/args} ex-data
          filtered-probs (filter-extra-spec-errors problem-list)
-         {:keys [path pred val via in]} (first filtered-probs)
+         {:keys [_path pred val _via in]} (first filtered-probs)
          fn-name (d/get-function-name (str fn-full-name))
          function-args-val (s/join " " (map d/non-macro-spec-arg->str args-val))
          arg-number (first in)
@@ -255,12 +259,16 @@
   "Takes a list of spec problems, returns true if any of the :via or :pred
    starts with :corefns.corefns"
   [probs]
-  (let [p (sp/select [sp/ALL (sp/multi-path :via :pred)] probs)]
-        (sp/selected-any? [sp/ALL
-                           ;; Can handle a vector or a list of predicates or a single predicate:
-                           (sp/if-path seqable? sp/ALL sp/STAY)
-                           #(s/starts-with? (str %) BABEL-NS)]
-                          p)))
+  #_{:clj-kondo/ignore [:unresolved-var]}
+  ;; This code works. Some VS Code extensions might complain about sp/ALL
+  ;; being an "unresolved var" for whatever reason, likely due to the 
+  ;; naming conventions used in the specter import.
+  (let [p (sp/select [sp/ALL (sp/multi-path :via :pred)] probs)] 
+    (sp/selected-any? [sp/ALL
+                       ;; Can handle a vector or a list of predicates or a single predicate:
+                       (sp/if-path seqable? sp/ALL sp/STAY)
+                       #(s/starts-with? (str %) BABEL-NS)]
+                      p)))
 
 
 (defn spec-message
@@ -330,7 +338,8 @@
    if all problems refer to the parameters and false otherwise"
    [problems]
    (let [via-lasts (distinct (map str (map last (map :via problems))))]
-        (and (not (empty? via-lasts)) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
+     ;; Usage of (seq? %) here is equivalent to (not (empty? %))
+     (and (seq via-lasts) (every? #(or (re-find #"param-list" %) (re-find #"param+body" %)) via-lasts))))
 
 (defn- let-macros
   "Takes parts of the spec message for let and related macros and returns an error message as a string"
