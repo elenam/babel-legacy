@@ -21,7 +21,7 @@
                         (recv [_this timeout] (.recv transport timeout))
                         (send [_this msg]     (.send transport msg))))))))
 
-;;sets the appropriate flags on the middleware so it is placed correctly
+;; sets the appropriate flags on the middleware so it is placed correctly
 (nrepl.middleware/set-descriptor! #'interceptor
                                                 {:expects #{"eval"} :requires #{} :handles {}})
 

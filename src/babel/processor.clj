@@ -6,14 +6,10 @@
            [errors.dictionaries :as d]
            [clojure.core.specs.alpha]))
 
+;; TODO: Look into removing this
 (def recorder 
   "An atom to record unmodified error messages and their details."
   (atom {:msg [] :detail []}))
-
-;; NOTE: It's standard practice in Clojure to end function names
-;; with ! if they are "not safe in STM transactions," in our case
-;; if they are changing an atom's state.
-;; See: https://github.com/bbatsov/clojure-style-guide?tab=readme-ov-file#unsafe-functions
 
 (defn reset-recorder!
   "Resets the recorder atom."
@@ -25,13 +21,13 @@
   [input-message]
   (swap! recorder update-in [:msg] conj input-message))
 
-(defn update-recorder-detail
+(defn update-recorder-detail!
   "Takes details of an unmodified error, and appends it to the recorder's detail contents."
   [inp-message]
   (swap! recorder update-in [:detail] conj inp-message))
 
-;; QUESTION: Do we need this function? All it does is wrap p-exc/process-errors.
-;; Are we adding anything to this in the future?
+;; TODO: Remove this and call p-exc/process-message directly where it is used,
+;; also rename the function to this in p-exc
 (defn process-message
   "Takes a type and a message and returns a string based on the match found in error
   dictionary"
@@ -52,17 +48,30 @@
    (and (= :macro-syntax-check (:clojure.error/phase (:data (first via))))
         (re-matches #"Invalid signature (.*) should be a (.*)" cause)))
 
-(def spec-ref {:number "a number", :collection "a sequence", :string "a string", :coll "a sequence",
-                :map-arg "a two-element-vector", :function "a function", :ratio "a ratio", :future "a future", :key "a key", :map-or-vector "a map or a vector",
-                :regex "a regular expression", :num-non-zero "a number that's not zero", :num "a number", :lazy "a lazy sequence"
-                :wrong-path "of correct type and length", :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs",
-                :number-greater-than-zero "a number that's greater than zero",
-                :collection-map "a sequence" :only-collection "a collection"})
+;; For use in the stringify function.
+;; These keywords are extracted from the :path of a spec failure 
+;; (keywords assoc.d with specs in s/or, s/cat, etc.)
+;; NOTE: We could probably condense this quite a bit with better conventions for kw'ing specs.
+;; Also, maybe this could be in a separate file?
+(def spec-ref {:number "a number", :num-non-zero "a number that's not zero"
+               :number-greater-than-zero "a number that's greater than zero"
+               :string "a string", :vector "a vector", :map "a map"
+               :collection "a sequence" :coll "a sequence" :collection-map "a sequence"
+               :map-arg "a two-element-vector"
+               :map-or-vector "a map or a vector"
+               :function "a function", :ratio "a ratio", :future "a future", :key "a key"
+               :regex "a regular expression",  :lazy "a lazy sequence"
+               :wrong-path "of correct type and length"
+               :sequence "a sequence of vectors with only 2 elements or a map with key-value pairs"
+               :only-collection "a collection"})
 
-(def length-ref {:b-length-one "one argument", :b-length-two "two arguments", :b-length-three "three arguments", :b-length-zero-or-greater "zero or more arguments",
-                 :b-length-greater-zero "one or more arguments", :b-length-greater-one "two or more arguments", :b-length-greater-two "three or more arguments",
-                 :b-length-zero-to-one "zero or one arguments", :b-length-one-to-two "one or two arguments", :b-length-two-to-three "two or three arguments",
-                 :b-length-two-to-four "two or up to four arguments", :b-length-one-to-three "one or up to three arguments", :b-length-zero-to-three "zero or up to three arguments"})
+;; Unqualified names for arity (argument count) specs are translated to readable string representations here.
+(def length-ref {:one "one argument", :two "two arguments", :three "three arguments",
+                 :zero-or-greater "zero or more arguments" :greater-than-zero "one or more arguments"
+                 :greater-than-one "two or more arguments", :greater-than-two "three or more arguments"
+                 :zero-to-one "zero or one arguments", :one-to-two "one or two arguments"
+                 :two-to-three "two or three arguments" :two-to-four "two or up to four arguments"
+                 :one-to-three "one or up to three arguments", :zero-to-three "zero or up to three arguments"})
 
 (defn stringify
   "Takes a vector of keywords of failed predicates. If there is
@@ -81,7 +90,7 @@
 
 (defn has-alpha-nil?
   "Takes a map of a key to a vector of paths,
-   returns logical true if :nil is present in the paths."
+   returns true if :nil is present in the paths."
   ;; Destructured map argument names the keyword ":keys", but this data is usually
   ;; coming from the ":path" binding... would it be helpful to rename this?
   [{:keys [path]}]
@@ -102,8 +111,9 @@
      (->> problem-maps
           (filter #(not (has-alpha-nil? %))) ;; ? I'd like to see an example
             ;; where the ex-data of a failing spec might contain :clojure.spec.alpha/nil in its path.
-          (filter #(not (contains? % :reason)))) ;; Why can't a problem-map contain a :reason key? Example?
-     
+          (filter #(not (contains? % :reason)))) ;; QUESTION: Why can't a problem-map contain a :reason key? Example?
+     ;; :reason keys just contain references to further-nested exceptions, in a way
+     ;; but you should look more into this by reading more ex-maps
      problem-maps))
 
 (defn- multi-spec-fails->str
@@ -111,10 +121,11 @@
    a string of failed predicates."
   [probs in]
   (->> probs
-       #_{:clj-kondo/ignore [:unresolved-var]}
        ;; This code works. Some VS Code extensions might complain about sp/ALL
-       ;; being an "unresolved var" for whatever reason, likely due to the 
+       ;; being an "unresolved var" for whatever reason, likely due to the
        ;; naming conventions used in the specter import.
+       ;; QUESTION: what to do about this? maybe look this up
+       #_{:clj-kondo/ignore [:unresolved-var]}
        (sp/select [sp/ALL (sp/pred #(= (:in %) in)) :pred])
        (s/join " or ")))
 
@@ -155,27 +166,31 @@
     
     (cond reason "babel specs are inconsistent, sorry",
     ;;    ^^^ If the only spec contains :reason, this means that babel 
-    ;; specs for length aren't set up right... i.e., we shouldn't be here.  
-    ;; QUESTION: Do we need this...? 
-
+    ;; specs for arity aren't set up right... i.e. we shouldn't be here.
+    ;; TODO: Look into trying to trigger this case, creating an inconsistent spec for arity
           ;; Case: the spec relates to a babel/length predicate. In this case, the user
           ;; has entered the wrong number of arguments for the function.
           ;; TODO: update the regex here to match namespace correctly. also, look into a better function
           (re-matches #"corefns\.corefns/b-length(.*)" (str pred))
-          (str "Wrong number of arguments in (" fn-name " " function-args-val "): "
-               "the function " fn-name " expects "
+          (str "Wrong number of arguments in (" 
+               fn-name 
+               " " 
+               function-args-val 
+               "): the function " 
+               fn-name 
+               " expects "
                (length-ref (keyword (d/get-function-name (str (first via)))))
                " but was given "
                (if (or (nil? val) (= (count val) 0)) "no" (d/number-word (count val)))
-               (if (= (count val) 1) " argument." " arguments.")),
+               (if (= (count val) 1) " argument." " arguments.")) 
           
           :else
-          (str "The "
-               (d/arg-str arg-number)
-               " of ("
-               fn-name
-               " "
-               function-args-val
+          (str "The " 
+               (d/arg-str arg-number) 
+               " of (" 
+               fn-name 
+               " " 
+               function-args-val 
                ") was expected to be "
                (stringify path)
                " but is "
@@ -254,11 +269,11 @@
              ", fails a requirement: "
              (multi-spec-fails->str filtered-probs in)))))
 
-(def babel-ns ":corefns.corefns")
+(def babel-ns ":babel")
 
 (defn- babel-fn-spec?
   "Takes a list of spec problems, returns true if any of the :via or :pred
-   starts with :corefns.corefns"
+   starts with :babel"
   [probs]
   #_{:clj-kondo/ignore [:unresolved-var]}
   ;; This code works. Some VS Code extensions might complain about sp/ALL
