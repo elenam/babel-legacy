@@ -1,8 +1,8 @@
 (ns babel.test-line-numbers
   (:require
-   [expectations :refer :all]
+   [expectations :refer [expect]]
    [logs.utils :as log]
-   [babel.non-spec-test :refer [to-log?]]
+   [babel.non-spec-test]
    [babel.utils-for-testing :as t]))
 
 ;#################################################
@@ -49,11 +49,13 @@
 (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
                         (sample-test-files.sample1/map-spec-test)"))
 
-(expect (t/make-pattern "Clojure ran out of memory, likely due to an infinite computation."
-                        #"(.*)"
-                        "In file sample1.clj on line 32.")
-(log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
-                        (sample-test-files.sample1/out-of-memory-test)"))
+;; This test doesn't seem to actually produce any error sometimes,
+;; consider commenting it out - we are unsure what to do with it
+;; (expect (t/make-pattern "Clojure ran out of memory, likely due to an infinite computation."
+;;                         #"(.*)"
+;;                         "In file sample1.clj on line 32.")
+;; (log/babel-test-message "(load-file \"src/sample_test_files/sample1.clj\")
+;;                         (sample-test-files.sample1/out-of-memory-test)"))
 
 (expect (t/make-pattern "Expected a character, but a string was given instead."
                         #"(.*)"

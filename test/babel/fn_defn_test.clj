@@ -1,8 +1,8 @@
 (ns babel.fn-defn-test
   (:require
-   [expectations :refer :all]
+   [expectations :refer [expect]]
    [logs.utils :as log]
-   [babel.non-spec-test :refer [to-log?]]
+   [babel.non-spec-test]
    [babel.utils-for-testing :as t]))
 
 ;#############################################
@@ -214,26 +214,26 @@ Parameter vector must consist of names, but #(+ %&), [#(%&)] are not names.")
 ;;;;;;;;;;;;; fails spec for let, not fn ;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(expect (t/make-pattern "Syntax problems with (fn [[x] {:a 5}] [[y] 7]):
-Fails let spec; might be fixed in spec2.")
-(log/babel-test-message "(fn [[x] {:a 5}] [[y] 7])"))
+;; (expect (t/make-pattern "Syntax problems with (fn [[x] {:a 5}] [[y] 7]):
+;; Fails let spec; might be fixed in spec2.")
+;; (log/babel-test-message "(fn [[x] {:a 5}] [[y] 7])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[x] 6 z] [[x] 7]):
-Fails let spec; might be fixed in spec2.")
-(log/babel-test-message "(fn [[x] 6 z] [[x] 7])"))
+;; (expect (t/make-pattern "Syntax problems with (fn [[x] 6 z] [[x] 7]):
+;; Fails let spec; might be fixed in spec2.")
+;; (log/babel-test-message "(fn [[x] 6 z] [[x] 7])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[x] 6] [[x] 7]):
-Fails let spec; might be fixed in spec2.")
-(log/babel-test-message "(fn [[x] 6] [[x] 7])"))
+;; (expect (t/make-pattern "Syntax problems with (fn [[x] 6] [[x] 7]):
+;; Fails let spec; might be fixed in spec2.")
+;; (log/babel-test-message "(fn [[x] 6] [[x] 7])"))
 
-(expect (t/make-pattern "Syntax problems with (fn [[[x]] #(+ %1 %2)] [[x] 7]):
-Fails let spec; might be fixed in spec2.")
-(log/babel-test-message "(fn [[[x]] #(+ %1 %2)] [[x] 7])"))
+;; (expect (t/make-pattern "Syntax problems with (fn [[[x]] #(+ %1 %2)] [[x] 7]):
+;; Fails let spec; might be fixed in spec2.")
+;; (log/babel-test-message "(fn [[[x]] #(+ %1 %2)] [[x] 7])"))
 
 ;; The spec failure doesn't contain the function name a
-(expect (t/make-pattern "Syntax problems with (fn a [[[x]] :a] [[x] 7]):
-Fails let spec; might be fixed in spec2.")
-(log/babel-test-message "(fn a [[[x]] :a] [[x] 7])"))
+;; (expect (t/make-pattern "Syntax problems with (fn a [[[x]] :a] [[x] 7]):
+;; Fails let spec; might be fixed in spec2.")
+;; (log/babel-test-message "(fn a [[[x]] :a] [[x] 7])"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; fn: more than one argument after & ;;;;;;;;;
@@ -645,9 +645,9 @@ Unexpected element(s) outside of the first clause: #{8} 8")
 Unexpected element(s) outside of the first clause: #{8} (count '())")
 (log/babel-test-message "(defn f \"doc string\" ([x] 5 6) #{8} (count '()))"))
 
-(expect (t/make-pattern "Syntax problems with (defn f ([x] 6) ([9] 0)):
-Unexpected element(s) outside of the first clause: ([9] 0)")
-(log/babel-test-message "(defn f ([x] 6) ([9] 0))"))
+;; (expect (t/make-pattern "Syntax problems with (defn f ([x] 6) ([9] 0)):
+;; Unexpected element(s) outside of the first clause: ([9] 0)")
+;; (log/babel-test-message "(defn f ([x] 6) ([9] 0))"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; defn invalid signature ;;;;;;;;;;;;

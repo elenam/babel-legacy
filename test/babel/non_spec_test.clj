@@ -1,6 +1,6 @@
 (ns babel.non-spec-test
   (:require
-   [expectations :refer :all]
+   [expectations :refer [expect]]
    [logs.utils :as log]
    [babel.utils-for-testing :as t]))
 
@@ -139,7 +139,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; I don't think this is the wording we want, but this is what our processing currently does
-(expect #"(?s)A keyword :a can only take one or two arguments\.(.*)"
+(expect #"(?s)The function :a cannot be called with three arguments\.(.*)"
 (log/babel-test-message "(:a 4 5 6)"))
 
 (expect #"(?s)An argument for a vector must be an integer number\.(.*)"

@@ -1,9 +1,9 @@
 (ns babel.spec-test
   (:require
     [logs.utils :as log]
-    [babel.non-spec-test :refer [to-log?]]
+    [babel.non-spec-test]
     [babel.utils-for-testing :as t]
-    [expectations :refer :all]))
+    [expectations :refer [expect]]))
 
 ;############################################
 ;### Tests for functions that have specs  ###

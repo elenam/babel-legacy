@@ -1,9 +1,9 @@
 (ns babel.test-stacktrace
   (:require
     [logs.utils :as log]
-    [babel.non-spec-test :refer [to-log?]]
+    [babel.non-spec-test]
     [babel.utils-for-testing :as t]
-    [expectations :refer :all]))
+    [expectations :refer [expect]]))
 
 ;############################################
 ;### Tests for functions that have specs  ###
@@ -25,8 +25,9 @@
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
                         "Call sequence:\n"
-                        "[divide (ns:clojure.lang.Numbers) called in file Numbers.java on line 188]\n"
-                        "[Clojure interactive session (repl)]"
+                        "[divide (ns:clojure.lang.Numbers) called in file Numbers.java on line "
+                        #"(\d+)" ; line number may vary due to difference in Java versions
+                        "]\n[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(/ 9 0)"))
 
@@ -51,8 +52,9 @@
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
                         "Call sequence:\n"
-                        "[+ (ns:clojure.core) called in file core.clj on line 984]\n"
-                        "[Clojure interactive session (repl)]"
+                        "[+ (ns:clojure.core) called in file core.clj on line "
+                        #"(\d+)"
+                        "]\n[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(+ (map #(/ 9 %) [9 0]))"))
 
@@ -60,8 +62,9 @@
 (expect (t/make-pattern "Expected a number, but a sequence was given instead."
                         #"(.*)"
                         "Call sequence:\n"
-                        "[add (ns:clojure.lang.Numbers) called in file Numbers.java on line 153]\n"
-                        "[Clojure interactive session (repl)]"
+                        "[add (ns:clojure.lang.Numbers) called in file Numbers.java on line "
+                        #"(\d+)"
+                        "]\n[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(+ 2 (map #(/ 9 %) [9 0]))"))
 
@@ -69,8 +72,9 @@
 (expect (t/make-pattern "Expected an integer number, but a sequence was given instead."
                         #"(.*)"
                         "Call sequence:\n"
-                        "[even? (ns:clojure.core) called in file core.clj on line 1391]\n"
-                        "[Clojure interactive session (repl)]"
+                        "[even? (ns:clojure.core) called in file core.clj on line "
+                        #"(\d+)"
+                        "]\n[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(even? (map inc [0 9]))"))
 
@@ -78,12 +82,16 @@
 (expect (t/make-pattern "Tried to divide by zero"
                         #"(.*)"
                         "Call sequence:\n"
-                        "[divide (ns:clojure.lang.Numbers) called in file Numbers.java on line 188]\n"
-                        "[An anonymous function called dynamically]\n"
-                        "[map (ns:clojure.core) called in file core.clj on line 2753]\n"
-                        "[str (ns:clojure.core) called in file core.clj on line 553]\n"
-                        "[even? (ns:clojure.core) called in file core.clj on line 1391]\n"
-                        "[Clojure interactive session (repl)]"
+                        "[divide (ns:clojure.lang.Numbers) called in file Numbers.java on line "
+                        #"(\d+)"
+                        "]\n[An anonymous function called dynamically]\n"
+                        "[map (ns:clojure.core) called in file core.clj on line "
+                        #"(\d+)"
+                        "]\n[str (ns:clojure.core) called in file core.clj on line "
+                        #"(\d+)"
+                        "]\n[even? (ns:clojure.core) called in file core.clj on line "
+                        #"(\d+)"
+                        "]\n[Clojure interactive session (repl)]"
                         #"(\s*)")
 (log/babel-test-message "(even? (map #(/ 9 %) [9 0]))"))
 
@@ -91,6 +99,7 @@
 ;################ Loaded from file #######################
 ;#########################################################
 
+;; Line numbers matter here. Don't touch the stack trace pattern
 (expect (t/make-pattern "The second argument of (map {} map) was expected to be a sequence but is a function map instead."
                         #"(.*)"
                         "Call sequence:\n"

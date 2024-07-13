@@ -1,6 +1,6 @@
 (ns babel.non-spec-macro-test
   (:require
-   [expectations :refer :all]
+   [expectations :refer [expect]]
    [logs.utils :as log]
    [babel.utils-for-testing :as t]))
 

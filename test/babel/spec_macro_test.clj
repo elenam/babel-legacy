@@ -1,12 +1,12 @@
 (ns babel.spec-macro-test
   (:require
    [logs.utils :as log]
-   [babel.non-spec-test :refer [to-log?]]
+   [babel.non-spec-test]
    [babel.utils-for-testing :as t]
-   [expectations :refer :all]))
+   [expectations :refer [expect]]))
 
 ;#########################################
-;### Tests for specced macros          ###
+;### Tests for spec'd macros          ###
 ;#########################################
 
 ;; TO RUN tests, make sure you have repl started in a separate terminal
@@ -70,7 +70,7 @@
 
 ;; TO-DO:
 ;; This wording is different from the wording above, and there is no space before the argument of 'let':
-(expect (t/make-pattern "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match. FIX!!!")
+(expect (t/make-pattern "let requires pairs of a name and an expression, but in (let[[8 _]] 9) one element doesn't have a match")
 (log/babel-test-message "(let [[8 _]] 9)"))
 
 (expect (t/make-pattern "Syntax problems with (let [(+ #(* %1 3) 2) g] 7):

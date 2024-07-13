@@ -1,9 +1,7 @@
 (ns babel.utils-test
   (:require
-    [errors.dictionaries :refer :all]
-    [logs.utils :as log]
-    [babel.processor :refer :all]
-    [expectations :refer :all]))
+    [errors.dictionaries :refer [print-macro-arg]]
+    [expectations :refer [expect]]))
 
 ;#########################################
 ;### Tests for utilties functions      ###

@@ -1,8 +1,8 @@
 (ns babel.test-print-eval
   (:require
-   [expectations :refer :all]
+   [expectations :refer [expect]]
    [logs.utils :as log]
-   [babel.non-spec-test :refer [to-log?]]
+   [babel.non-spec-test]
    [babel.utils-for-testing :as t]))
 
 ;#################################################
